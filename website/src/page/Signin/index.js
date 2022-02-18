@@ -2,7 +2,7 @@ import React from 'react'
 
 export default function Signin(){
     return(
-        <div>
+        <div className='container '>
             sdhks
         </div>
     )

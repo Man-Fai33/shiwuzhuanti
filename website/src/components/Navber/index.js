@@ -38,7 +38,7 @@ export default function NavBar() {
                     </div>
                     <Popover.Group as="nav" className="hidden justify-start items-center md:flex space-x-10">
                         {/* <Popover className="relative"> */}
-                        {/* sd */}
+                 
                         {/* {({ open }) => (
                                 <>
                                     <Popover.Button
@@ -103,7 +103,7 @@ export default function NavBar() {
                             )} */}
                         {/* </Popover> */}
 
-                        <a href="#" className="text-base font-medium text-gray-500 hover:text-gray-900">
+                        <a href="index" className="text-base font-medium text-gray-500 hover:text-gray-900">
                             Pricing
                         </a>
                         <a href="#" className="text-base font-medium text-gray-500 hover:text-gray-900">
