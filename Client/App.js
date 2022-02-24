@@ -11,12 +11,12 @@ const App = () => {
   const Stack = createNativeStackNavigator();
 
   return (
-    <ImagePathContext.Provider >
+    <ImagePathContext.Provider>
       <NavigationContainer>
         <Stack.Navigator>
           <Stack.Screen options={{ title: 'Index' }} name="Index" component={Index} />
-          <Stack.Screen options={{ title: 'Register' }} name="Register" component={Register} />
-          <Stack.Screen options={{ title: 'Login' }} name="Login" component={Login} />
+          {/* <Stack.Screen options={{ title: 'Register' }} name="Register" component={Register} />
+          <Stack.Screen options={{ title: 'Login' }} name="Login" component={Login} /> */}
         </Stack.Navigator>
       </NavigationContainer>
     </ImagePathContext.Provider>

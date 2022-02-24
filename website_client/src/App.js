@@ -1,35 +1,29 @@
-// import logo from './logo.svg';
-import React, { useState } from 'react'
-
-import './App.css';
-import "tailwindcss/tailwind.css"
+ import './App.css';
 import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
-import Index from './page/Index';
-import NavBar from './components/Navber';
-
+import Index from './Page/Index';
+import SignUp from './Page/SignUp';
 function App() {
-  const [userToken, setLogin] = useState(null)
-  const [userInfo, setUserInfo] = useState(null)
-
   return (
-    <div className="container">
+    <div className="App">
+
       {/* <UserInfoContext.Provider  > */}
       <BrowserRouter>
-        <NavBar>
-          {/* <NavBar setLogin={setLogin}> */}
-          {/* <NavBarItem to={"/upload"} text={"Upload PDF"} />
+        {/* <NavBar> */}
+        {/* <NavBar setLogin={setLogin}> */}
+        {/* <NavBarItem to={"/upload"} text={"Upload PDF"} />
           <NavBarItem to={"/pdflist"} text={"PDF List"} /> */}
-        </NavBar>
+        {/* </NavBar> */}
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/SignUp" element={<SignUp/>}/>
           {/* <Route path="upload" element={<UploadPage />} />
           <Route path="pdflist" element={<PDFListPage />} /> */}
         </Routes>
       </BrowserRouter>
       <Outlet />
       {/* </UserInfoContext.Provider> */}
-    </div>
 
+    </div>
   );
 }
 
