@@ -2,12 +2,14 @@
 import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
 import Index from './Page/Index';
 import SignUp from './Page/SignUp';
+import DrawerBar from './Compnonet/DrawerBar';
 function App() {
   return (
     <div className="App">
 
       {/* <UserInfoContext.Provider  > */}
       <BrowserRouter>
+      <DrawerBar/>
         {/* <NavBar> */}
         {/* <NavBar setLogin={setLogin}> */}
         {/* <NavBarItem to={"/upload"} text={"Upload PDF"} />

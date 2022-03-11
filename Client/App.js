@@ -1,27 +1,68 @@
+/**
+ * Sample React Native App
+ * https://github.com/facebook/react-native
+ *
+ * @format
+ * @flow strict-local
+ */
+
 import React from 'react';
+import { NativeBaseProvider } from 'native-base';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Index from './src/page/Index';
-import Login from './src/page/Login';
-import Register from './src/page/Register';
-export const ImagePathContext = React.createContext()
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+
+import Index from './src/Screens/Index';
+import SignInForm from './src/Screens/SignIn';
+import SignUpForm from './src/Screens/SignUp';
+import Footer from './src/compnonets/Footer';
+
+
+const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
+
+
+
 
 
 const App = () => {
-  const Stack = createNativeStackNavigator();
+  const routes = [
+    { name: 'Home', component: Index },
+    { name: 'SignIn', component: SignInForm },
+    { name: 'SignUp', component: SignUpForm },
+    // { name: 'SettingsPage', component: SettingsPage },
+    // { name: 'HistoryPage', component: History },
+    // { name: 'PractiseHome', component: PractiseIndex },
+    // { name: 'SubmitEval', component: SubmitIndex },
+    // { name: 'EvalResult', component: EvalResult },
+    // { name: 'EvalDetails', component: EvalDiff },
+  ];
+
 
   return (
-    <ImagePathContext.Provider>
+
+    <NativeBaseProvider
+      config={{ suppressColorAccessibilityWarning: true }}
+    // theme={Theme}
+    >
       <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen options={{ title: 'Index' }} name="Index" component={Index} />
-          {/* <Stack.Screen options={{ title: 'Register' }} name="Register" component={Register} />
-          <Stack.Screen options={{ title: 'Login' }} name="Login" component={Login} /> */}
+        <Stack.Navigator screenOptions={{ headerShown: false, }}>
+          {/* // screenOptions={{headerShown: false,}}>
+          // {routes.map(({ name, component }) => (
+          //   <Stack.Screen name={name} component={component} />
+          // ))} */}
+          <Stack.Screen name='Home' component={Index} />
+          <Stack.Screen name='SignIn' component={SignInForm} />
+          <Stack.Screen name='SignUp' component={SignUpForm} />
         </Stack.Navigator>
+        <Footer />
       </NavigationContainer>
-    </ImagePathContext.Provider>
+
+    </NativeBaseProvider>
+
+
+
   );
 };
-
 
 export default App;

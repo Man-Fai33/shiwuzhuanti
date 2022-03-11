@@ -1,9 +1,9 @@
 import React from 'react'
- 
+
 export default function Index() {
     return (
         <div>
-            <a href='/signup'> DLLM</a>
+            <a href="/signup"> DLLM</a>
         </div>
     )
 }
