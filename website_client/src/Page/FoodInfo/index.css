@@ -1,0 +1,25 @@
+.FoodDiv {
+    margin-top: 1rem;
+}
+
+.makeStyles-root-27 {
+    height: 60%;
+}
+
+.Foodbackground {
+    background-color: blanchedalmond;
+}
+
+.FoodType {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    width: 95%;
+    flex: auto;
+    
+    overflow-y: scroll;
+}
+
+.foodconnectImage {
+    width: 200px;
+    padding-left: 0.5rem;
+}

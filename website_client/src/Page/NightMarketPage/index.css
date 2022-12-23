@@ -1,0 +1,10 @@
+.nightMarketPage {
+    background-color: antiquewhite;
+}
+
+.NightMarketMap {
+    max-width: 95%;
+    height: 200px;
+    overflow-x: auto;
+    overflow-y: hidden;
+}

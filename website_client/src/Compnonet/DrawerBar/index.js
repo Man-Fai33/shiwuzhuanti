@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import clsx from 'clsx';
 import Avatar from '@mui/material/Avatar';
 import Tooltip from '@mui/material/Tooltip';
@@ -22,8 +22,14 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import MailIcon from '@material-ui/icons/Mail';
+import Select from '@mui/material/Select';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
 import Box from '@mui/material/Box';
+import { Button } from '@mui/material';
+import { FormattedMessage } from 'react-intl';
 const drawerWidth = 240;
+// import GTranslateIcon from '@mui/icons-material/GTranslate';
 
 
 
@@ -86,23 +92,31 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 export default function DrawerBar({ }) {
+
     const classes = useStyles();
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
+    const [lang, setLang] = useState("zh_TW");
+
+
     const handleDrawerOpen = () => {
         setOpen(true);
     };
-    const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+    const settings = ['Profile', 'Account', 'Logout'];
+    const settings_zh = [
+        { "PageName": 'Profile', "PagePath": "/profile" }
+        , { "PageName": 'Account', "PagePath": "/account" },
+        { "PageName": 'Logout', "PagePath": "/logout" }
+    ];
     const DrawerData = [
-        { 'drawerName': 'Inbox', 'drawerPath': '/' }
-        , { 'drawerName': 'Starred', 'drawerPath': '/signup' }
-        , { 'drawerName': 'Send email', 'drawerPath': '/' }
-        , { 'drawerName': 'Drafts', 'drawerPath': '/signup' }
+        { 'drawerName': '主頁', 'drawerPath': '/index' }
+        , { 'drawerName': '夜市列表', 'drawerPath': '/nightmarket' }
+        , { 'drawerName': '食物', 'drawerPath': '/Food' }
+        // , { 'drawerName': '市集', 'drawerPath': '/market' }
     ]
-
-    const DrawerData2 = [{ 'drawerName': 'All mail', 'drawerPath': '/' }
-        , { 'drawerName': 'Trash', 'drawerPath': '/signup' }
-        , { 'drawerName': 'Spam', 'drawerPath': '/' }
+    const DrawerData2 = [{ 'drawerName': '公告欄', 'drawerPath': '/bulletinBoard' }
+        , { 'drawerName': '網站地圖', 'drawerPath': '/' }
+        , { 'drawerName': '回饋', 'drawerPath': '/feedback' }
     ]
     const handleDrawerClose = () => {
         setOpen(false);
@@ -114,6 +128,7 @@ export default function DrawerBar({ }) {
         setAnchorElUser(null);
     };
     const [anchorElUser, setAnchorElUser] = React.useState(null);
+
 
     return (
         <div>
@@ -127,6 +142,7 @@ export default function DrawerBar({ }) {
                         [classes.appBarShift]: open,
                     })}
                 >
+
                     <Toolbar>
                         <IconButton
                             color="inherit"
@@ -138,10 +154,11 @@ export default function DrawerBar({ }) {
                             <MenuIcon />
                         </IconButton>
 
-                        <Typography variant="h6" noWrap>
-                            Persistent drawer
+                        <Typography variant="h6" component="div" noWrap>
+                            <a>夜市比較好走</a>
                         </Typography>
-                        <Box sx={{ flexGrow: 0 }}>
+                        <Box sx={{ flexGrow: 18 }} ></Box>
+                        <Box sx={{ flexGrow: 0 }} >
                             <Tooltip title="Open settings">
                                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                                     <Avatar alt="Remy Sharp" src={require('../../Img/Cat.jpg')} />
@@ -163,22 +180,49 @@ export default function DrawerBar({ }) {
                                 open={Boolean(anchorElUser)}
                                 onClose={handleCloseUserMenu}
                             >
-                                {settings.map((setting) => (
+                                {/* {settings.map((setting) => (
                                     <MenuItem key={setting} onClick={handleCloseUserMenu}>
                                         <Typography textAlign="center">{setting}</Typography>
                                     </MenuItem>
+                                ))} */}
+                                {settings_zh.map((setting) => (
+                                    <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                                        <a href={setting.PagePath} textAlign="center" >{setting.PageName}</a>
+                                    </MenuItem>
                                 ))}
                             </Menu>
+
+                        </Box>
+
+                        <Box sx={{ flexGrow: 0 }} >
+
+                            <FormControl >
+                                <InputLabel id="demo-simple-select-label">Language</InputLabel>
+                                <Select
+                                    labelId="demo-simple-select-label"
+                                    id="demo-simple-select"
+                                    value={lang}
+                                    label="Language"
+                                    onChange={(evt) => {
+                                        setLang(evt.target.value);
+                                    }}
+                                >
+                                    <MenuItem value="en">English</MenuItem>
+                                    <MenuItem value="zh_TW">中文</MenuItem>
+                                    {/* <MenuItem value="fr">Français</MenuItem> */}
+                                    {/* <MenuItem value="jp">日本語</MenuItem> */}
+
+                                </Select>
+                            </FormControl>
+
+                        </Box>
+                        {/* <Box sx={{ flexGrow: 1 }}></Box> */}
+                        <Box sx={{ flexGrow: 1 }} >
+                            <Button variant="contained" href='/signin'>
+                                <FormattedMessage id="app.signIn" defaultMessage={"Sign In"}></FormattedMessage>
+                            </Button>
                         </Box>
                     </Toolbar>
-
-
-
-
-
-
-
-
 
 
                 </AppBar>

@@ -1,0 +1,5 @@
+.BulletinBoard_Image {
+    object-fit: fill;
+    height: 200px;
+    width: fit-content;
+}

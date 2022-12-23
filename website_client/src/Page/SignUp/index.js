@@ -1,4 +1,5 @@
-import * as React from 'react';
+import React, { useState } from 'react';
+import { styled } from '@mui/material/styles';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -12,40 +13,137 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-
-function Copyright(props) {
-    return (
-        <Typography variant="body2" color="text.secondary" align="center" {...props}>
-            {'Copyright © '}
-            <Link color="inherit" href="https://mui.com/">
-                Your Website
-            </Link>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
-    );
-}
+import Switch from '@mui/material/Switch';
+import Stack from '@mui/material/Stack';
+import helper from '../Helper/helper';
 
 const theme = createTheme();
-
+const AntSwitch = styled(Switch)(({ theme }) => ({
+    width: 28,
+    height: 16,
+    padding: 0,
+    display: 'flex',
+    '&:active': {
+        '& .MuiSwitch-thumb': {
+            width: 15,
+        },
+        '& .MuiSwitch-switchBase.Mui-checked': {
+            transform: 'translateX(9px)',
+        },
+    },
+    '& .MuiSwitch-switchBase': {
+        padding: 2,
+        '&.Mui-checked': {
+            transform: 'translateX(12px)',
+            color: '#fff',
+            '& + .MuiSwitch-track': {
+                opacity: 1,
+                backgroundColor: theme.palette.mode === 'dark' ? '#177ddc' : '#1890ff',
+            },
+        },
+    },
+    '& .MuiSwitch-thumb': {
+        boxShadow: '0 2px 4px 0 rgb(0 35 11 / 20%)',
+        width: 12,
+        height: 12,
+        borderRadius: 6,
+        transition: theme.transitions.create(['width'], {
+            duration: 200,
+        }),
+    },
+    '& .MuiSwitch-track': {
+        borderRadius: 16 / 2,
+        opacity: 1,
+        backgroundColor:
+            theme.palette.mode === 'dark' ? 'rgba(255,255,255,.35)' : 'rgba(0,0,0,.25)',
+        boxSizing: 'border-box',
+    },
+}));
 export default function SignUp() {
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        // eslint-disable-next-line no-console
-        console.log({
-            email: data.get('email'),
-            password: data.get('password'),
-        });
-    };
+    // variable
+    const [uname, setUname] = useState("")
+    const [upassword, setUpassword] = useState("")
+    const [ugender, setUgender] = useState(false)
+    const [uphone, setUphone] = useState("")
+    const [ulocation, setUlocation] = useState("")
+    const [uemail, setUemail] = useState("")
+    const [error, setError] = useState("")
 
+    //handle variables on changed 
+
+    const handleEmail = (event) => {
+
+    }
+
+
+
+    const handleGender = (event) => {
+        event.preventDefault();
+        console.log(event.target.checked)
+        if (event.target.checked == false) {
+            setUgender(false);
+
+        } else {
+            setUgender(true);
+        }
+        console.log(ugender);
+    }
+
+
+
+
+
+
+    const handleSubmit = async e => {
+        e.preventDefault();
+        const data = new FormData(e.currentTarget);
+
+        // eslint-disable-next-line no-console
+        let user =
+        {
+            user: {
+                username: uname,
+                email: data.get('email'),
+                password: data.get('password'),
+                role: "visitor",
+                phone: uphone,
+                location: ulocation,
+                gender: ugender
+            }
+        }
+
+        if (data.get('email') === "" || upassword === "") {
+            setError("Username or Password is empty！");
+            alert(error);
+        } else {
+            let res = await helper.helper.AsyncUserCreate(user)
+            console.log(res)
+
+            if (res.status == "success") {
+                if (res.user.role == "Administrator") {
+                    // localStorage.setItem('user', JSON.stringify(res.user))
+                    // window.location.href = "/home";
+                    alert()
+                } else if ("visitor" == res.user.role) {
+                    // localStorage.clear();
+                    // window.location.href = "/";
+                    alert("you are just normal user, this is only for admin user");
+                }
+            } else {
+                // localStorage.clear();
+                alert("you input worng password or email");
+                // window.location.href = "/";
+            }
+        }
+
+    };
     return (
         <ThemeProvider theme={theme}>
             <Container component="main" maxWidth="xs">
                 <CssBaseline />
                 <Box
                     sx={{
-                        marginTop: 8,
+                        marginTop: 12,
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
@@ -59,35 +157,53 @@ export default function SignUp() {
                     </Typography>
                     <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
                         <Grid container spacing={2}>
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} >
                                 <TextField
                                     autoComplete="given-name"
-                                    name="firstName"
+                                    name="userName"
                                     required
                                     fullWidth
-                                    id="firstName"
-                                    label="First Name"
+                                    id="username"
+                                    label="Please Input Full User Name"
                                     autoFocus
+                                    onChange={(event) => {
+                                        setUname(event.target.value)
+                                        // console.log(event.target.value)
+                                    }}
                                 />
                             </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    required
-                                    fullWidth
-                                    id="lastName"
-                                    label="Last Name"
-                                    name="lastName"
-                                    autoComplete="family-name"
-                                />
-                            </Grid>
+
                             <Grid item xs={12}>
                                 <TextField
                                     required
                                     fullWidth
                                     id="email"
+                                    type="email"
                                     label="Email Address"
                                     name="email"
                                     autoComplete="email"
+                                />
+                            </Grid>
+                            <Grid item xs={12} >
+                                <TextField
+                                    required
+                                    fullWidth
+                                    id="phone"
+                                    label="Phone"
+                                    name="phone"
+                                    autoComplete="phone"
+                                    onChange={(event) => { setUphone(event.target.value) }}
+                                />
+                            </Grid>
+                            <Grid item xs={12} >
+                                <TextField
+                                    required
+                                    fullWidth
+                                    id="location"
+                                    label="Location"
+                                    name="location"
+                                    autoComplete="location"
+                                    onChange={(event) => { setUlocation(event.target.value) }}
                                 />
                             </Grid>
                             <Grid item xs={12}>
@@ -99,14 +215,30 @@ export default function SignUp() {
                                     type="password"
                                     id="password"
                                     autoComplete="new-password"
+                                    onChange={(event) => { setUpassword(event.target.value) }}
+
                                 />
                             </Grid>
+
                             <Grid item xs={12}>
+
+
+                                <Stack direction="row" spacing={1} alignItems="center">
+                                    Gender:
+
+                                    <Typography>Male</Typography>
+                                    <AntSwitch defaultValue={false} inputProps={{ 'aria-label': 'ant design' }} onChange={handleGender} />
+                                    <Typography>Female</Typography>
+
+                                </Stack>
+
+                            </Grid>
+                            {/* <Grid item xs={12}>
                                 <FormControlLabel
                                     control={<Checkbox value="allowExtraEmails" color="primary" />}
                                     label="I want to receive inspiration, marketing promotions and updates via email."
                                 />
-                            </Grid>
+                            </Grid> */}
                         </Grid>
                         <Button
                             type="submit"
@@ -118,14 +250,14 @@ export default function SignUp() {
                         </Button>
                         <Grid container justifyContent="flex-end">
                             <Grid item>
-                                <Link href="#" variant="body2">
+                                <Link href="/SignIn" variant="body2">
                                     Already have an account? Sign in
                                 </Link>
                             </Grid>
                         </Grid>
                     </Box>
                 </Box>
-                <Copyright sx={{ mt: 5 }} />
+
             </Container>
         </ThemeProvider>
     );

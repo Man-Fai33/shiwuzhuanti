@@ -1,0 +1,9 @@
+.Profile_div {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    width: auto;
+    height: auto;
+    border: 1px solid black;
+    padding-top: 2rem;
+    padding-bottom: 1rem;
+}

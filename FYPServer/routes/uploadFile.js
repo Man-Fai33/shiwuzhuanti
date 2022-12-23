@@ -1,0 +1,53 @@
+const express = require('express');
+const mongoose = require('mongoose');
+const router = express.Router();
+const Helper = require('../helper/helper');
+const asyncHandler = require('express-async-handler')
+const multer = require('multer')
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'public/images/')
+    },
+    filename: function (req, file, cb) {
+        const fileName = `${uuidv4()}${path.extname(file.originalname)}`
+        cb(null, fileName)
+    }
+})
+const imgUpload = multer({
+    fileSize: 10000000,
+    fileFilter(req, file, cb) {
+        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+            cb(new Error('Please upload an image'))
+        }
+        cb(null, true)
+    },
+    storage: storage
+})
+const singleImgUpload = imgUpload.single('img');
+
+const imgUploadHandler = (req, res, next) => {
+    singleImgUpload(req, res, function (err) {
+        if (err instanceof multer.MulterError) {
+            // A Multer error occurred when uploading.
+            next(err)
+        } else if (err) {
+            // An unknown error occurred when uploading.
+            next(err)
+        }
+        // Everything went fine.
+        next()
+    })
+}
+router.post('/', imgUploadHandler, asyncHandler(async function (req, res, next) {
+
+    const { file, body } = req;
+    console.log("file")
+    console.log(file)
+    console.log("body")
+    console.log(body)
+
+}));
+
+// router.post("/image", express.static(path.join(__dirname, "./public")));
+module.exports = router;
