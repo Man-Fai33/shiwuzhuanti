@@ -77,20 +77,8 @@ export default function Profile() {
     const handleSubmit = async e => {
         e.preventDefault();
 
-        const bodyJSON = new FormData();
-        bodyJSON.append('image', ImageIcon)
-        console.log(bodyJSON)
-        let url = URL.Url.UpLoad
-        let response = await fetch(url, {
-            method: 'POST',
-            body: bodyJSON
-        }).then(res => {
-            console.log(res)
-        })
-
-        let responseJson = await response.json();
-        console.log(responseJson)
-        return responseJson;
+        const data = new FormData();
+        data.append('Image', ImageIcon)
 
         // Object.keys(image).forEach(key => {
         //     data.append(image.item(key).name, image.item(key))
