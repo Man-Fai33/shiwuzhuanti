@@ -40,14 +40,21 @@ const imgUploadHandler = (req, res, next) => {
     })
 }
 router.post('/', imgUploadHandler, asyncHandler(async function (req, res, next) {
-
-    const { file, body } = req;
-    console.log("file")
-    console.log(file)
-    console.log("body")
-    console.log(body)
+    console.log(req)
+    const { file } = req;
+  
+    // res.json({path: `http://${req.get('host')}/images/${file.filename}`});
+    // console.log("file")
+    // console.log(file)
+    // console.log("body")
+    // console.log(body)
 
 }));
+// router.post('/', async (req, res, next) =>{
+//     console.log(req)
+//     const { files } = req.body;
+//     console.log(files)
+// })
 
 // router.post("/image", express.static(path.join(__dirname, "./public")));
 module.exports = router;

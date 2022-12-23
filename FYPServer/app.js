@@ -1,4 +1,4 @@
-
+var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
@@ -12,21 +12,31 @@ var checktoken = require('./checktoken');
 // const mongodb = require('mongodb').MongoClient;
 var mongoose = require('mongoose');
 const formData = require('express-form-data')
-
+const fileUpload = require('express-fileupload');
 //setting
 var morgan = require('morgan');
 require('dotenv').config();
 var config = require('./config');
-var express = require('express');
+
+
 const bodyParser = require('body-parser');
 
 var cors = require('cors')
 
+// Routers
+var indexRouter = require('./routes/index');
+var usersRouter = require('./routes/users');
+var uploadRouter = require('./routes/uploadFile');
+var foodRouter = require('./routes/food');
+var shopRouter = require('./routes/shop');
+var commentRouter = require('./routes/chat');
 
-var app = express();
 
-app.use(formData.parse())
-
+// app.use(formData.parse())
+// enable files upload
+// app.use(fileUpload({
+//   createParentPath: true
+// }));
 
 
 
@@ -34,7 +44,6 @@ mongoose.connect("mongodb+srv://CMF:" + process.env.MONGODB_PASS + "@cluster0.vs
   useUnifiedTopology: true,
   useNewUrlParser: true
 }, (error) => {
-
   if (error == null) {
     console.log("Server is connected");
   }
@@ -44,43 +53,35 @@ mongoose.connect("mongodb+srv://CMF:" + process.env.MONGODB_PASS + "@cluster0.vs
   }
 });
 
-
+var app = express();
 
 //allow other device access
 app.use(cors())
-// app.use((req, res, next) => {
-//   res.header('Access-Control-Allow-Origin', '*');
-//   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-//   if (req.method === 'OPTIONS') {
-//     res.header('Access-Control-Allow-Methods', 'PUT , POST, PATCH, DELETE , GET');
-//     return res.status(200).json({});
-//   }
-
-//   next();
-// })
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Methods', 'PUT , POST, PATCH, DELETE , GET');
+    return res.status(200).json({});
+  }
+  next();
+})
 
 
 //error handle
-app.use(morgan('dev'));
+
 // app.use('/uploads', express.static('uploads'));
-app.use(express.static('public'));
-app.set("view engine", "ejs")
+// app.use(express.static('public'));
+// app.set("view engine", "ejs")
 
 //body parser
-app.use(bodyParser.urlencoded({ limit: '50mb', extended: false, parameterLimit: 50000 }));
+// These must be placed under body parser!!!
+app.use(morgan('dev'));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true, parameterLimit: 50000 }));
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
-// These must be placed under body parser!!!
 
 
-// Routers
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var uploadRouter = require('./routes/uploadFile');
-var foodRouter = require('./routes/food');
-var shopRouter = require('./routes/shop');
-var commentRouter = require('./routes/chat');
-const { application } = require('express');
 
 
 app.use('/', indexRouter);
@@ -97,23 +98,6 @@ app.use('/comment', commentRouter);
 
 
 mongoose.Promise = global.Promise;
-
-
-
-
-
-
-
-// app.use(logger('dev'));
-// app.use(express.json());
-// app.use(express.urlencoded({ extended: false }));
-// app.use(cookieParser());
-
-// using
-
-
-// app.use(checktoken);
-// app.use('/check', check);
 
 
 
