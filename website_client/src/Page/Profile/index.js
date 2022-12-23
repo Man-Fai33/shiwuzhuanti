@@ -77,7 +77,7 @@ export default function Profile() {
     const handleSubmit = async e => {
         e.preventDefault();
 
-        const data = new FormData();
+        let data = new FormData();
         data.append('Image', ImageIcon)
 
         // Object.keys(image).forEach(key => {
