@@ -8,10 +8,6 @@ export const helper = {
             console.log(bodyJSON)
             let url = URL.Url.UpLoad
             let response = await fetch(url, {
-                headers: {
-                    Accept: 'application/json',
-                    'content-type': 'multipart/form-data; application/x-www-form-urlencoded; charset=UTF-8'
-                },
                 method: 'POST',
                 body: bodyJSON
             }).then(res => {
