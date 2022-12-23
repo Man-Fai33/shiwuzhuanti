@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { makeStyles } from '@material-ui/core/styles';
 import { Avatar, Button, Divider, Grid, Paper, Typography } from '@material-ui/core'
 import "./index.css"
-
+import URL from '../Helper/url';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -73,25 +73,31 @@ export default function Profile() {
     const handleCloseCPWD = () => {
         SetChangePwd(false);
     };
-    const ImageUpload = (event) => {
-        setImageIcon(event.target.files[0]);
-    }
 
     const handleSubmit = async e => {
         e.preventDefault();
 
+        const bodyJSON = new FormData();
+        bodyJSON.append('image', ImageIcon)
+        console.log(bodyJSON)
+        let url = URL.Url.UpLoad
+        let response = await fetch(url, {
+            method: 'POST',
+            body: bodyJSON
+        }).then(res => {
+            console.log(res)
+        })
 
-        const data = new FormData();
+        let responseJson = await response.json();
+        console.log(responseJson)
+        return responseJson;
 
-        let file = ImageIcon
-        console.log(file)
-        data.append("Image", file)
         // Object.keys(image).forEach(key => {
         //     data.append(image.item(key).name, image.item(key))
         // })
         let res = await helper.helper.AsyncUploadImage(data)
 
-        // console.log(res)
+        // let res = await helper.helper.AsyncUploadImage(ImageIcon)
 
     }
 
@@ -113,13 +119,13 @@ export default function Profile() {
                                     <Button variant='contained' size='small' component="label">
                                         Upload Image
 
-                                        <input hidden type="file" multiple accept="image/jpg,image/jpeg,image/png,image/gif" onChange={ImageUpload} />
+                                        <input hidden type="file" multiple name="image" accept="image/jpg,image/jpeg,image/png,image/gif" onChange={e => setImageIcon(e.target.files[0])} />
 
 
                                     </Button>
                                     <Button variant='contained' size='small' component="label">
                                         Sbmit
-                                        <input hidden type="submit" />
+                                        <input hidden onClick={handleSubmit} />
                                     </Button>
                                 </form>
                             </Box>

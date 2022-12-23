@@ -8,7 +8,7 @@ export const Url = {
     User: (HOST + "/users/user"),
     Food: (HOST, "/foods/food"),
     Shop: (HOST, "/shops/shop"),
-    UpLoad: (HOST + "/upload/"),
+    UpLoad: (HOST + "/upload"),
 
     // Viewimage: (HOST + "/binary/img/id/"),
     // Viewuser: (HOST + "/user/view/all"),
