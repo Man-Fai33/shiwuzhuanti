@@ -20,6 +20,9 @@ var config = require('./config');
 var express = require('express');
 const bodyParser = require('body-parser');
 
+var cors = require('cors')
+
+
 var app = express();
 
 app.use(formData.parse())
@@ -44,16 +47,17 @@ mongoose.connect("mongodb+srv://CMF:" + process.env.MONGODB_PASS + "@cluster0.vs
 
 
 //allow other device access
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  if (req.method === 'OPTIONS') {
-    res.header('Access-Control-Allow-Methods', 'PUT , POST, PATCH, DELETE , GET');
-    return res.status(200).json({});
-  }
+app.use(cors())
+// app.use((req, res, next) => {
+//   res.header('Access-Control-Allow-Origin', '*');
+//   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+//   if (req.method === 'OPTIONS') {
+//     res.header('Access-Control-Allow-Methods', 'PUT , POST, PATCH, DELETE , GET');
+//     return res.status(200).json({});
+//   }
 
-  next();
-})
+//   next();
+// })
 
 
 //error handle
@@ -63,7 +67,7 @@ app.use(express.static('public'));
 app.set("view engine", "ejs")
 
 //body parser
-app.use(bodyParser.urlencoded({limit: '50mb',  extended: false , parameterLimit: 50000 }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: false, parameterLimit: 50000 }));
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 // These must be placed under body parser!!!
@@ -75,7 +79,7 @@ var usersRouter = require('./routes/users');
 var uploadRouter = require('./routes/uploadFile');
 var foodRouter = require('./routes/food');
 var shopRouter = require('./routes/shop');
-var commentRouter =require('./routes/chat');
+var commentRouter = require('./routes/chat');
 const { application } = require('express');
 
 
@@ -85,7 +89,7 @@ app.use('/users', usersRouter);
 app.use('/upload', uploadRouter)
 app.use('/foods', foodRouter)
 app.use('/shops', shopRouter)
-app.use('/comment',commentRouter);
+app.use('/comment', commentRouter);
 
 
 
