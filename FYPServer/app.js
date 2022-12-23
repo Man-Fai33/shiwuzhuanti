@@ -48,8 +48,6 @@ mongoose.connect("mongodb+srv://CMF:" + process.env.MONGODB_PASS + "@cluster0.vs
   }
 });
 
-var app = express();
-
 //allow other device access
 app.use(cors())
 app.use((req, res, next) => {

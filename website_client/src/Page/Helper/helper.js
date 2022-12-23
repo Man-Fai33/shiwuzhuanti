@@ -4,17 +4,10 @@ export const helper = {
     //Upload Async
     AsyncUploadImage: async (image) => {
         try {
-
-            const bodyJSON = new FormData();
-
-            // const bodyJSON = ({
-            //     file: image
-            // })
-            bodyJSON.append('image', image)
             let url = URL.Url.UpLoad
             let response = await fetch(url, {
                 method: 'POST',
-                body: bodyJSON
+                body: image
             }).then(res => {
                 console.log(res)
             })

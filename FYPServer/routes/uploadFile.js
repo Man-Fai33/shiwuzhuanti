@@ -42,14 +42,11 @@ const imgUploadHandler = (req, res, next) => {
     })
 }
 router.post('/', imgUploadHandler, asyncHandler(async function (req, res, next) {
-    console.log(req)
     const { file } = req;
 
     // res.json({path: `http://${req.get('host')}/images/${file.filename}`});
     console.log("file")
     console.log(file)
-    console.log("body")
-    console.log(body)
 
 }));
 // router.post('/', async (req, res, next) =>{
