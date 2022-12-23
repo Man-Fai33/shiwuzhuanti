@@ -24,7 +24,7 @@ const imgUpload = multer({
     },
     storage: storage
 })
-const singleImgUpload = imgUpload.single('img');
+const singleImgUpload = imgUpload.single('Image');
 
 const imgUploadHandler = (req, res, next) => {
     singleImgUpload(req, res, function (err) {
