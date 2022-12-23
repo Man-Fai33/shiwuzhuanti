@@ -11,7 +11,7 @@ var checktoken = require('./checktoken');
 // const { MongoClient, ServerApiVersion } = require('mongodb');
 // const mongodb = require('mongodb').MongoClient;
 var mongoose = require('mongoose');
-const formData = require('express-form-data')
+// const formData = require('express-form-data')
 
 //setting
 var morgan = require('morgan');
@@ -25,10 +25,7 @@ var cors = require('cors')
 
 var app = express();
 
-app.use(formData.parse())
-
-
-
+// app.use(formData.parse())
 
 mongoose.connect("mongodb+srv://CMF:" + process.env.MONGODB_PASS + "@cluster0.vsbu5md.mongodb.net/" + process.env.MONGODB_NAME + "?retryWrites=true&w=majority", {
   useUnifiedTopology: true,
@@ -128,6 +125,7 @@ app.use((req, res, next) => {
 
 //send back error object as json
 app.use((error, req, res, next) => {
+  console.error(error);
   res.status(error.status || 500);
   res.json({
     error: {

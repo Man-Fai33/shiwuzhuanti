@@ -4,10 +4,12 @@ const router = express.Router();
 const Helper = require('../helper/helper');
 const asyncHandler = require('express-async-handler')
 const multer = require('multer')
+const { v4: uuidv4 } = require('uuid');
+const path = require('path')
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'public/images/')
+        cb(null, 'public/images/uploads')
     },
     filename: function (req, file, cb) {
         const fileName = `${uuidv4()}${path.extname(file.originalname)}`

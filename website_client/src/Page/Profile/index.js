@@ -79,7 +79,7 @@ export default function Profile() {
 
     const handleSubmit = async e => {
         e.preventDefault();
- 
+
 
         const data = new FormData();
 
@@ -89,7 +89,7 @@ export default function Profile() {
         // Object.keys(image).forEach(key => {
         //     data.append(image.item(key).name, image.item(key))
         // })
-        let res = await helper.helper.AsyncUploadImage(ImageIcon)
+        let res = await helper.helper.AsyncUploadImage(data)
 
         // console.log(res)
 
