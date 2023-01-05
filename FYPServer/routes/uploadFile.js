@@ -9,7 +9,7 @@ const path = require('path')
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'public/images/uploads')
+        cb(null, 'public/images')
     },
     filename: function (req, file, cb) {
         const fileName = `${uuidv4()}${path.extname(file.originalname)}`
@@ -44,7 +44,7 @@ const imgUploadHandler = (req, res, next) => {
 router.post('/', imgUploadHandler, asyncHandler(async function (req, res, next) {
     const { file } = req;
 
-    // res.json({path: `http://${req.get('host')}/images/${file.filename}`});
+    res.json({path: `http://${req.get('host')}/images/${file.filename}`});
     console.log("file")
     console.log(file)
 

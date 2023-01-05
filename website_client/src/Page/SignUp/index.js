@@ -4,8 +4,6 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
@@ -105,7 +103,7 @@ export default function SignUp() {
                 username: uname,
                 email: data.get('email'),
                 password: data.get('password'),
-                role: "visitor",
+                role: "user",
                 phone: uphone,
                 location: ulocation,
                 gender: ugender
@@ -120,15 +118,7 @@ export default function SignUp() {
             console.log(res)
 
             if (res.status == "success") {
-                if (res.user.role == "Administrator") {
-                    // localStorage.setItem('user', JSON.stringify(res.user))
-                    // window.location.href = "/home";
-                    alert()
-                } else if ("visitor" == res.user.role) {
-                    // localStorage.clear();
-                    // window.location.href = "/";
-                    alert("you are just normal user, this is only for admin user");
-                }
+                window.location.href = "/signin"
             } else {
                 // localStorage.clear();
                 alert("you input worng password or email");

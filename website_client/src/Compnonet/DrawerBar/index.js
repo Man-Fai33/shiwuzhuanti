@@ -26,10 +26,11 @@ import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import Box from '@mui/material/Box';
-import { Button } from '@mui/material';
+import { Button, Grid } from '@mui/material';
 import { FormattedMessage } from 'react-intl';
 const drawerWidth = 240;
 // import GTranslateIcon from '@mui/icons-material/GTranslate';
+
 
 
 
@@ -91,8 +92,13 @@ const useStyles = makeStyles((theme) => ({
         marginLeft: 0,
     },
 }));
-export default function DrawerBar({ }) {
 
+
+
+
+
+export default function DrawerBar({ }) {
+    const user = JSON.parse(localStorage.getItem('user'));
     const classes = useStyles();
     const theme = useTheme();
     const [open, setOpen] = React.useState(false);
@@ -106,7 +112,7 @@ export default function DrawerBar({ }) {
     const settings_zh = [
         { "PageName": 'Profile', "PagePath": "/profile" }
         , { "PageName": 'Account', "PagePath": "/account" },
-        { "PageName": 'Logout', "PagePath": "/logout" }
+        { "PageName": 'DataMangement', "PagePath": "/dataManagement" }
     ];
     const DrawerData = [
         { 'drawerName': '主頁', 'drawerPath': '/index' }
@@ -115,7 +121,6 @@ export default function DrawerBar({ }) {
         // , { 'drawerName': '市集', 'drawerPath': '/market' }
     ]
     const DrawerData2 = [{ 'drawerName': '公告欄', 'drawerPath': '/bulletinBoard' }
-        , { 'drawerName': '網站地圖', 'drawerPath': '/' }
         , { 'drawerName': '回饋', 'drawerPath': '/feedback' }
     ]
     const handleDrawerClose = () => {
@@ -130,6 +135,68 @@ export default function DrawerBar({ }) {
     const [anchorElUser, setAnchorElUser] = React.useState(null);
 
 
+
+    const isLogin = () => {
+        return (
+            <Box >
+                <Button variant="contained" href='/signin'  >
+                    <FormattedMessage id="app.signIn" defaultMessage={"Sign In"}></FormattedMessage>
+                </Button>
+            </Box>
+        )
+    }
+
+    const HandleSignOut = () => {
+        console.log(localStorage.getItem('user'))
+        localStorage.clear();
+        window.location.href = "/";
+    }
+
+    const SignOut = () => {
+        return (
+            <Box >
+                <Button variant="contained" onClick={HandleSignOut}  >
+                    <FormattedMessage id="app.signIn" defaultMessage={"Sign Out"}></FormattedMessage>
+                </Button>
+            </Box>
+        )
+    }
+    const getPermission = () => {
+        return (<Box>
+            <Tooltip title="Open settings">
+                <IconButton onClick={handleOpenUserMenu}  >
+                    <Avatar alt="Remy Sharp" src={localStorage.getItem('user') === null ? null : user.iconUrl} />
+                </IconButton>
+            </Tooltip>
+            <Menu
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
+            >
+                {/* {settings.map((setting) => (
+                <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                    <Typography textAlign="center">{setting}</Typography>
+                </MenuItem>
+            ))} */}
+                {settings_zh.map((setting) => (
+                    <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                        <a href={setting.PagePath} textAlign="center" >{setting.PageName}</a>
+                    </MenuItem>
+                ))}
+            </Menu>
+
+        </Box>)
+    }
     return (
         <div>
             <div className={classes.root}>
@@ -142,8 +209,7 @@ export default function DrawerBar({ }) {
                         [classes.appBarShift]: open,
                     })}
                 >
-
-                    <Toolbar>
+                    <Toolbar >
                         <IconButton
                             color="inherit"
                             aria-label="open drawer"
@@ -157,71 +223,35 @@ export default function DrawerBar({ }) {
                         <Typography variant="h6" component="div" noWrap>
                             <a>夜市比較好走</a>
                         </Typography>
-                        <Box sx={{ flexGrow: 18 }} ></Box>
-                        <Box sx={{ flexGrow: 0 }} >
-                            <Tooltip title="Open settings">
-                                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                    <Avatar alt="Remy Sharp" src={require('../../Img/Cat.jpg')} />
-                                </IconButton>
-                            </Tooltip>
-                            <Menu
-                                sx={{ mt: '45px' }}
-                                id="menu-appbar"
-                                anchorEl={anchorElUser}
-                                anchorOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
+
+
+
+
+                        {localStorage.getItem('user') === null ? null : getPermission()}
+
+
+                        <FormControl >
+                            <InputLabel id="demo-simple-select-label">Language</InputLabel>
+                            <Select
+                                labelId="demo-simple-select-label"
+                                id="demo-simple-select"
+                                value={lang}
+                                label="Language"
+                                onChange={(evt) => {
+                                    setLang(evt.target.value);
                                 }}
-                                keepMounted
-                                transformOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
-                                open={Boolean(anchorElUser)}
-                                onClose={handleCloseUserMenu}
                             >
-                                {/* {settings.map((setting) => (
-                                    <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                                        <Typography textAlign="center">{setting}</Typography>
-                                    </MenuItem>
-                                ))} */}
-                                {settings_zh.map((setting) => (
-                                    <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                                        <a href={setting.PagePath} textAlign="center" >{setting.PageName}</a>
-                                    </MenuItem>
-                                ))}
-                            </Menu>
+                                <MenuItem value="en">English</MenuItem>
+                                <MenuItem value="zh_TW">中文</MenuItem>
+                                {/* <MenuItem value="fr">Français</MenuItem>
+                            <MenuItem value="jp">日本語</MenuItem> */}
 
-                        </Box>
+                            </Select>
+                        </FormControl>
 
-                        <Box sx={{ flexGrow: 0 }} >
+                        {localStorage.getItem('user') === null ? isLogin() : SignOut()}
 
-                            <FormControl >
-                                <InputLabel id="demo-simple-select-label">Language</InputLabel>
-                                <Select
-                                    labelId="demo-simple-select-label"
-                                    id="demo-simple-select"
-                                    value={lang}
-                                    label="Language"
-                                    onChange={(evt) => {
-                                        setLang(evt.target.value);
-                                    }}
-                                >
-                                    <MenuItem value="en">English</MenuItem>
-                                    <MenuItem value="zh_TW">中文</MenuItem>
-                                    {/* <MenuItem value="fr">Français</MenuItem> */}
-                                    {/* <MenuItem value="jp">日本語</MenuItem> */}
 
-                                </Select>
-                            </FormControl>
-
-                        </Box>
-                        {/* <Box sx={{ flexGrow: 1 }}></Box> */}
-                        <Box sx={{ flexGrow: 1 }} >
-                            <Button variant="contained" href='/signin'>
-                                <FormattedMessage id="app.signIn" defaultMessage={"Sign In"}></FormattedMessage>
-                            </Button>
-                        </Box>
                     </Toolbar>
 
 

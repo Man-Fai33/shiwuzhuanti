@@ -1,6 +1,6 @@
 import Grid from '@mui/material/Unstable_Grid2';
 import { Box } from '@mui/system'
-import * as React from 'react';
+import React, { useState, useContext } from 'react';
 import IndexImage from '../../Img/yeshi.jpg'
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -9,18 +9,85 @@ import Typography from '@mui/material/Typography';
 import { CardActionArea } from '@mui/material';
 import { Paper } from '@material-ui/core';
 
+
+
+
+
 export default function Index() {
+
+
+
+    const managerBox = (user) => {
+
+        if (user.role === "manager") {
+
+            return (
+                <Box xs={12} mt={2} mb={1}>
+                    <Paper elevation={24}>
+                        <a
+                        href='/'
+                        >
+                            <Card sx={12}>
+                                <CardActionArea>
+                                    <CardMedia
+                                        component="img"
+                                        height="140px"
+                                        image='./Shop_management.jpg'
+                                        alt="green iguana"
+                                    />
+
+                                    < Box pl={2} pt={1}>
+                                        <Typography gutterBottom variant="h6" component="div">
+                                            店家管理
+                                        </Typography>
+                                    </Box>
+
+                                </CardActionArea>
+                            </Card>
+                        </a>
+                    </Paper>
+                </Box>
+            )
+        }
+        else {
+            return (
+                <Box xs={12} mt={2} mb={1} >
+                    <Paper elevation={24}>
+                        <a
+
+                        >
+                            <Card sx={12}>
+                                <CardActionArea>
+                                    <CardMedia
+                                        component="img"
+                                        height="140px"
+                                        image='./Shop_management.jpg'
+                                        alt="green iguana"
+                                    />
+
+                                    < Box pl={2} pt={1}>
+                                        <Typography gutterBottom variant="h6" component="div">
+                                            店家管理
+                                        </Typography>
+                                    </Box>
+
+                                </CardActionArea>
+                            </Card>
+                        </a>
+                    </Paper>
+                </Box>
+            )
+        }
+
+
+    }
     return (
         <Box >
-
-
-
             <Grid container spacing={6}>
                 <Grid xs={6} color="error" style={{ "backgroundColor": "white" }}  >
 
                 </Grid>
                 <Grid xs={6}  >
-
                     <Box xs={12} mt={2} mb={1}>
                         <Paper elevation={24}>
                             <a href="/Food">
@@ -67,30 +134,8 @@ export default function Index() {
                         </Paper>
                     </Box>
 
+                    {localStorage.getItem('user') === null ? null : managerBox(JSON.parse(localStorage.getItem('user')))}
 
-                    <Box xs={12} mt={2} mb={1}>
-                        <Paper elevation={24}>
-                            <a
-                            //  href="/signup"
-                            >
-                                <Card sx={12}>
-                                    <CardActionArea>
-                                        <CardMedia
-                                            component="img"
-                                            height="140px"
-                                            image='./Shop_management.jpg'
-                                            alt="green iguana"
-                                        />
-                                        <Box pl={2} pt={1}>
-                                            <Typography gutterBottom variant="h6" component="div">
-                                                店家管理
-                                            </Typography>
-                                        </Box>
-                                    </CardActionArea>
-                                </Card>
-                            </a>
-                        </Paper>
-                    </Box>
 
                     {/* <Box xs={12} mt={2} mb={1}>
                             <a href="/signup">
@@ -114,6 +159,6 @@ export default function Index() {
 
             </Grid>
 
-        </Box>
+        </Box >
     )
 }

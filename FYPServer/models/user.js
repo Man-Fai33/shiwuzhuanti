@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const Shop = require('../models/shop');
+
 const User = new mongoose.Schema({
     username: { type: String, required: true },
     email: { type: String, required: true, unique: true },
@@ -16,6 +17,7 @@ const User = new mongoose.Schema({
     location: String,
     gender: Boolean,
     date: Date,
-    shop: { type: Array, default: [] }
+    shop: { type: Array, default: [] },
+    iconUrl: { type: String, default: "" }
 });
 module.exports = mongoose.model('User', User);

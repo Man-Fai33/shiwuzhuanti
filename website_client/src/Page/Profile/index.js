@@ -3,7 +3,6 @@ import React, { useState } from 'react'
 import { makeStyles } from '@material-ui/core/styles';
 import { Avatar, Button, Divider, Grid, Paper, Typography } from '@material-ui/core'
 import "./index.css"
-import URL from '../Helper/url';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -11,9 +10,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
 //form
-import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
-import InputAdornment from '@mui/material/InputAdornment';
 import FormControl from '@mui/material/FormControl';
 import Input from '@mui/material/Input';
 import TextField from '@mui/material/TextField';
@@ -22,8 +19,7 @@ import helper from '../Helper/helper';
 
 
 import Cat from '../../Img/Cat.jpg'
-import { formatDate } from '@formatjs/intl';
-import { keys } from '@material-ui/core/styles/createBreakpoints';
+
 
 const useStyles = makeStyles((theme) => ({
 
@@ -34,6 +30,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Profile() {
+    const user = localStorage.getItem('user') === null ? null : JSON.parse(localStorage.getItem('user'));
+
     const [username, setusername] = useState("");
     const [usereamil, setusereamil] = useState("");
     const [userpermission, setuserpermission] = useState("");
@@ -41,30 +39,29 @@ export default function Profile() {
     const [userphone, setuserphone] = useState("");
     const [userlocation, setuserlocation] = useState("");
     const [userintroduction, setuserintroduction] = useState("");
+    const [oldpassowrd, setOldPassword] = useState("");
+    const [newpassword, setNewPassword] = useState("")
 
     const [changePwd, SetChangePwd] = React.useState(false);
     const [editUser, setEditUser] = React.useState(false);
     const [ImageIcon, setImageIcon] = useState(null);
     const handleClickEditUser = () => {
         setEditUser(true);
-        document.getElementById('id_username').removeAttribute('disabled')
-        document.getElementById('id_usereamil').removeAttribute('disabled')
-        document.getElementById('id_permission').removeAttribute('disabled')
-        document.getElementById('id_gender').removeAttribute('disabled')
-        document.getElementById('id_phone').removeAttribute('disabled')
-        document.getElementById('id_location').removeAttribute('disabled')
-        document.getElementById('id_userintroduction').removeAttribute('disabled')
-
+    }
+    const handleQuitEditUser = () => {
+        setEditUser(false);
     }
     const handleDoneEditUser = () => {
         setEditUser(false);
-        document.getElementById('id_username').setAttribute('disabled')
-        document.getElementById('id_usereamil').setAttribute('disabled')
-        document.getElementById('id_permission').setAttribute('disabled')
-        document.getElementById('id_gender').setAttribute('disabled')
-        document.getElementById('id_phone').setAttribute('disabled')
-        document.getElementById('id_location').setAttribute('disabled')
-        document.getElementById('id_userintroduction').setAttribute('disabled')
+
+        username !== "" ? alert(username) : console.log(username)
+        !usereamil.includes("@") ? alert(usereamil) : console.log(usereamil)
+        userpermission !== "" ? alert(userpermission) : console.log(userpermission)
+        usergender !== "" ? alert(usergender) : console.log(usergender)
+        userphone !== "" ? alert(userphone) : console.log(userphone)
+        userlocation !== "" ? alert(userlocation) : console.log(userlocation)
+        userintroduction !== "" ? alert(userintroduction) : console.log(userintroduction)
+
     }
     const handleClickCPWD = () => {
         SetChangePwd(true);
@@ -73,20 +70,33 @@ export default function Profile() {
     const handleCloseCPWD = () => {
         SetChangePwd(false);
     };
+    const handleDoneCPWD = () => {
+        SetChangePwd(false);
+        if (oldpassowrd !== "" && newpassword !== "") {
+            if (oldpassowrd === user.password) {
+                user.password = newpassword
+                
+
+            } else {
+                alert("舊密碼不符合")
+            }
+        } else {
+            alert("請輸入完整密碼")
+        }
+    }
+
 
     const handleSubmit = async e => {
         e.preventDefault();
 
         let data = new FormData();
         data.append('Image', ImageIcon)
-
-        // Object.keys(image).forEach(key => {
-        //     data.append(image.item(key).name, image.item(key))
-        // })
         let res = await helper.helper.AsyncUploadImage(data)
-
-        // let res = await helper.helper.AsyncUploadImage(ImageIcon)
-
+        user.iconUrl = res.path;
+        console.log(user.iconUrl)
+        let response = await helper.helper.AsyncUserEdit(user);
+        localStorage.setItem('user', JSON.stringify(response.user));
+        window.location.reload();
     }
 
     const classes = useStyles();
@@ -98,7 +108,7 @@ export default function Profile() {
                         <Grid item xs={12} sm={6}>
                             <Box className='Profile_Box' display="flex" justifyContent="center" p={2}>
                                 <Box className='Profile_Icon'>
-                                    <Avatar alt="Remy Sharp" src={Cat} className={classes.large} />
+                                    <Avatar alt="Remy Sharp" src={localStorage.getItem('user') === null ? null : user.iconUrl} className={classes.large} />
                                 </Box>
 
                             </Box>
@@ -128,12 +138,9 @@ export default function Profile() {
                                         <Input
                                             id="id_username"
                                             disabled
-                                            // value={values.amount}
-                                            // onChange={handleChange('amount')}
-                                            // startAdornment={<InputAdornment position="start"></InputAdornment>}
-                                            onChange={(event) => {
-                                                setusername(event.target.value)
-                                            }}
+                                            value={user.username}
+                                        // onChange={handleChange('amount')}
+                                        // startAdornment={<InputAdornment position="start"></InputAdornment>}
                                         />
 
                                     </FormControl>
@@ -143,14 +150,11 @@ export default function Profile() {
                                         <InputLabel htmlFor="outlined-adornment-amount">User Email</InputLabel>
                                         <Input
                                             id="id_usereamil"
-                                            // value={values.amount}
+                                            value={user.email}
                                             // onChange={handleChange('amount')}
                                             // startAdornment={<InputAdornment position="start"></InputAdornment>}
                                             disabled
                                             label="usereamil"
-                                            onChange={(event) => {
-                                                setusereamil(event.target.value)
-                                            }}
                                         />
                                     </FormControl>
                                 </Grid>
@@ -160,15 +164,11 @@ export default function Profile() {
                                         <InputLabel htmlFor="outlined-adornment-amount">User Permission</InputLabel>
                                         <Input
                                             id="id_permission"
-                                            // value={values.amount}
+                                            value={user.role}
                                             // onChange={handleChange('amount')}
                                             // startAdornment={<InputAdornment position="start"></InputAdornment>}
                                             disabled
                                             label="permission"
-                                            onChange={(event) => {
-                                                setuserpermission(event.target.value)
-                                            }}
-
                                         />
                                     </FormControl>
                                 </Grid>
@@ -177,14 +177,12 @@ export default function Profile() {
                                         <InputLabel htmlFor="outlined-adornment-amount">  User Gender</InputLabel>
                                         <Input
                                             id="id_gender"
-                                            // value={values.amount}
+                                            value={user.gender === true ? "Male" : "Female"}
                                             // onChange={handleChange('amount')}
                                             // startAdornment={<InputAdornment position="start"></InputAdornment>}
                                             disabled
                                             label="gender"
-                                            onChange={(event) => {
-                                                setusergender(event.target.value)
-                                            }}
+
                                         />
                                     </FormControl>
                                 </Grid>
@@ -196,14 +194,10 @@ export default function Profile() {
                                         <InputLabel htmlFor="outlined-adornment-amount"> User Phone</InputLabel>
                                         <Input
                                             id="id_phone"
-                                            // value={values.amount}
-                                            // onChange={handleChange('amount')}
-                                            // startAdornment={<InputAdornment position="start"></InputAdornment>}
+                                            value={user.phone}
                                             disabled
                                             label="phone"
-                                            onChange={(event) => {
-                                                setuserphone(event.target.value)
-                                            }}
+
                                         />
                                     </FormControl>
                                 </Grid>
@@ -212,14 +206,12 @@ export default function Profile() {
                                         <InputLabel htmlFor="outlined-adornment-amount"> User Location</InputLabel>
                                         <Input
                                             id="id_location"
-                                            // value={values.amount}
+                                            value={user.location}
                                             // onChange={handleChange('amount')}
                                             // startAdornment={<InputAdornment position="start"></InputAdornment>}
                                             disabled
                                             label="location"
-                                            onChange={(event) => {
-                                                setuserlocation(event.target.value)
-                                            }}
+
                                         />
                                     </FormControl>
                                 </Grid>
@@ -239,12 +231,10 @@ export default function Profile() {
                                 fullWidth
                                 rows={4}
                                 disabled
-                                // value={value}
+                                value={user.introduction}
                                 // onChange={handleChange}
                                 variant="filled"
-                                onChange={(event) => {
-                                    setuserintroduction(event.target.value)
-                                }}
+
                             />
 
                         </Box>
@@ -264,9 +254,139 @@ export default function Profile() {
 
                     </Grid>
 
+                    <Dialog
+                        open={editUser}
+                        onClose={handleCloseCPWD}
+                        aria-labelledby="alert-dialog-title"
+                        aria-describedby="alert-dialog-description"
+                    >
+                        <DialogTitle id="alert-dialog-title">{"改個人資料"}</DialogTitle>
+                        <Divider />
+                        <DialogContent>
+                            <DialogContentText id="alert-dialog-description">
+                                <Box pl={2} pr={2}>
 
 
+                                    <FormControl fullWidth variant="standard">
+                                        <InputLabel htmlFor="outlined-adornment-amount">User Name</InputLabel>
+                                        <Input
+                                            id="id_username"
+                                            placeholder={user.username}
 
+                                            // onChange={handleChange('amount')}
+                                            // startAdornment={<InputAdornment position="start"></InputAdornment>}
+                                            onChange={(event) => {
+                                                setusername(event.target.value)
+                                            }}
+                                        />
+
+                                    </FormControl>
+
+                                    <FormControl fullWidth variant="standard">
+                                        <InputLabel htmlFor="outlined-adornment-amount">User Email</InputLabel>
+                                        <Input
+                                            id="id_usereamil"
+                                            placeholder={user.email}
+                                            // onChange={handleChange('amount')}
+                                            // startAdornment={<InputAdornment position="start"></InputAdornment>}
+                                            type="email"
+                                            label="usereamil"
+                                            onChange={(event) => {
+                                                setusereamil(event.target.value)
+                                            }}
+                                        />
+                                    </FormControl>
+
+
+                                    <FormControl fullWidth variant="standard">
+                                        <InputLabel htmlFor="outlined-adornment-amount">User Permission</InputLabel>
+                                        <Input
+                                            id="id_permission"
+                                            placeholder={user.role}
+                                            // onChange={handleChange('amount')}
+                                            // startAdornment={<InputAdornment position="start"></InputAdornment>}
+
+                                            label="permission"
+                                            onChange={(event) => {
+                                                setuserpermission(event.target.value)
+                                            }}
+
+                                        />
+                                    </FormControl>
+
+                                    <FormControl fullWidth variant="standard">
+                                        <InputLabel htmlFor="outlined-adornment-amount">  User Gender</InputLabel>
+                                        <Input
+                                            id="id_gender"
+                                            placeholder={user.gender === true ? "Male" : "Female"}
+                                            // onChange={handleChange('amount')}
+                                            // startAdornment={<InputAdornment position="start"></InputAdornment>}
+
+                                            label="gender"
+                                            onChange={(event) => {
+                                                setusergender(event.target.value)
+                                            }}
+                                        />
+                                    </FormControl>
+
+                                    <FormControl fullWidth variant="standard">
+                                        <InputLabel htmlFor="outlined-adornment-amount"> User Phone</InputLabel>
+                                        <Input
+                                            id="id_phone"
+                                            placeholder={user.phone}
+                                            // onChange={handleChange('amount')}
+                                            // startAdornment={<InputAdornment position="start"></InputAdornment>}
+
+                                            label="phone"
+                                            onChange={(event) => {
+                                                setuserphone(event.target.value)
+                                            }}
+                                        />
+                                    </FormControl>
+
+                                    <FormControl fullWidth variant="standard">
+                                        <InputLabel htmlFor="outlined-adornment-amount"> User Location</InputLabel>
+                                        <Input
+                                            id="id_location"
+                                            placeholder={user.location}
+                                            // onChange={handleChange('amount')}
+                                            // startAdornment={<InputAdornment position="start"></InputAdornment>}
+
+                                            label="location"
+                                            onChange={(event) => {
+                                                setuserlocation(event.target.value)
+                                            }}
+                                        />
+                                    </FormControl>
+                                    <Box mt={2}>
+                                        <TextField
+                                            id="id_userintroduction"
+                                            label="User Introduction"
+                                            multiline
+                                            maxRows={4}
+                                            fullWidth
+                                            rows={4}
+
+
+                                            onChange={(event) => {
+                                                setuserintroduction(event.target.value)
+                                            }}
+                                        />
+                                    </Box>
+                                </Box>
+                            </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+
+                            <Button onClick={handleQuitEditUser} color="primary">
+                                退出
+                            </Button>
+                            <Button onClick={handleDoneEditUser} color="primary" autoFocus>
+                                更改
+                            </Button>
+                        </DialogActions>
+
+                    </Dialog>
 
 
                     <Dialog
@@ -283,36 +403,29 @@ export default function Profile() {
                                     <FormControl fullWidth variant="standard">
                                         <InputLabel htmlFor="outlined-adornment-amount">舊密碼</InputLabel>
                                         <Input
-                                            id="gender"
+                                            id="oldpassowrd"
                                             // value={values.amount}
                                             // onChange={handleChange('amount')}
                                             // startAdornment={<InputAdornment position="start"></InputAdornment>}
                                             // disabled
-                                            label="gender"
+                                            type='password'
+                                            label="oldpassowrd"
+                                            onChange={e => setOldPassword(e.target.value)}
                                         />
                                     </FormControl>
                                     <FormControl fullWidth variant="standard">
                                         <InputLabel htmlFor="outlined-adornment-amount">新密碼</InputLabel>
                                         <Input
-                                            id="gender"
+                                            id="password"
                                             // value={values.amount}
                                             // onChange={handleChange('amount')}
                                             // startAdornment={<InputAdornment position="start"></InputAdornment>}
-                                            // disabled
-                                            label="gender"
+                                            type='password'
+                                            label="password"
+                                            onChange={e => setNewPassword(e.target.value)}
                                         />
                                     </FormControl>
-                                    <FormControl fullWidth variant="standard">
-                                        <InputLabel htmlFor="outlined-adornment-amount">再輸入新密碼</InputLabel>
-                                        <Input
-                                            id="gender"
-                                            // value={values.amount}
-                                            // onChange={handleChange('amount')}
-                                            // startAdornment={<InputAdornment position="start"></InputAdornment>}
-                                            // disabled
-                                            label="gender"
-                                        />
-                                    </FormControl>
+
                                 </Box>
                             </DialogContentText>
                         </DialogContent>
@@ -321,11 +434,12 @@ export default function Profile() {
                             <Button onClick={handleCloseCPWD} color="primary">
                                 退出
                             </Button>
-                            <Button onClick={handleCloseCPWD} color="primary" autoFocus>
+                            <Button onClick={handleDoneCPWD} color="primary" autoFocus>
                                 更改
                             </Button>
                         </DialogActions>
                     </Dialog>
+
                 </Box>
             </Paper >
         </Box>

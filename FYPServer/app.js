@@ -4,9 +4,9 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 // var MongoClient = require('mongodb').MongoClient;
 
-var auth = require('./routes/auth');
-var check = require('./routes/check')
-var checktoken = require('./checktoken');
+// var auth = require('./routes/auth');
+// var check = require('./routes/check')
+// var checktoken = require('./checktoken');
 
 // const { MongoClient, ServerApiVersion } = require('mongodb');
 // const mongodb = require('mongodb').MongoClient;
@@ -24,13 +24,15 @@ const bodyParser = require('body-parser');
 var cors = require('cors')
 
 // Routers
-var indexRouter = require('./routes/index');
+
 var usersRouter = require('./routes/users');
 var uploadRouter = require('./routes/uploadFile');
 var foodRouter = require('./routes/food');
 var shopRouter = require('./routes/shop');
 var commentRouter = require('./routes/chat');
-
+var ImageRouter = require('./routes/images');
+var MarketRouter = require('./routes/market')
+var FeedBackRouter = require('./routes/feedback')
 var app = express();
 
 // app.use(formData.parse())
@@ -75,16 +77,15 @@ app.use(bodyParser.json({ limit: '50mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-
-
-app.use('/', indexRouter);
 app.use('/users', usersRouter);
 // app.use('/auth', auth);
 app.use('/upload', uploadRouter)
 app.use('/foods', foodRouter)
 app.use('/shops', shopRouter)
-app.use('/comment', commentRouter);
-
+app.use('/comment', commentRouter)
+app.use('/images', ImageRouter);
+app.use('/market', MarketRouter)
+app.use('/feedback', FeedBackRouter)
 
 
 

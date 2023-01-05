@@ -15,6 +15,10 @@ const Shop = new mongoose.Schema({
     isSale: { type: Boolean },
     rank: { type: Number, default: 0 },
     rating: { type: Number, default: 0 },
-    food: { type: Array, default: [] }
-}) 
-module.exports =  mongoose.model('Shop', Shop);
+    food: { type: Array, default: [] },
+    status: { type: String, default: "" }
+    // Possible values for role include the following:
+    // 1. "Application"
+    // 2. "Reject"
+})
+module.exports = mongoose.model('Shop', Shop);

@@ -1,5 +1,5 @@
 import { Box, Container, Typography, Link, Grid, CardActionArea } from '@mui/material';
-import React from 'react';
+import React, { useState } from 'react';
 import Card from '@mui/material/Card';
 import CardMedia from '@mui/material/CardMedia';
 import Paper from '@mui/material/Paper';
@@ -14,7 +14,85 @@ import CardContent from '@mui/material/CardContent';
 // import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 // import Typography from '@mui/material/Typography';
+import helper from '../Helper/helper';
+
+
+const handleNightPage = (id) => {
+    localStorage.setItem('nightID', id)
+
+    window.location.href = '/nightmarketpage'
+
+}
+
 export default function NightMarket() {
+    const [market, setMarket] = useState([])
+
+    const loadMarket = async () => {
+        let res = await helper.helper.AsyncMarketData();
+        setMarket(res.market)
+
+    }
+    React.useEffect(() => {
+        loadMarket()
+    }, [])
+
+
+    const ListMarket = () => {
+
+        return (
+            market.map((item, i) => {
+                return (
+                    <Box mt={4} mb={2}  >
+                        <Box mb={1}>
+                            <Card >
+                                <CardActionArea>
+                                    <CardMedia
+                                        component="img"
+                                        width="100%"
+
+                                        image={item.marketIcon}
+                                        sx={{ flex: 'auto', padding: "1rem 6rem  0 6rem", objectFit: "contain" }}
+                                        title="Contemplative Reptile"
+                                    />
+                                    <CardContent>
+
+                                        <Typography gutterBottom variant="h5" component="h2" >
+                                            {item.name}
+                                        </Typography>
+
+                                        <Typography variant="body2" color="textSecondary" component="p">
+                                            {item.brief}
+                                        </Typography>
+
+                                    </CardContent>
+
+                                </CardActionArea>
+
+                                <Box display="flex" justifyContent="flex-end">
+                                    <CardActions>
+                                        {/* <a href=''>
+                                    <Button size="small" color="primary">
+                                        打開地圖
+                                    </Button>
+                                </a> */}
+                                        {/* <a href='/nightmarketpage'> */}
+                                        <Button size="small" color="primary" onClick={e => handleNightPage(item._id)}>
+                                            資訊
+                                        </Button>
+                                        {/* </a> */}
+                                    </CardActions>
+                                </Box>
+
+                            </Card>
+                        </Box >
+
+                    </Box >
+                )
+            })
+        )
+    }
+
+
     const [selectedLocal, setSelectedLocal] = React.useState("all");
 
     const HandleAll = () => {
@@ -76,7 +154,7 @@ export default function NightMarket() {
                     </Grid>
                 </Grid>
             </Box>
-
+            {market !== null ? ListMarket() : null}
             <Box mt={4} mb={2}  >
                 <Box mb={1}>
                     <Card >

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, setState, createContext } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -13,6 +13,8 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import helper from '../Helper/helper';
+import UserContext from '../../Context/context';
+
 const theme = createTheme();
 
 
@@ -20,38 +22,47 @@ export default function SignIn() {
     const [error, setError] = useState("");
     const [useremail, setUseremail] = useState("");
     const [password, setpassowrd] = useState("");
-
+    const user = useContext(UserContext)
 
     const handleSubmit = async e => {
+
         e.preventDefault();
-        
         const data = new FormData(e.currentTarget);
-        // eslint-disable-next-line no-console
-        console.log({
-            email: data.get('email'),
-            password: data.get('password'),
-        });
-        if (data.get('email') === "" || password === "") {
+        if (!data.get('email').match("@")) {
+            alert("Please Input correct Mail form  " + "\n" + " XXX@xxx.com");
+        }
+        if (data.get('email') === "" || data.get('password') === "") {
             setError("Username or Password is empty！");
             alert(error);
         } else {
-            let res = await helper.helper.AsyncUserByEmailPass(data.get('email'), password)
-
+            let res = await helper.helper.AsyncUserByEmailPass(data.get('email'), data.get('password'))
 
             if (res.status == "success") {
-                if (res.user.role == "Administrator") {
-                    // localStorage.setItem('user', JSON.stringify(res.user))
-                    // window.location.href = "/home";
-                    alert( )
-                } else if ("Standard" == res.user.role) {
-                    localStorage.clear();
-                    window.location.href = "/";
-                    alert("you are just normal user, this is only for admin user");
+
+
+                localStorage.setItem('user', JSON.stringify(res.user));
+                // console.log(localStorage.getItem('user'))
+                // console.log(localStorage.getItem('user'));
+                // 1. "Visitor"
+                // 2. "User"
+                // 3. "Manager"
+                // 4. "Administrator"
+                if (res.user.role === "administrator") {
+                    alert("Welcome Administrator")
+                    window.location.href = "/index"
+                } else if ("manager" === res.user.role) {
+                    alert("Welcome Manager")
+                    window.location.href = "/index"
+                } else if ("user" === res.user.role) {
+                    alert("Welcome user")
+                    window.location.href = "/index"
                 }
+
+
             } else {
                 // localStorage.clear();
                 alert("you input worng password or email");
-                window.location.href = "/";
+                // window.location.href = "/";
             }
         }
 
@@ -85,6 +96,7 @@ export default function SignIn() {
                                     fullWidth
                                     id="email"
                                     label="Email Address"
+                                    type="email"
                                     name="email"
                                     autoComplete="email"
                                 />

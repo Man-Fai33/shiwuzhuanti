@@ -1,11 +1,45 @@
 import { Paper } from '@material-ui/core'
 import { Box } from '@mui/system'
-import React from 'react'
+import React, { useState } from 'react'
 import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import { Button } from '@mui/material';
+import helper from '../Helper/helper';
+
 export default function FeedBack() {
+    const [username, setUsername] = useState("");
+    const [phone, setPhone] = useState(0);
+    const [email, setEmail] = useState("");
+    const [opinion, setOpinion] = useState("");
+
+    const user = localStorage.getItem('user') !== "" ? JSON.parse(localStorage.getItem('user')) : null
+    console.log(user)
+    const handleSubmit = async () => {
+        if (email.includes('@') && email.includes('.')) {
+            if (username !== "" && phone !== 0 && email !== "" && opinion !== "") {
+
+                let isMember = user !== "" ? user._id : null;
+                let feedback = {
+                    feedback: {
+                        owner: username,
+                        contact: phone,
+                        email: email,
+                        opinion: opinion,
+                        isMember: isMember,
+                        date: null
+                    }
+                }
+                let res = await helper.helper.AsyncFeedbackCreate(feedback)
+                console.log(res)
+            } else {
+                alert("?")
+            }
+        } else {
+            alert("請輸入正確的電郵格式")
+        }
+    }
+
     return (
         <Box mt={2} mb={2}>
             <Paper elevation={24}>
@@ -21,16 +55,14 @@ export default function FeedBack() {
                         聯繫人：羅雅君<br />
                         熱線電話： A11008001<br />
                         24小時可以撥打此電話<br />
-                
+
                     </Box>
                     <Box>
                         <FormControl fullWidth sx={{ m: 1 }} variant="standard">
                             <InputLabel htmlFor="standard-adornment-amount">使用者名稱</InputLabel>
                             <Input
                                 id="standard-adornment-amount"
-                            // value={values.amount}
-                            // onChange={handleChange('amount')}
-                            // startAdornment={<InputAdornment position="start">店鋪名稱</InputAdornment>}
+                                onChange={e => setUsername(e.target.value)}
                             />
                         </FormControl>
                     </Box>
@@ -39,9 +71,9 @@ export default function FeedBack() {
                             <InputLabel htmlFor="standard-adornment-amount">聯絡電話</InputLabel>
                             <Input
                                 id="standard-adornment-amount"
-                            // value={values.amount}
-                            // onChange={handleChange('amount')}
-                            // startAdornment={<InputAdornment position="start">店鋪名稱</InputAdornment>}
+                                type="number"
+                                onChange={e => setPhone(e.target.value)}
+
                             />
                         </FormControl>
                     </Box>
@@ -50,9 +82,8 @@ export default function FeedBack() {
                             <InputLabel htmlFor="standard-adornment-amount">E-mail</InputLabel>
                             <Input
                                 id="standard-adornment-amount"
-                            // value={values.amount}
-                            // onChange={handleChange('amount')}
-                            // startAdornment={<InputAdornment position="start">店鋪名稱</InputAdornment>}
+                                type='email'
+                                onChange={e => setEmail(e.target.value)}
                             />
                         </FormControl>
                     </Box>
@@ -63,14 +94,12 @@ export default function FeedBack() {
                                 id="standard-adornment-amount"
                                 multiline
                                 rows={5}
-                            // value={values.amount}
-                            // onChange={handleChange('amount')}
-                            // startAdornment={<InputAdornment position="start">店鋪名稱</InputAdornment>}
+                                onChange={e => setOpinion(e.target.value)}
                             />
                         </FormControl>
                     </Box>
                     <Box display='flex' justifyContent='flex-end'>
-                        <Button variant='contained'>送出</Button>
+                        <Button variant='contained' onClick={handleSubmit}>送出</Button>
                     </Box>
                 </Box>
 

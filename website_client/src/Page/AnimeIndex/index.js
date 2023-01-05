@@ -3,6 +3,8 @@ import React from 'react'
 import IndexImage from '../../Img/yeshi.jpg'
 
 export default function AnimeIndex() {
+        
+
     return (
         <Box>
 
