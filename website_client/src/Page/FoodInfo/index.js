@@ -1,26 +1,62 @@
 import React, { useState } from 'react';
-import { Box, Card } from '@material-ui/core'
+import { Box  } from '@material-ui/core'
 import Paper from '@mui/material/Paper';
 import Rating from '@mui/material/Rating';
-import Cat from '../../Img/Cat.jpg'
-import Yeshi from '../../Img/yeshi.jpg'
-import neight from '../../Img/nightmarket.jpg'
-import MuiImageSlider from 'mui-image-slider';
-import { Button, Divider, Typography } from '@mui/material';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import IconButton, { IconButtonProps } from '@mui/material/IconButton';
+
+
+import { Button,Typography } from '@mui/material';
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
 import ImageListItemBar from '@mui/material/ImageListItemBar';
 import './index.css'
-const ImageLists = [
-    Yeshi,
-    neight,
-    Cat
-]
+import InfoIcon from '@mui/icons-material/Info';
+import helper from '../Helper/helper';
+
 
 export default function FoodInfo() {
     const [rating, setRating] = useState(0);
+    // const foodId = localStorage.getItem('foodId') !== "" ? localStorage.getItem('foodId') : null
+    const [food, setFood] = useState("")
+    const [shop, setShop] = useState([])
+    const user = localStorage.getItem('user') !== "" ? JSON.parse(localStorage.getItem('user')) : ""
+    const loadFood = async () => {
+
+        let res = await helper.helper.AsyncFoodOne(localStorage.getItem('foodId'));
+        setFood(res.food)
+        let resp = await helper.helper.AsyncShopData()
+        setShop(resp.shop)
+
+    }
+    React.useEffect(() => {
+        loadFood()
+    }, [])
+
+    const handleRating = async (newRating) => {
+        setRating(newRating)
+        let editfood = ({
+            ...food, rating: newRating
+        })
+        let res = await helper.helper.AsyncEditFood(user._id, editfood)
+        console.log(res.food)
+    }
+    const handleFavorite = () => {
+        let editfood = ({
+            ...food, isLike: user._id
+        })
+        console.log(food)
+    }
+    const readfoodType = (foodType) => {
+        return (
+            < Button variant="contained" color="success" > {foodType}</Button>
+        )
+    }
+    const handleclickShop = (id) => {
+
+        localStorage.setItem('shopId', id)
+        window.location.href = '/shop'
+    }
+
+
 
     return (
         <div className='FoodDiv'>
@@ -28,62 +64,94 @@ export default function FoodInfo() {
                 <Paper elevation={24} square={false}  >
 
                     <div className='Foodbackground'>
-                        <Box display='flex' justifyContent='flex-end'>
-                            <IconButton aria-label="add to favorites">
-                                <FavoriteIcon />
-                            </IconButton>
+
+                        {/* <Box display='flex' justifyContent='flex-end'>
+                            <IconButton aria-label="add to favorites" onClick={handleFavorite}>
+                                {user !== "" ?
+                                    console.log(food.isLike)
+                                    
+                                : <FavoriteBorderIcon />
+                                }
+
+                            </IconButton> */}
+                        {/* </Box> */}
+                        <Box className='FoodName' display="flex" justifyContent="center" mt={2} pt={2} pb={2}>
+                            <Typography variant="h3" >{food.foodName}</Typography>
                         </Box>
-                        <Box className='FoodName' display="flex" justifyContent="center" mt={2}>
-                            <Typography variant="h3" > FOOD IS BEST</Typography>
+                        <Box className='FoodPicture' display='flex' justifyContent="center" pl={8} pr={8}>
+                            {/* <MuiImageSlider  img={} /> */}
+                            <img src={food.foodIcon} />
                         </Box>
-                        <Box className='FoodPicture' display='flex' justifyContent="center">
-                            <MuiImageSlider images={ImageLists} />
-                        </Box>
-                        <Divider />
+
                         <Box pr={2} pl={2} pb={2} pt={2}>
                             <Box  >
-                                <Typography variant="subtitle1" >  小籠包是指傳統上用小竹蒸籠（小籠）蒸製的一種小包子,選用豬肉為餡，拌入雞湯凍再加入蟹粉或蝦仁或春筍。
-                                    <br />
-                                    Xiaolongbao refers to a type of small Chinese steamed bun (baozi) traditionally STEAMED in a small bamboo steaming basket (xiaolong). Normally filled with pork,  chicken soup jelly and other ingredients like crab powder or shrimp or bamboo shoots.</Typography>
+                                <Typography variant="subtitle1" >
+                                    {food.foodInfo}
+                                </Typography>
+                                <Typography variant="subtitle1" >
+                                    {food.foodInfoEN}
+                                </Typography>
                             </Box>
                             <Box display='flex' justifyContent='flex-end' mt={1} mb={1}>
-                                <Rating name="half-rating" defaultValue={0} value={rating} precision={0.5}
+                                {/* {console.log(food.rating)} */}
+                                <Rating name="half-rating" defaultValue={food.rating+1-1} value={food.rating+1-1} precision={0.5}
                                     onChange={(event, newRating) => {
-                                        setRating(newRating);
+                                        handleRating(newRating)
                                     }} />
                             </Box>
 
 
 
-                            <Paper>
-                                <Box p={1}> 食物的類型:</Box>
-                                <Divider />
-                                <Box display="flex" pt={1} pb={1}>
-                                    <Box pr={1} pl={1}> <Button variant="contained" color="success">nodd</Button></Box>
-                                    <Box pr={1} pl={1}> <Button variant="contained" color="success">nodd</Button></Box>
-                                    <Box pr={1} pl={1}> <Button variant="contained" color="success">nodd</Button></Box>
-                                    <Box pr={1} pl={1}> <Button variant="contained" color="success">nodd</Button></Box>
+                            <Paper elevation={12}>
+                                <Box pl={2} pt={2}> 食物的類型:</Box>
+
+                                <Box maxWidth="100%" display='flex' justifyContent='flex-start' sx={{ flexWrap: 'wrap' }} p={2} >
+                                    <Box pr={1} pl={1}>
+                                        {/* {food.foodType.map((item) => {
+
+                                            return (< Button variant="contained" color="success" > {item}</Button>)
+                                        })} */}
+                                        {food.foodType !== "" ? readfoodType(food.foodType) : < Button variant="contained" color="success" > 沒有適合的類型</Button>}
+                                    </Box>
+
                                 </Box>
                             </Paper>
 
                             <Box mt={2} pr={2} pl={2} color='#0000000'>
                                 <Box display='flex' justifyContent='flex-start' mr={1} >相關食店排名</Box>
                                 <Box display='flex' justifyContent='space-between' mt={2} mb={2}>
-                                    <ImageList sx={{ width: "100%", height: 200 }} variant='masonry'>
-                                        {itemData.map((item) => (
-                                            <a href=''>
-                                                <ImageListItem key={item.img} >
-                                                    <img
-                                                        src={`${item.img}?w=248&fit=crop&auto=format`}
-                                                        srcSet={`${item.img}?w=248&fit=crop&auto=format&dpr=2 2x`}
-                                                        alt={item.title}
-                                                        loading="lazy"
-                                                    />
-                                                    <ImageListItemBar
-                                                        title={item.title}
-                                                    />
-                                                </ImageListItem>
-                                            </a>
+                                    <ImageList sx={{ width: "100%", height: 270 }} variant='masonry'>
+                                        {shop.map((item) => (
+
+
+                                            <ImageListItem key={item.shopIcon} >
+                                                <img
+                                                    src={`${item.shopIcon}?w=248&fit=crop&auto=format`}
+                                                    srcSet={`${item.shopIcon}?w=248&fit=crop&auto=format&dpr=2 2x`}
+                                                    alt={item.shopName}
+                                                    loading="lazy"
+                                                />
+                                                <ImageListItemBar
+                                                    title={item.shopName}
+                                                    actionIcon={
+                                                        <Box mr={2}>
+
+                                                            <Button
+                                                                sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
+                                                                aria-label={`info about ${item.shopName}`}
+                                                                variant='contained'
+                                                                onClick={e => handleclickShop(item._id)}
+                                                            >
+                                                                <InfoIcon color="primary" />
+                                                                查看
+                                                            </Button>
+
+                                                        </Box>
+                                                    }
+
+                                                />
+                                            </ImageListItem>
+
                                         ))}
                                     </ImageList>
                                 </Box>
@@ -93,72 +161,10 @@ export default function FoodInfo() {
 
                     </div >
                 </Paper >
-            </Box>
+            </Box >
+
+           
 
         </div >
     )
 }
-const itemData = [
-    {
-        img: 'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e',
-        title: 'Breakfast',
-        author: '@bkristastucchio',
-        featured: true,
-    },
-    {
-        img: 'https://images.unsplash.com/photo-1551782450-a2132b4ba21d',
-        title: 'Burger',
-        author: '@rollelflex_graphy726',
-    },
-    {
-        img: 'https://images.unsplash.com/photo-1522770179533-24471fcdba45',
-        title: 'Camera',
-        author: '@helloimnik',
-    },
-    {
-        img: 'https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c',
-        title: 'Coffee',
-        author: '@nolanissac',
-    },
-    {
-        img: 'https://images.unsplash.com/photo-1533827432537-70133748f5c8',
-        title: 'Hats',
-        author: '@hjrc33',
-    },
-    {
-        img: 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62',
-        title: 'Honey',
-        author: '@arwinneil',
-        featured: true,
-    },
-    {
-        img: 'https://images.unsplash.com/photo-1516802273409-68526ee1bdd6',
-        title: 'Basketball',
-        author: '@tjdragotta',
-    },
-    {
-        img: 'https://images.unsplash.com/photo-1518756131217-31eb79b20e8f',
-        title: 'Fern',
-        author: '@katie_wasserman',
-    },
-    {
-        img: 'https://images.unsplash.com/photo-1597645587822-e99fa5d45d25',
-        title: 'Mushrooms',
-        author: '@silverdalex',
-    },
-    {
-        img: 'https://images.unsplash.com/photo-1567306301408-9b74779a11af',
-        title: 'Tomato basil',
-        author: '@shelleypauls',
-    },
-    {
-        img: 'https://images.unsplash.com/photo-1471357674240-e1a485acb3e1',
-        title: 'Sea star',
-        author: '@peterlaster',
-    },
-    {
-        img: 'https://images.unsplash.com/photo-1589118949245-7d38baf380d6',
-        title: 'Bike',
-        author: '@southside_customs',
-    },
-];

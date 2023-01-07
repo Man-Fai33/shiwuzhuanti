@@ -1,31 +1,19 @@
-import { Paper } from '@material-ui/core'
-import { Box } from '@mui/material'
-import React from 'react'
+import { Paper} from '@material-ui/core'
+import { Box, Button } from '@mui/material'
+import React, { useState, useEffect } from 'react'
 import { makeStyles } from '@material-ui/core/styles';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
-
-
+import Typography from '@mui/material/Typography';
 import Grid from '@material-ui/core/Grid';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import Checkbox from '@material-ui/core/Checkbox';
-import Divider from '@material-ui/core/Divider';
-
-
 import Input from '@mui/material/Input';
 import InputLabel from '@mui/material/InputLabel';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
 import InputAdornment from '@mui/material/InputAdornment';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import helper from '../Helper/helper';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -46,8 +34,6 @@ const useStyles = makeStyles((theme) => ({
     button: {
         margin: theme.spacing(0.5, 0),
     },
-
-
     foodimg: {
         width: theme.spacing(20),
         height: theme.spacing(20),
@@ -55,70 +41,45 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-function not(a, b) {
-    return a.filter((value) => b.indexOf(value) === -1);
-}
-
-function intersection(a, b) {
-    return a.filter((value) => b.indexOf(value) !== -1);
-}
 
 function getSteps() {
-    return ['填寫店鋪資料', '上傳店舖美食', '選擇現有美食'];
+    return ['填寫店鋪資料', '上傳店舖美食', '顯示資料'];
 }
 
-export default function Account() {
 
+export default function Account() {
+    const user = localStorage.getItem('user') !== "" ? JSON.parse(localStorage.getItem('user')) : null
     const classes = useStyles();
     const [activeStep, setActiveStep] = React.useState(0);
     const steps = getSteps();
-
-
+    const [market, setMarket] = useState([])
+    const [FoodList, setFoodList] = useState([])
+    const [foodType, setFoodType] = useState('')
     const [foodName, setFoodName] = React.useState("")
     const [foodPrice, setFoodPrice] = React.useState("")
     const [foodInfo, setFoodInfo] = React.useState("")
+    const [foodInfoEn, setFoodInfoEN] = React.useState("")
+    const [foodIcon, setFoodIcon] = useState("")
+
+    const [nm, setNM] = useState("")
+    const [shopName, setShopName] = useState("")
+    const [shopNum, setShopNum] = useState("")
+    const [shopType, setShopType] = useState("")
+    const [shopLocal, setShopLocal] = useState("")
+    const [shopOwnerID, setShopOwnerID] = useState("")
+    const [shortIntro, setShortIntro] = useState("")
+    const [Intro, setIntro] = useState("")
+    const [shopIcon, setShopIcon] = useState("")
+
+    const loaddata = async () => {
+        let res = await helper.helper.AsyncMarketData()
+        setMarket(res.market)
+    }
+    useEffect(() => { loaddata() }, [FoodList])
 
 
-    const [checked, setChecked] = React.useState([]);
-    const [left, setLeft] = React.useState(["小籠包", "雞扒", "鹹酥雞", "牛肉麵"]);
-    const [right, setRight] = React.useState(["珍珠奶茶", "茶葉蛋", "可頌", "麻辣鴨血"]);
-
-    const leftChecked = intersection(checked, left);
-    const rightChecked = intersection(checked, right);
-
-    const handleToggle = (value) => () => {
-        const currentIndex = checked.indexOf(value);
-        const newChecked = [...checked];
-        if (currentIndex === -1) {
-            newChecked.push(value);
-        } else {
-            newChecked.splice(currentIndex, 1);
-        }
-        setChecked(newChecked);
-    };
 
 
-    const handleAllRight = () => {
-        setRight(right.concat(left));
-        setLeft([]);
-    };
-
-    const handleCheckedRight = () => {
-        setRight(right.concat(leftChecked));
-        setLeft(not(left, leftChecked));
-        setChecked(not(checked, leftChecked));
-    };
-
-    const handleCheckedLeft = () => {
-        setLeft(left.concat(rightChecked));
-        setRight(not(right, rightChecked));
-        setChecked(not(checked, rightChecked));
-    };
-
-    const handleAllLeft = () => {
-        setLeft(left.concat(right));
-        setRight([]);
-    };
 
     const handleNext = () => {
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -130,119 +91,208 @@ export default function Account() {
     const handleReset = () => {
         setActiveStep(0);
     };
+
+    const readYESHI = () => {
+        return (
+            market.map((item) => {
+
+                return (
+                    <MenuItem value={item.name}>{item.name}</MenuItem>
+                )
+            })
+        )
+    }
+    const appendFood = async () => {
+        if (foodType !== "" && foodName !== "" && foodPrice !== "" && foodInfo !== "" && foodInfoEn !== "" && foodIcon !== "") {
+            let data = new FormData();
+            data.append('Image', foodIcon)
+            let res = await helper.helper.AsyncUploadImage(data)
+            let food = ({
+                foodName: foodName,
+                foodPrice: foodPrice,
+                foodType: foodType,
+                foodInfo: foodInfo,
+                foodInfoEN: foodInfoEn,
+                foodIcon: res.path,
+                isSale: false,
+                rank: 0,
+                rating: 0,
+            })
+            FoodList.push(food)
+            document.getElementById("food_name").value = ""
+            setFoodIcon("")
+            document.getElementById("food_price").value = ""
+            document.getElementById("food_info").value = ""
+            document.getElementById("food_type").value = ""
+            document.getElementById("food_infoEN").value = ""
+
+        } else {
+            alert("請輸入完整資料")
+        }
+    }
+    const createShop = async () => {
+
+        let data = new FormData();
+        data.append('Image', shopIcon)
+        let res = await helper.helper.AsyncUploadImage(data)
+        let new_shop = ({
+            shopIcon: res.path,
+            shopYeShi: nm,
+            shopName: shopName,
+            shopNumber: shopNum,
+            shopType: shopType,
+            shopLocation: shopLocal,
+            shopManager: user._id,
+            shopManagerID: shopOwnerID,
+            shopIntroduction: Intro,
+            shopShortIntroduction: shortIntro,
+            isSale: false,
+            rank: 0,
+            rating: 0,
+            food: FoodList,
+            status: "Applying",
+        })
+        let response = await helper.helper.AsyncCreateShop(new_shop)
+        console.log(response)
+    }
+
+
     function getStepContent(stepIndex) {
         switch (stepIndex) {
             case 0:
                 return (
                     <Box pl="8%" pr="8%" mb={4}>
-                        <Box display='flex' justifyContent='space-between'>店鋪區域: <Box>
-                            <FormGroup row='true' >
-                                <FormControlLabel control={<Checkbox defaultChecked />} label="台北" />
-                                <FormControlLabel control={<Checkbox />} label="台中" />
-                                <FormControlLabel control={<Checkbox />} label="台南" />
-                                <FormControlLabel control={<Checkbox />} label="台東" />
-                            </FormGroup>
-                        </Box>
-                        </Box>
+
                         <Box>
 
-                            <Box>店鋪的夜市 </Box>
+                            <Box mb={4}>
+                                <Paper elevation={24}>
+                                    <img src={shopIcon !== "" ? URL.createObjectURL(shopIcon) : null}></img>
+
+                                </Paper>
+                            </Box>
+
 
                             <Box display='flex' justifyContent='flex-end'>
                                 <FormControl sx={{ width: 200 }}>
-                                    <InputLabel id="demo-simple-select-label">夜市</InputLabel>
+                                    <InputLabel id="NM">夜市</InputLabel>
                                     <Select
-                                        labelId="demo-simple-select-label"
-                                        id="demo-simple-select"
-                                        // value={age}
-                                        label="夜市"
-                                    // onChange={handleChange}
+                                        labelId="NM"
+                                        id="NM"
+                                        label="NM"
+                                        placeholder={nm}
+                                        onChange={e => setNM(e.target.value)}
                                     >
-                                        <MenuItem value={10}>寧夏夜市</MenuItem>
-                                        <MenuItem value={20}>饒河夜市</MenuItem>
-                                        <MenuItem value={30}>師大夜市</MenuItem>
-                                        <MenuItem value={40}>公館夜市</MenuItem>
+                                        {market !== "" ? readYESHI() : null}
                                     </Select>
                                 </FormControl>
+                                <FormControl sx={{ width: 200 }}>
+                                    <InputLabel id="marketType">店鋪食物類別</InputLabel>
+                                    <Select
+                                        labelId="marketType"
+                                        id="marketType"
+                                        placeholder={shopType}
+                                        label="店鋪食物類別"
+                                        onChange={e => setShopType(e.target.value)}
+                                    >
+                                        <MenuItem value={"Pasta"}>麵食</MenuItem>
+                                        <MenuItem value={"Fried"}>炸物</MenuItem>
+                                        <MenuItem value={"snack"}>小吃</MenuItem>
+                                        <MenuItem value={"Dessert"}>甜品</MenuItem>
+                                    </Select>
+                                </FormControl>
+
+                                <Button variant='contained' size='large' component="label">
+                                    上傳夜市圖片
+                                    <input hidden type="file" multiple name="image" accept="image/jpg,image/jpeg,image/png,image/gif" onChange={e => setShopIcon(e.target.files[0])} />
+                                </Button>
+
                             </Box>
                         </Box>
                         <Box>
                             <FormControl fullWidth sx={{ m: 1 }} variant="standard">
-                                <InputLabel htmlFor="standard-adornment-amount">店鋪名稱</InputLabel>
+                                <InputLabel htmlFor="shopName">店鋪名稱</InputLabel>
                                 <Input
-                                    id="standard-adornment-amount"
-                                // value={values.amount}
-                                // onChange={handleChange('amount')}
+                                    id="shopName"
+                                    placeholder={shopName}
+                                    onChange={e => setShopName(e.target.value)}
                                 // startAdornment={<InputAdornment position="start">店鋪名稱</InputAdornment>}
                                 />
                             </FormControl>
                         </Box>
                         <Box>
                             <FormControl fullWidth sx={{ m: 1 }} variant="standard">
-                                <InputLabel htmlFor="standard-adornment-amount">店鋪號碼</InputLabel>
+                                <InputLabel htmlFor="shopNum">店鋪號碼</InputLabel>
                                 <Input
-                                    id="standard-adornment-amount"
-                                // value={values.amount}
-                                // onChange={handleChange('amount')}
+                                    id="shopNum"
+                                    type='number'
+                                    placeholder={shopNum}
+                                    onChange={e => setShopNum(e.target.value)}
                                 // startAdornment={<InputAdornment position="start">店鋪名稱</InputAdornment>}
                                 />
                             </FormControl>
                         </Box>
-                        <Box>店鋪食物定位
-                            <Box display='flex' justifyContent='flex-end'>
-                                <FormControl sx={{ width: 200 }}>
-                                    <InputLabel id="demo-simple-select-label">類別</InputLabel>
-                                    <Select
-                                        labelId="demo-simple-select-label"
-                                        id="demo-simple-select"
-                                        // value={age}
-                                        label="夜市"
-                                    // onChange={handleChange}
-                                    >
-                                        <MenuItem value={10}>麵食</MenuItem>
-                                        <MenuItem value={20}>炸物</MenuItem>
-                                        <MenuItem value={30}>小吃</MenuItem>
-                                        <MenuItem value={40}>甜品</MenuItem>
-                                    </Select>
-                                </FormControl>
-                            </Box>
+                        <Box>
+                            <FormControl fullWidth sx={{ m: 1 }} variant="standard">
+                                <InputLabel htmlFor="shopLocation">店鋪地址</InputLabel>
+                                <Input
+                                    id="shopLocation"
+                                    placeholder={shopLocal}
+                                    onChange={e => setShopLocal(e.target.value)}
+                                // startAdornment={<InputAdornment position="start">店鋪名稱</InputAdornment>}
+                                />
+                            </FormControl>
                         </Box>
-
 
                         <Box>
                             <FormControl fullWidth sx={{ m: 1 }} variant="standard">
-                                <InputLabel htmlFor="standard-adornment-amount">店鋪地址</InputLabel>
+                                <InputLabel htmlFor="shopManagerID">店鋪老闆身分證ID</InputLabel>
                                 <Input
-                                    id="standard-adornment-amount"
-                                // value={values.amount}
-                                // onChange={handleChange('amount')}
+                                    id="shopManagerID"
+                                    placeholder={shopOwnerID}
+                                    onChange={e => setShopOwnerID(e.target.value)}
                                 // startAdornment={<InputAdornment position="start">店鋪名稱</InputAdornment>}
                                 />
                             </FormControl>
                         </Box>
-                        <Box>
+                        <Box >
                             <FormControl fullWidth sx={{ m: 1 }} variant="standard">
-                                <InputLabel htmlFor="standard-adornment-amount">店鋪老闆名字</InputLabel>
+                                <InputLabel htmlFor="standard-adornment-amount">店鋪簡短介紹</InputLabel>
                                 <Input
-                                    id="standard-adornment-amount"
-                                // value={values.amount}
-                                // onChange={handleChange('amount')}
-                                // startAdornment={<InputAdornment position="start">店鋪名稱</InputAdornment>}
+                                    id="food_info"
+                                    // value={values.amount}
+                                    // onChange={handleChange('amount')}
+                                    placeholder={shortIntro}
+                                    multiline
+                                    rows={2}
+                                    // startAdornment={<InputAdornment position="start">$</InputAdornment>}
+                                    onChange={(e) => {
+                                        setShortIntro(e.target.value)
+                                    }}
                                 />
                             </FormControl>
                         </Box>
-                        <Box>
+                        <Box >
                             <FormControl fullWidth sx={{ m: 1 }} variant="standard">
-                                <InputLabel htmlFor="standard-adornment-amount">店鋪身分證ID</InputLabel>
+                                <InputLabel htmlFor="standard-adornment-amount">店鋪介紹</InputLabel>
                                 <Input
-                                    id="standard-adornment-amount"
-                                // value={values.amount}
-                                // onChange={handleChange('amount')}
-                                // startAdornment={<InputAdornment position="start">店鋪名稱</InputAdornment>}
+                                    id="food_info"
+                                    // value={values.amount}
+                                    // onChange={handleChange('amount')}
+                                    placeholder={Intro}
+                                    multiline
+                                    rows={5}
+                                    // startAdornment={<InputAdornment position="start">$</InputAdornment>}
+                                    onChange={(e) => {
+                                        setIntro(e.target.value)
+                                    }}
                                 />
                             </FormControl>
                         </Box>
                         <Box>店鋪基本會員費用：1000/年</Box>
+                        <Box display='flex' justifyContent='flex-end'>
+
+                        </Box>
                     </Box>
                 );
             case 1:
@@ -250,17 +300,16 @@ export default function Account() {
                     <Box mb={4}>
                         <Grid container spacing={2}>
                             <Grid item xs={6} md={4}>
-                                <Box display='flex' justifyContent='center'>
-                                    <img src='./logo192.png' className={classes.large} />
+                                <Box display='flex' justifyContent='center' mb={2}>
+                                    <Paper elevation={24}>
+                                        <img src={foodIcon !== "" ? URL.createObjectURL(foodIcon) : null} className={classes.large} />
+                                    </Paper>
                                 </Box>
                                 <Box display='flex' justifyContent='center'>
-
-                                    <Button variant='outlined'  color='success' size='small' component="label">
+                                    <Button variant='outlined' color='success' size='small' component="label">
                                         上傳食物圖片
-                                        <form method="post" action="/upload" enctype="multipart/form-data">
-                                            <input hidden accept="image/*" multiple type="file" />
-                                            <input type="submit" value="upload"/>
-                                        </form>
+                                        <input hidden type="file" multiple name="image" accept="image/jpg,image/jpeg,image/png,image/gif" onChange={e => setFoodIcon(e.target.files[0])} />
+
                                     </Button>
                                 </Box>
                             </Grid>
@@ -285,8 +334,7 @@ export default function Account() {
                                             <InputLabel htmlFor="standard-adornment-amount">食物價錢</InputLabel>
                                             <Input
                                                 id="food_price"
-                                                // value={values.amount}
-                                                // onChange={handleChange('amount')}
+                                                type='number'
                                                 startAdornment={<InputAdornment position="start">$</InputAdornment>}
                                                 onChange={(event) => {
                                                     setFoodPrice(event.target.value)
@@ -310,16 +358,54 @@ export default function Account() {
                                             />
                                         </FormControl>
                                     </Box>
+                                    <Box mt={2}>
+                                        <FormControl sx={{ width: 200 }}>
+                                            <InputLabel id="marketType">食物類別</InputLabel>
+                                            <Select
+                                                labelId="foodType"
+                                                id="food_type"
+                                                placeholder={foodType}
+                                                label="店鋪食物類別"
+                                                onChange={e => setFoodType(e.target.value)}
+                                            >
+                                                <MenuItem value={"Pasta"}>麵食</MenuItem>
+                                                <MenuItem value={"Fried"}>炸物</MenuItem>
+                                                <MenuItem value={"snack"}>小吃</MenuItem>
+                                                <MenuItem value={"Dessert"}>甜品</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                    </Box>
+                                    <Box mt={2}>
+                                        <FormControl fullWidth variant="standard">
+                                            <InputLabel htmlFor="foodInfoEN">食物介紹(英文)</InputLabel>
+                                            <Input
+                                                id="food_infoEN"
+                                                multiline
+                                                rows={3} onChange={(event) => {
+                                                    setFoodInfoEN(event.target.value)
+                                                }}
+                                            />
+                                        </FormControl>
+                                    </Box>
+
                                     <Box mt={1} display='flex' justifyContent='flex-end'>
-                                        <Button variant='contained' size='small'>添加</Button>
+                                        <Button variant='contained' size='small' onClick={appendFood}>添加</Button>
                                     </Box>
                                 </Box>
                             </Grid>
                         </Grid>
                         <Box mt={2}>
                             <Paper elevation={12}>
-                                <Box maxWidth="100%" display='flex' justifyContent='flex-start' p={2} m={2}>
-                                    <Button variant='outlined' >food</Button>
+                                <Box pl={2} pt={2}> 已經添加的食物</Box>
+                                <Box maxWidth="100%" display='flex' justifyContent='flex-start' sx={{ flexWrap: 'wrap' }} p={2} >
+                                    {FoodList.map((food) => {
+                                        return (
+                                            <Button variant='contained' size='medium' >{food.foodName}</Button>
+
+                                        )
+                                    })
+                                    }
+
                                 </Box>
                             </Paper>
                         </Box>
@@ -334,97 +420,105 @@ export default function Account() {
                 );;
             case 2:
                 return (
-                    <div>
-                        <Grid
-                            container
-                            spacing={2}
-                            justifyContent="center"
-                            alignItems="center"
-                            className={classes.root}
-                        >
-                            <Grid item>
-                                <Box display="flex" justifyContent='center'>未上架食物</Box>
-                                {customList(left)}
+                    <Box>
+                        <Grid container spacing={4}>
+                            <Grid item xs={6}>
+                                <img src={shopIcon !== "" ? URL.createObjectURL(shopIcon) : null}></img>
                             </Grid>
-                            <Grid item>
-                                <Grid container direction="column" alignItems="center">
-                                    <Button
-                                        variant="outlined"
-                                        size="small"
-                                        className={classes.button}
-                                        onClick={handleAllRight}
-                                        disabled={left.length === 0}
-                                        aria-label="move all right"
-                                    >
-                                        ≫
-                                    </Button>
-                                    <Button
-                                        variant="outlined"
-                                        size="small"
-                                        className={classes.button}
-                                        onClick={handleCheckedRight}
-                                        disabled={leftChecked.length === 0}
-                                        aria-label="move selected right"
-                                    >
-                                        &gt;
-                                    </Button>
-                                    <Button
-                                        variant="outlined"
-                                        size="small"
-                                        className={classes.button}
-                                        onClick={handleCheckedLeft}
-                                        disabled={rightChecked.length === 0}
-                                        aria-label="move selected left"
-                                    >
-                                        &lt;
-                                    </Button>
-                                    <Button
-                                        variant="outlined"
-                                        size="small"
-                                        className={classes.button}
-                                        onClick={handleAllLeft}
-                                        disabled={right.length === 0}
-                                        aria-label="move all left"
-                                    >
-                                        ≪
-                                    </Button>
-                                </Grid>
+                            <Grid item xs={6}>
+
+                                <FormControl fullWidth sx={{ m: 1 }} variant="standard">
+                                    <InputLabel htmlFor="shopName">{nm}</InputLabel>
+                                </FormControl>
+
+                                <FormControl fullWidth sx={{ m: 1 }} variant="standard">
+                                    <InputLabel htmlFor="shopName">店鋪食物類別：{shopType}</InputLabel>
+                                </FormControl>
+
+
+                                <FormControl fullWidth sx={{ m: 1 }} variant="standard">
+                                    <InputLabel htmlFor="shopName">店鋪名稱：{shopName}</InputLabel>
+                                </FormControl>
+
+                                <FormControl fullWidth sx={{ m: 1 }} variant="standard">
+                                    <InputLabel htmlFor="shopName">店鋪號碼：{shopNum}</InputLabel>
+                                </FormControl>
+
+                                <FormControl fullWidth sx={{ m: 1 }} variant="standard">
+                                    <InputLabel htmlFor="shopName">店鋪地址：{shopNum}</InputLabel>
+                                </FormControl>
+
+                                <FormControl fullWidth sx={{ m: 1 }} variant="standard">
+                                    <InputLabel htmlFor="shopName">店鋪老闆身分證ID：{shopNum}</InputLabel>
+                                </FormControl>
+
+
                             </Grid>
-                            <Grid item>
-                                <Box display="flex" justifyContent="center">上架的食物</Box>
-                                {customList(right)}
+
+                            <Grid item xs={12} >
+                                <FormControl fullWidth sx={{ m: 1 }} variant="standard">
+                                    <InputLabel htmlFor="shopName">店鋪簡短介紹：{shortIntro}</InputLabel>
+                                </FormControl>
                             </Grid>
+                            <Grid item xs={12} >
+                                <FormControl fullWidth sx={{ m: 1 }} variant="standard">
+                                    <InputLabel htmlFor="shopName">店鋪介紹：{Intro}</InputLabel>
+                                </FormControl>
+                            </Grid>
+
+                            {
+                                FoodList.map((food, i) => {
+                                    // console.log(food)
+                                    return (
+                                        <Grid container item xs={12} id={i}>
+
+
+                                            <Grid item xs={4}>
+                                                <img src={food.foodIcon !== "" ? food.foodIcon : null}></img>
+                                            </Grid>
+                                            <Grid container item xs={8}>
+
+                                                <Grid item xs={4}>食物名字：{food.foodName}</Grid>
+                                                <Grid item xs={4}>食物價錢：{food.foodPrice}</Grid>
+                                                <Grid item xs={4}>食物類別：{food.foodType} </Grid>
+                                                <Grid item direction={'column-reverse'} xs={12}>
+
+                                                    食物介紹：
+                                                    <Box sx={{ width: '100%', maxWidth: "100%" }}>
+                                                        <Typography variant="body1" noWrap>
+                                                            {food.foodInfo}dfgshjklfdhkjhkjhbkdjhndbskhsjfhjsnbmshkjdnvbcxmdhfjnvbmfdhskjashfkdhakjfhdlkshfjldshfkj
+                                                        </Typography>
+                                                    </Box>
+                                                </Grid>
+                                                <Grid item xs={12}>
+                                                    食物介紹（英文）：
+                                                    <Box sx={{ width: '100%', maxWidth: "100%" }}>
+                                                        <Typography variant="body1" noWrap>
+                                                            {food.foodInfoEN}
+                                                        </Typography>
+                                                    </Box>
+                                                </Grid>
+
+                                            </Grid>
+
+                                        </Grid>
+
+                                    )
+                                })
+                            }
                         </Grid>
-                    </div>
-                );;
+                        <Box mt={3} mb={2} display='flex' justifyContent='center'>
+                            <Button variant='contained' size='large' color='success' onClick={createShop} >建立新的店鋪</Button>
+
+                        </Box>
+                    </Box>
+
+                )
             default:
                 return 'Unknown stepIndex';
         }
     }
-    const customList = (items) => (
-        <Paper className={classes.paper}>
-            <List dense component="div" role="list">
-                {items.map((value) => {
-                    const labelId = `transfer-list-item-${value}-label`;
 
-                    return (
-                        <ListItem key={value} role="listitem" button onClick={handleToggle(value)}>
-                            <ListItemIcon>
-                                <Checkbox
-                                    checked={checked.indexOf(value) !== -1}
-                                    tabIndex={-1}
-                                    disableRipple
-                                    inputProps={{ 'aria-labelledby': labelId }}
-                                />
-                            </ListItemIcon>
-                            <ListItemText id={labelId} primary={` ${value}`} />
-                        </ListItem>
-                    );
-                })}
-                <ListItem />
-            </List>
-        </Paper>
-    );
     return (
         <div className='Account_Box'>
             <Box mt={2} mb={2}>

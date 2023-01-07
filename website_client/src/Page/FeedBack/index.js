@@ -14,8 +14,9 @@ export default function FeedBack() {
     const [opinion, setOpinion] = useState("");
 
     const user = localStorage.getItem('user') !== "" ? JSON.parse(localStorage.getItem('user')) : null
-    console.log(user)
+
     const handleSubmit = async () => {
+
         if (email.includes('@') && email.includes('.')) {
             if (username !== "" && phone !== 0 && email !== "" && opinion !== "") {
 
@@ -32,6 +33,7 @@ export default function FeedBack() {
                 }
                 let res = await helper.helper.AsyncFeedbackCreate(feedback)
                 console.log(res)
+                window.location.reload()
             } else {
                 alert("?")
             }

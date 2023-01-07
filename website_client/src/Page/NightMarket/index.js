@@ -26,6 +26,7 @@ const handleNightPage = (id) => {
 
 export default function NightMarket() {
     const [market, setMarket] = useState([])
+    const [inputSearch, setInputSearch] = useState("")
 
     const loadMarket = async () => {
         let res = await helper.helper.AsyncMarketData();
@@ -35,59 +36,108 @@ export default function NightMarket() {
     React.useEffect(() => {
         loadMarket()
     }, [])
+    const handleSearch = (e) => {
+        market.map((item) => {
+            let name = item.name
+            if (name.match(inputSearch) !== null) {
+                localStorage.setItem('search', name)
+                window.location.reload()
+                return
+            }
 
+        })
+    }
 
     const ListMarket = () => {
 
         return (
             market.map((item, i) => {
-                return (
-                    <Box mt={4} mb={2}  >
-                        <Box mb={1}>
-                            <Card >
-                                <CardActionArea>
-                                    <CardMedia
-                                        component="img"
-                                        width="100%"
+                if ((localStorage.getItem('search') !== "" && item.name === localStorage.getItem('search'))) {
 
-                                        image={item.marketIcon}
-                                        sx={{ flex: 'auto', padding: "1rem 6rem  0 6rem", objectFit: "contain" }}
-                                        title="Contemplative Reptile"
-                                    />
-                                    <CardContent>
+                    return (
+                        <Box mt={4} mb={2}  >
+                            <Box mb={1}>
+                                <Card >
+                                    <CardActionArea>
+                                        <CardMedia
+                                            component="img"
+                                            width="100%"
+                                            image={item.marketIcon}
+                                            sx={{ flex: 'auto', padding: "1rem 6rem  0 6rem", objectFit: "contain" }}
+                                            title="Contemplative Reptile"
+                                        />
+                                        <CardContent>
 
-                                        <Typography gutterBottom variant="h5" component="h2" >
-                                            {item.name}
-                                        </Typography>
+                                            <Typography gutterBottom variant="h5" component="h2" >
+                                                {item.name}
+                                            </Typography>
 
-                                        <Typography variant="body2" color="textSecondary" component="p">
-                                            {item.brief}
-                                        </Typography>
+                                            <Typography variant="body2" color="textSecondary" component="p">
+                                                {item.brief}
+                                            </Typography>
 
-                                    </CardContent>
+                                        </CardContent>
 
-                                </CardActionArea>
+                                    </CardActionArea>
 
-                                <Box display="flex" justifyContent="flex-end">
-                                    <CardActions>
-                                        {/* <a href=''>
-                                    <Button size="small" color="primary">
-                                        打開地圖
-                                    </Button>
-                                </a> */}
-                                        {/* <a href='/nightmarketpage'> */}
-                                        <Button size="small" color="primary" onClick={e => handleNightPage(item._id)}>
-                                            資訊
-                                        </Button>
-                                        {/* </a> */}
-                                    </CardActions>
-                                </Box>
+                                    <Box display="flex" justifyContent="flex-end">
+                                        <CardActions>
+                                            <Button size="small" color="primary" onClick={e => handleNightPage(item._id)}>
+                                                資訊
+                                            </Button>
+                                        </CardActions>
+                                    </Box>
 
-                            </Card>
+                                </Card>
+                            </Box >
+
                         </Box >
+                    )
 
-                    </Box >
-                )
+                }
+                else if (item.marketLocation == selectedLocal || selectedLocal == "all" && localStorage.getItem('search') === null) {
+
+                    return (
+                        <Box mt={4} mb={2}  >
+                            <Box mb={1}>
+                                <Card >
+                                    <CardActionArea>
+                                        <CardMedia
+                                            component="img"
+                                            width="100%"
+
+                                            image={item.marketIcon}
+                                            sx={{ flex: 'auto', padding: "1rem 6rem  0 6rem", objectFit: "contain" }}
+                                            title="Contemplative Reptile"
+                                        />
+                                        <CardContent>
+
+                                            <Typography gutterBottom variant="h5" component="h2" >
+                                                {item.name}
+                                            </Typography>
+
+                                            <Typography variant="body2" color="textSecondary" component="p">
+                                                {item.brief}
+                                            </Typography>
+
+                                        </CardContent>
+
+                                    </CardActionArea>
+
+                                    <Box display="flex" justifyContent="flex-end">
+                                        <CardActions>
+                                            <Button size="small" color="primary" onClick={e => handleNightPage(item._id)}>
+                                                資訊
+                                            </Button>
+                                        </CardActions>
+                                    </Box>
+
+                                </Card>
+                            </Box >
+
+                        </Box >
+                    )
+                }
             })
         )
     }
@@ -97,19 +147,21 @@ export default function NightMarket() {
 
     const HandleAll = () => {
         setSelectedLocal('all')
-        console.log(selectedLocal)
+        localStorage.removeItem('search')
+        window.location.reload()
     }
     const HandleTaiPei = () => {
         setSelectedLocal('tp')
-        console.log(selectedLocal)
+        localStorage.removeItem('search')
+
     }
     const HandleTaiZhong = () => {
         setSelectedLocal('tz')
-        console.log(selectedLocal)
+        localStorage.removeItem('search')
     }
     const HandleTaiNan = () => {
         setSelectedLocal('tn')
-        console.log(selectedLocal)
+        localStorage.removeItem('search')
     }
     return (
         <Box xs={12} mt={1} mb={3}  >
@@ -132,8 +184,9 @@ export default function NightMarket() {
                         sx={{ ml: 1, flex: 1 }}
                         placeholder="查找你想的夜市"
                         inputProps={{ 'aria-label': 'search google maps' }}
+                        onChange={e => setInputSearch(e.target.value)}
                     />
-                    <IconButton type="button" sx={{ p: '10px' }} aria-label="search">
+                    <IconButton type="button" sx={{ p: '10px' }} aria-label="search" onClick={e => handleSearch(e)}>
                         <SearchIcon />
                     </IconButton>
                 </Paper>
@@ -155,7 +208,7 @@ export default function NightMarket() {
                 </Grid>
             </Box>
             {market !== null ? ListMarket() : null}
-            <Box mt={4} mb={2}  >
+            {/* <Box mt={4} mb={2}  >
                 <Box mb={1}>
                     <Card >
                         <CardActionArea>
@@ -183,11 +236,7 @@ export default function NightMarket() {
 
                         <Box display="flex" justifyContent="flex-end">
                             <CardActions>
-                                {/* <a href=''>
-                                    <Button size="small" color="primary">
-                                        打開地圖
-                                    </Button>
-                                </a> */}
+
                                 <a href='/nightmarketpage'>
                                     <Button size="small" color="primary">
                                         資訊
@@ -199,7 +248,7 @@ export default function NightMarket() {
                     </Card>
                 </Box>
 
-            </Box>
+            </Box> */}
         </Box>
 
     )

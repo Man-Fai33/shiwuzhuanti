@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import clsx from 'clsx';
 import Avatar from '@mui/material/Avatar';
 import Tooltip from '@mui/material/Tooltip';
@@ -26,7 +26,7 @@ import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import Box from '@mui/material/Box';
-import { Button, Grid } from '@mui/material';
+import { Button } from '@mui/material';
 import { FormattedMessage } from 'react-intl';
 const drawerWidth = 240;
 // import GTranslateIcon from '@mui/icons-material/GTranslate';
@@ -109,10 +109,15 @@ export default function DrawerBar({ }) {
         setOpen(true);
     };
     const settings = ['Profile', 'Account', 'Logout'];
-    const settings_zh = [
+    const admin_zh = [
         { "PageName": 'Profile', "PagePath": "/profile" }
         , { "PageName": 'Account', "PagePath": "/account" },
         { "PageName": 'DataMangement', "PagePath": "/dataManagement" }
+    ];
+    const user_zh = [
+        { "PageName": 'Profile', "PagePath": "/profile" }
+        , { "PageName": 'Account', "PagePath": "/account" }
+
     ];
     const DrawerData = [
         { 'drawerName': '主頁', 'drawerPath': '/index' }
@@ -162,40 +167,81 @@ export default function DrawerBar({ }) {
         )
     }
     const getPermission = () => {
-        return (<Box>
-            <Tooltip title="Open settings">
-                <IconButton onClick={handleOpenUserMenu}  >
-                    <Avatar alt="Remy Sharp" src={localStorage.getItem('user') === null ? null : user.iconUrl} />
-                </IconButton>
-            </Tooltip>
-            <Menu
-                id="menu-appbar"
-                anchorEl={anchorElUser}
-                anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                }}
-                keepMounted
-                transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                }}
-                open={Boolean(anchorElUser)}
-                onClose={handleCloseUserMenu}
-            >
-                {/* {settings.map((setting) => (
+        if (user.role === "admin") {
+            return (
+                <Box>
+                    <Tooltip title="Open settings">
+                        <IconButton onClick={handleOpenUserMenu}  >
+                            <Avatar alt="Remy Sharp" src={localStorage.getItem('user') === null ? null : user.iconUrl} />
+                        </IconButton>
+                    </Tooltip>
+                    <Menu
+                        id="menu-appbar"
+                        anchorEl={anchorElUser}
+                        anchorOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right',
+                        }}
+                        keepMounted
+                        transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right',
+                        }}
+                        open={Boolean(anchorElUser)}
+                        onClose={handleCloseUserMenu}
+                    >
+                        {/* {settings.map((setting) => (
                 <MenuItem key={setting} onClick={handleCloseUserMenu}>
                     <Typography textAlign="center">{setting}</Typography>
                 </MenuItem>
             ))} */}
-                {settings_zh.map((setting) => (
-                    <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                        <a href={setting.PagePath} textAlign="center" >{setting.PageName}</a>
-                    </MenuItem>
-                ))}
-            </Menu>
+                        {admin_zh.map((setting) => (
+                            <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                                <a href={setting.PagePath} textAlign="center" >{setting.PageName}</a>
+                            </MenuItem>
+                        ))}
+                    </Menu>
 
-        </Box>)
+                </Box>)
+        } else {
+            return (
+                <Box>
+                    <Tooltip title="Open settings">
+                        <IconButton onClick={handleOpenUserMenu}  >
+                            <Avatar alt="Remy Sharp" src={localStorage.getItem('user') === null ? null : user.iconUrl} />
+                        </IconButton>
+                    </Tooltip>
+                    <Menu
+                        id="menu-appbar"
+                        anchorEl={anchorElUser}
+                        anchorOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right',
+                        }}
+                        keepMounted
+                        transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right',
+                        }}
+                        open={Boolean(anchorElUser)}
+                        onClose={handleCloseUserMenu}
+                    >
+                        {/* {settings.map((setting) => (
+            <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                <Typography textAlign="center">{setting}</Typography>
+            </MenuItem>
+        ))} */}
+                        {user_zh.map((setting) => (
+                            <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                                <a href={setting.PagePath} textAlign="center" >{setting.PageName}</a>
+                            </MenuItem>
+                        ))}
+                    </Menu>
+
+                </Box>)
+
+
+        }
     }
     return (
         <div>

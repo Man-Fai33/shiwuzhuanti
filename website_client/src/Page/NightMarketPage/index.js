@@ -5,7 +5,6 @@ import { GoogleMap, LoadScript } from '@react-google-maps/api';
 import Chip from '@material-ui/core/Chip';
 import Avatar from '@material-ui/core/Avatar';
 import './index.css'
-import Cat from '../../Img/Cat.jpg'
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
 import ImageListItemBar from '@mui/material/ImageListItemBar';
@@ -19,12 +18,16 @@ import helper from '../Helper/helper';
 
 export default function NightMarketPage() {
     const [market, setMarket] = useState({})
-
-
-
+    const [shop, setShop] = useState([])
+    const [food, setFood] = useState([])
     const loadMarketOne = async () => {
         let res = await helper.helper.AsyncMarketOne(localStorage.getItem('nightID'));
         setMarket(res.market)
+        let resp = await helper.helper.AsyncShopData()
+        setShop(resp.shop)
+
+        let response = await helper.helper.AsyncFood()
+        setFood(response.food)
 
     }
 
@@ -47,6 +50,16 @@ export default function NightMarketPage() {
             return (< Chip avatar={< Avatar > TP</Avatar >} label="台中" color='primary' ></Chip>)
         }
     }
+    const handleclickfood = (id) => {
+        localStorage.setItem('foodId', id)
+
+        window.location.href = '/foodInfo'
+    }
+    const handleclickShop = (id) => {
+ 
+        localStorage.setItem('shopId', id)
+        window.location.href = '/shop'
+    }
 
     return (
 
@@ -56,7 +69,7 @@ export default function NightMarketPage() {
                 <Box p={2} >
                     <Box display="flex" justifyContent="center" >
                         <Typography className='NightName_zh' variant='h4'>
-                            {console.log(market)}
+
                             {market !== "" ? market.name : "hahs"}
                         </Typography>
                     </Box>
@@ -88,7 +101,7 @@ export default function NightMarketPage() {
                         </Grid>
                         <Grid item className='NightMarketInfo' xs={12} md={8} sm={12} >
                             <Grid item xs={12} md={12} sm={6}>{market !== "" ? getlocation(market.marketLocation) : <Chip avatar={<Avatar>TP</Avatar>} label="台北?" color='primary' />}<Typography variant='h7'>{market !== "" ? market.name : ""} </Typography></Grid>
-                            <Grid item xs={12} md={12} sm={6}>位置：雙連或中山捷運站走路五分鐘</Grid>
+                            <Grid item xs={12} md={12} sm={6}>{market !== "" ? market.positionGuidelines : null}</Grid>
 
                             <Grid item xs={12} md={12} sm={12}>
                                 {market !== "" ? market.brief : ""}
@@ -105,30 +118,31 @@ export default function NightMarketPage() {
                             <ImageListItem key="Subheader" cols={2}>
                                 <ListSubheader component="div">頂級美食列表</ListSubheader>
                             </ImageListItem>
-                            {itemData.map((item) => (
+                            {food.map((item) => (
                                 <ImageListItem key={item.img} >
                                     <img
-                                        src={`${item.img}?w=248&fit=crop&auto=format`}
-                                        srcSet={`${item.img}?w=248&fit=crop&auto=format&dpr=2 2x`}
-                                        alt={item.title}
+                                        src={`${item.foodIcon}?w=248&fit=crop&auto=format`}
+                                        srcSet={`${item.foodIcon}?w=248&fit=crop&auto=format&dpr=2 2x`}
+                                        alt={item.foodName}
                                         loading="lazy"
                                     />
                                     <ImageListItemBar
-                                        title={item.title}
-                                        subtitle={item.author}
+                                        title={item.foodName}
+
 
                                         actionIcon={
                                             <Box mr={2}>
-                                                <a href='/foodInfo'>
-                                                    <Button
-                                                        sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
-                                                        aria-label={`info about ${item.title}`}
-                                                        variant='contained'
-                                                    >
-                                                        <InfoIcon color="primary" />
-                                                        查看
-                                                    </Button>
-                                                </a>
+
+                                                <Button
+                                                    sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
+                                                    aria-label={`info about ${item.foodName}`}
+                                                    variant='contained'
+                                                    onClick={e => handleclickfood(item._id)}
+                                                >
+                                                    <InfoIcon color="primary" />
+                                                    查看
+                                                </Button>
+
                                             </Box>
                                         }
                                     />
@@ -142,18 +156,34 @@ export default function NightMarketPage() {
 
                         <Box display='flex' justifyContent='flex-start'>夜市攤位列表Top 10</Box>
                         <Box spacing={2} display='flex' justifyContent='space-between'>
-                            <ImageList sx={{ width: "100%", height: 200 }} variant='masonry'>
-                                {itemData.map((item) => (
-                                    <ImageListItem key={item.img} >
+                            <ImageList sx={{ width: "100%", height: 300 }} variant='masonry'>
+                                {shop.map((item) => (
+                                    <ImageListItem key={item.shopIcon} >
                                         <img
-                                            src={`${item.img}?w=248&fit=crop&auto=format`}
-                                            srcSet={`${item.img}?w=248&fit=crop&auto=format&dpr=2 2x`}
-                                            alt={item.title}
+                                            src={`${item.shopIcon}?w=248&fit=crop&auto=format`}
+                                            srcSet={`${item.shopIcon}?w=248&fit=crop&auto=format&dpr=2 2x`}
+                                            alt={item.shopName}
                                             loading="lazy"
                                         />
+                                        {console.log(item.id)}
                                         <ImageListItemBar
-                                            title={item.title + " ,店家基本會員費:1000"}
-                                            subtitle={item.author}
+                                            title={item.shopName}
+                                            actionIcon={
+                                                <Box mr={2}>
+
+                                                    <Button
+                                                        sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
+                                                        aria-label={`info about ${item.shopName}`}
+                                                        variant='contained'
+                                                    onClick={e => handleclickShop(item._id)}
+                                                    >
+                                                        <InfoIcon color="primary" />
+                                                        查看
+                                                    </Button>
+
+                                                </Box>
+                                            }
+
                                         />
                                     </ImageListItem>
                                 ))}
@@ -190,53 +220,3 @@ export default function NightMarketPage() {
 
     )
 }
-const itemData = [
-    {
-        img: 'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e',
-        title: 'Breakfast',
-    },
-    {
-        img: 'https://images.unsplash.com/photo-1551782450-a2132b4ba21d',
-        title: 'Burger',
-    },
-    {
-        img: 'https://images.unsplash.com/photo-1522770179533-24471fcdba45',
-        title: 'Camera',
-    },
-    {
-        img: 'https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c',
-        title: 'Coffee',
-    },
-    {
-        img: 'https://images.unsplash.com/photo-1533827432537-70133748f5c8',
-        title: 'Hats',
-    },
-    {
-        img: 'https://images.unsplash.com/photo-1558642452-9d2a7deb7f62',
-        title: 'Honey',
-    },
-    {
-        img: 'https://images.unsplash.com/photo-1516802273409-68526ee1bdd6',
-        title: 'Basketball',
-    },
-    {
-        img: 'https://images.unsplash.com/photo-1518756131217-31eb79b20e8f',
-        title: 'Fern',
-    },
-    {
-        img: 'https://images.unsplash.com/photo-1597645587822-e99fa5d45d25',
-        title: 'Mushrooms',
-    },
-    {
-        img: 'https://images.unsplash.com/photo-1567306301408-9b74779a11af',
-        title: 'Tomato basil',
-    },
-    {
-        img: 'https://images.unsplash.com/photo-1471357674240-e1a485acb3e1',
-        title: 'Sea star',
-    },
-    {
-        img: 'https://images.unsplash.com/photo-1589118949245-7d38baf380d6',
-        title: 'Bike',
-    },
-];

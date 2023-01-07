@@ -1,7 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
-
 const Bulletin = require('../models/bulletin')
 router.post('/', async (req, res) => {
 
@@ -12,6 +11,7 @@ router.post('/', async (req, res) => {
     let date = new Date();
     data.date = date
     bulletin = new Bulletin(data)
+
     try {
         resp.bulletin = await bulletin.save()
 

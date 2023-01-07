@@ -1,5 +1,4 @@
 
-import UserInfoContext from "../../Context/context"
 import URL from "./url"
 
 export const helper = {
@@ -157,7 +156,7 @@ export const helper = {
         try {
             let jsonBody = JSON.stringify({
                 requesterid: null,
-                bulletin:bulletin.bulletin
+                bulletin: bulletin.bulletin
             })
             console.log(jsonBody)
             let url = URL.Url.Bulletin
@@ -203,6 +202,43 @@ export const helper = {
             return msg;
         }
     },
+    AsyncCommentCreate: async (comment) => {
+        try {
+            let jsonBody = JSON.stringify({
+                comment: comment
+            })
+            console.log(jsonBody)
+            let url = URL.Url.Comment
+            let response = await fetch(url, {
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                method: 'post',
+                body: jsonBody
+            })
+            let responseJson = await response.json();
+            return responseJson;
+        } catch (e) {
+            let msg = {};
+            msg.status = 'fail'
+            msg.message = 'Network Error'
+            return msg;
+        }
+    },
+    AsyncComments: async () => {
+        let url = URL.Url.Comment
+        let response = await fetch(url, {
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            method: 'get',
+        })
+        let responseJson = await response.json();
+
+        return responseJson;
+    },
 
     AsyncFeedBackAll: async () => {
         let url = URL.Url.FeedBack
@@ -232,6 +268,49 @@ export const helper = {
 
         return responseJson;
     },
+    AsyncShopData: async () => {
+        let url = URL.Url.Shop
+        let response = await fetch(url, {
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+
+            },
+            method: 'get',
+        })
+        let responseJson = await response.json();
+
+        return responseJson;
+    },
+    AsyncShopOne: async (id) => {
+        let url = URL.Url.Shop
+        let response = await fetch(url + "/" + id, {
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+
+            },
+            method: 'get',
+        })
+        let responseJson = await response.json();
+
+        return responseJson;
+    },
+    AsyncBulletin: async () => {
+        let url = URL.Url.Bulletin
+
+        let response = await fetch(url, {
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+
+            },
+            method: 'get',
+        })
+        let responseJson = await response.json();
+
+        return responseJson;
+    },
     AsyncMarketOne: async (id) => {
         let url = URL.Url.Market
 
@@ -247,9 +326,101 @@ export const helper = {
 
         return responseJson;
     },
-    AsyncUserData: async () => {
+    AsyncFoodOne: async (id) => {
+        let url = URL.Url.Food
 
-        return
+        let response = await fetch(url + id, {
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+
+            },
+            method: 'get',
+        })
+        let responseJson = await response.json();
+
+        return responseJson;
+    },
+    AsyncEditFood: async (id, food) => {
+        let url = URL.Url.Food
+        let jsonBody = JSON.stringify({
+
+            food: food
+        })
+
+        let response = await fetch(url + id, {
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+
+            },
+            method: 'put',
+            body: jsonBody
+        })
+        let responseJson = await response.json();
+        console.log(responseJson)
+        return responseJson;
+    },
+    AsyncEditShop: async (id, shop) => {
+        let url = URL.Url.Shop
+        let jsonBody = JSON.stringify({
+
+            shop: shop
+        })
+
+        let response = await fetch(url + "/" + id, {
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+
+            },
+            method: 'put',
+            body: jsonBody
+        })
+        let responseJson = await response.json();
+        return responseJson;
+    },
+    AsyncFood: async () => {
+        let url = URL.Url.Food
+
+        let response = await fetch(url, {
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            method: 'get',
+        })
+        let responseJson = await response.json();
+
+        return responseJson;
+    },
+    AsyncCreateShop: async (shop) => {
+
+        try {
+            let jsonBody = JSON.stringify({
+                shop: shop
+            })
+
+            let url = URL.Url.Shop
+            let response = await fetch(url, {
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                method: "post",
+                body: jsonBody
+            })
+            let respJson = await response.json();
+            return respJson;
+
+        } catch (e) {
+            console.log(e)
+            let msg = {};
+            msg.status = 'fail'
+            msg.message = 'Network Error'
+            return msg;
+        }
+
     }
 
 }

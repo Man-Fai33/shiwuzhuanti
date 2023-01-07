@@ -1,12 +1,11 @@
 import Grid from '@mui/material/Unstable_Grid2';
 import { Box } from '@mui/system'
-import React, { useState, useContext } from 'react';
+import React from 'react';
 import IndexImage from '../../Img/yeshi.jpg'
 import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
-import { CardActionArea } from '@mui/material';
+import { Button, CardActionArea } from '@mui/material';
 import { Paper } from '@material-ui/core';
 
 
@@ -19,13 +18,13 @@ export default function Index() {
 
     const managerBox = (user) => {
 
-        if (user.role === "manager") {
+        if (user.role === "admin") {
 
             return (
                 <Box xs={12} mt={2} mb={1}>
                     <Paper elevation={24}>
                         <a
-                        href='/'
+                            href='/dataManagement'
                         >
                             <Card sx={12}>
                                 <CardActionArea>
@@ -38,7 +37,7 @@ export default function Index() {
 
                                     < Box pl={2} pt={1}>
                                         <Typography gutterBottom variant="h6" component="div">
-                                            店家管理
+                                            管理
                                         </Typography>
                                     </Box>
 
@@ -51,30 +50,30 @@ export default function Index() {
         }
         else {
             return (
-                <Box xs={12} mt={2} mb={1} >
+                <Box xs={12} mt={2} mb={1}  >
+
                     <Paper elevation={24}>
-                        <a
 
-                        >
-                            <Card sx={12}>
-                                <CardActionArea>
-                                    <CardMedia
-                                        component="img"
-                                        height="140px"
-                                        image='./Shop_management.jpg'
-                                        alt="green iguana"
-                                    />
+                        <Card sx={12}>
+                            <CardActionArea>
+                                <CardMedia
+                                    component="img"
+                                    height="140px"
+                                    image='./Shop_management.jpg'
+                                    alt="green iguana"
+                                />
 
-                                    < Box pl={2} pt={1}>
-                                        <Typography gutterBottom variant="h6" component="div">
-                                            店家管理
-                                        </Typography>
-                                    </Box>
+                                < Box pl={2} pt={1}>
+                                    <Typography gutterBottom variant="h6" component="div">
+                                        店家管理
+                                    </Typography>
+                                </Box>
 
-                                </CardActionArea>
-                            </Card>
-                        </a>
+                            </CardActionArea>
+                        </Card>
+
                     </Paper>
+
                 </Box>
             )
         }

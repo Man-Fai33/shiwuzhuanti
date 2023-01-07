@@ -6,14 +6,13 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import { Button, FormControl, Grid, IconButton, InputAdornment, InputLabel, OutlinedInput } from '@mui/material';
+import { Button, FormControl, Grid, InputLabel, OutlinedInput } from '@mui/material';
 import helper from '../Helper/helper';
 import { DataGrid } from '@mui/x-data-grid';
-import { compose } from '@mui/system';
-import { Paper, Table, TableBody, TableContainer, TableHead, TableRow } from '@material-ui/core';
-import { styled } from '@mui/material/styles';
-import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import Input from '@mui/material/Input';
+ 
+import { Paper} from '@material-ui/core';
+ 
+
 interface TabPanelProps {
     children?: React.ReactNode;
     dir?: string;
@@ -48,25 +47,6 @@ function a11yProps(index: number) {
     };
 }
 
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-        backgroundColor: theme.palette.common.black,
-        color: theme.palette.common.white,
-    },
-    [`&.${tableCellClasses.body}`]: {
-        fontSize: 14,
-    },
-}));
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-    '&:nth-of-type(odd)': {
-        backgroundColor: theme.palette.action.hover,
-    },
-    // hide last border
-    '&:last-child td, &:last-child th': {
-        border: 0,
-    },
-}));
 
 
 export default function DataManagement() {
@@ -135,7 +115,7 @@ export default function DataManagement() {
 
     }
 
-    React.useEffect(() => {
+    useEffect(() => {
         loaddata()
     }, [])
 
@@ -194,8 +174,14 @@ export default function DataManagement() {
                     date: ""
                 }
             }
+            let response = await helper.helper.AsyncBulletinCreate(newbulletin)
+            console.log(response)
+            window.location.reload()
         }
 
+    }
+    const handleApply = (id) => {
+        alert(id)
     }
 
 
@@ -213,9 +199,9 @@ export default function DataManagement() {
                     aria-label="full width tabs example"
                 >
                     <Tab label="新增夜市" {...a11yProps(0)} />
-                    <Tab label="使用者管理" {...a11yProps(1)} />
-                    <Tab label="意見管理" {...a11yProps(2)} />
-                    <Tab label="公告欄管理" {...a11yProps(3)} />
+                    {/* <Tab label="使用者管理" {...a11yProps(1)} /> */}
+                    <Tab label="意見管理" {...a11yProps(1)} />
+                    <Tab label="公告欄管理" {...a11yProps(2)} />
                 </Tabs>
             </AppBar>
             <SwipeableViews
@@ -334,13 +320,12 @@ export default function DataManagement() {
 
 
                 </TabPanel>
-                <TabPanel value={value} index={1} dir={theme.direction}>
+                {/* <TabPanel value={value} index={1} dir={theme.direction}>
                     <TableContainer component={Paper}>
                         <TableHead>
                             <TableRow>
-                                <StyledTableCell align="center">操作</StyledTableCell>
-                                <StyledTableCell align="right">ID</StyledTableCell>
-                                <StyledTableCell align="right">用戶名字</StyledTableCell>
+                                <StyledTableCell align="center">操作按鈕</StyledTableCell>
+                                <StyledTableCell align="center">用戶名字</StyledTableCell>
                                 <StyledTableCell align="right">用戶</StyledTableCell>
                                 <StyledTableCell align="right">Protein&nbsp;(g)</StyledTableCell>
                                 <StyledTableCell align="right">Carbs&nbsp;(g)</StyledTableCell>
@@ -355,9 +340,9 @@ export default function DataManagement() {
                             {users.map((user) => (
                                 <StyledTableRow key={user._id}>
                                     <StyledTableCell component="th" scope="row">
-                                        {user.username}
+                                        <Button variant='outlined' onClick={e => handleApply(user._id)}>接受申請</Button>
                                     </StyledTableCell>
-                                    <StyledTableCell align="right">{user.calories}</StyledTableCell>
+                                    <StyledTableCell align="center">{user.username}        </StyledTableCell>
                                     <StyledTableCell align="right">{user.fat}</StyledTableCell>
                                     <StyledTableCell align="right">{user.carbs}</StyledTableCell>
                                     <StyledTableCell align="right">{user.protein}</StyledTableCell>
@@ -366,8 +351,8 @@ export default function DataManagement() {
 
                         </TableBody>
                     </TableContainer>
-                </TabPanel>
-                <TabPanel value={value} index={2} dir={theme.direction}>
+                </TabPanel> */}
+                <TabPanel value={value} index={1} dir={theme.direction}>
                     <Box sx={{ height: 400, width: '100%' }}>
                         <DataGrid
                             rows={feedback}
@@ -380,7 +365,7 @@ export default function DataManagement() {
                         />
                     </Box>
                 </TabPanel>
-                <TabPanel value={value} index={3} dir={theme.direction}>
+                <TabPanel value={value} index={2} dir={theme.direction}>
                     <Box>
                         <Box mb={2}>
                             <Grid container spacing={4}>

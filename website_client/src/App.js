@@ -14,12 +14,14 @@ import FoodList from './Page/FoodList';
 import FoodInfo from './Page/FoodInfo';
 import Profile from './Page/Profile';
 import DataManagement from './Page/DataManagement';
+
 // import Market from './Page/Market';
 
 import { IntlProvider } from "react-intl";
 import { useEffect, useState } from 'react'
 import Account from './Page/Account';
 import UserContext from './Context/context';
+import ShopPage from './Page/Shop/shop';
 function App() {
   const [lang, setLang] = useState('zh_TW')
   const [locale, setLocale] = useState(undefined)
@@ -57,6 +59,7 @@ function App() {
               <Route path="/bulletinBoard" element={<BulletinBoard />} />
               <Route path="/feedback" element={<FeedBack />} />
               <Route path="/datamanagement" element={<DataManagement />} />
+              <Route path="/shop" element={<ShopPage />} />
               {/* <Route path="upload" element={<UploadPage />} />
           <Route path="pdflist" element={<PDFListPage />} /> */}
             </Routes>

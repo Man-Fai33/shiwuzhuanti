@@ -1,4 +1,4 @@
-import { Box, Button, Paper } from '@material-ui/core'
+import { Box, Button, Grid, Paper } from '@material-ui/core'
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
@@ -15,7 +15,8 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import helper from '../Helper/helper';
 const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
@@ -49,12 +50,41 @@ export default function BulletinBoard() {
     const classes = useStyles();
     const theme = useTheme();
     const [isDialog, SetDialog] = React.useState(false);
-    const HandleClickDialog = () => {
+    const [title, setTitle] = useState("")
+    const [context, setContext] = useState("")
+    const [date, setDate] = useState("")
+    // const [bulletin, setBulletin] =useState()
+
+    const HandleClickDialog = (item) => {
+        console.log(item)
         SetDialog(true);
+        setTitle(item.title)
+        setContext(item.context)
+        setDate(item.date)
     }
     const HandleDoneDialog = () => {
         SetDialog(false);
     }
+    const [bulletins, setBulletins] = useState([])
+
+    const loaddata = async () => {
+        let res = await helper.helper.AsyncBulletin()
+        setBulletins(res.bulletin)
+
+
+
+    }
+    React.useEffect(() => {
+        loaddata()
+    }, [])
+
+    // const readBulletin = () => {
+
+    //     return (
+
+    //     )
+    // }
+
     return (
         <div>
             <Box mt={2} mb={2} mr={2} ml={2}>
@@ -69,10 +99,45 @@ export default function BulletinBoard() {
                     </Box>
                 </Paper>
             </Box>
-
-            <Box mb={2}>
+            {bulletins !== "" ? bulletins.map((item, i) => {
+                return (
+                    <Box mb={2}>
+                        <Paper elevation={24}>
+                            <Box p={2}>
+                                <Card className={classes.root}>
+                                    <Grid container spacing={4}>
+                                        <Grid item xs={4}>
+                                            <Paper elevation={24} >
+                                                <img src={item.imgUrl} />
+                                            </Paper>
+                                        </Grid>
+                                        <Grid item xs={8}>
+                                            <div className={classes.details}>
+                                                <CardContent className={classes.content}>
+                                                    <Typography component="h5" variant="h5">
+                                                        {item.title}
+                                                    </Typography>
+                                                    <Typography variant="subtitle1" color="textSecondary">
+                                                        {item.context}
+                                                    </Typography>
+                                                    <Typography variant="subtitle2" color="textSecondary">
+                                                        {item.date.substr(0,10)}
+                                                    </Typography>
+                                                </CardContent>
+                                                <Box display='flex' justifyContent='flex-end' mr={2} mb={1}>
+                                                    <Button variant='outlined' onClick={e => HandleClickDialog(item)}>查看詳情</Button>
+                                                </Box>
+                                            </div>
+                                        </Grid>
+                                    </Grid>
+                                </Card>
+                            </Box>
+                        </Paper>
+                    </Box>
+                )
+            }) : null}
+            {/* <Box mb={2}>
                 <Paper elevation={24}>
-                    {/* BoardList */}
                     <Box p={2}>
                         <Card className={classes.root}>
                             <CardMedia
@@ -89,7 +154,7 @@ export default function BulletinBoard() {
                                         60-100處傳統市集(公有市場+列管夜市)，每處自治會行銷經費10萬元，匯集市集特色商品，每個市集提供價值至少100元的特色商品組合(四周合計至少1,600份)，吸引民眾至傳統市集消費，帶動市場及夜市攤商商機。
                                     </Typography>
                                     <Typography variant="subtitle2" color="textSecondary">
-                                        2022-06-15,主辦方
+                                        2022-06-15
                                     </Typography>
                                 </CardContent>
                                 <Box display='flex' justifyContent='flex-end' mr={2} mb={1}>
@@ -99,12 +164,8 @@ export default function BulletinBoard() {
                             </div>
                         </Card>
                     </Box>
-
-
-
                 </Paper>
-
-            </Box>
+            </Box> */}
 
             <Dialog
                 open={isDialog}
@@ -114,17 +175,16 @@ export default function BulletinBoard() {
                 width="900px"
             >
                 <DialogTitle id="alert-dialog-title">
-                    「半價銅板購」
+                    {title}
                 </DialogTitle>
                 {/* <Divider /> */}
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
                         <Box pl={2} pr={2}>
-                            60-100處傳統市集(公有市場+列管夜市)，每處自治會行銷經費10萬元，匯集市集特色商品，每個市集提供價值至少100元的特色商品組合(四周合計至少1,600份)，吸引民眾至傳統市集消費，帶動市場及夜市攤商商機。
-
+                            {context}
                         </Box>
                         <Box display="flex" justifyContent="flex-end" >
-                            2022-06-15,主辦方
+                            {date.substr(0,10)}
                         </Box>
                     </DialogContentText>
                 </DialogContent>

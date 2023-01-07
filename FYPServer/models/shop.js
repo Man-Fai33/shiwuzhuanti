@@ -2,7 +2,6 @@ const mongoose = require('mongoose')
 const Food = require('./food')
 const Shop = new mongoose.Schema({
     shopIcon: { type: String, default: "" },
-    shopArea: { type: String, required: true },
     shopYeShi: { type: String, required: true },
     shopName: { type: String, required: true },
     shopNumber: { type: String, required: true },

@@ -1,48 +1,49 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
-const Comment =require('../models/comment');
+const Comment = require('../models/comment');
 
 
 
 //create a chat comment 
-router.post('/chat', async (req, res) => {
+router.post('/', async (req, res) => {
     let requesterid = req.body.requesterid
+    let target = req.body.comment
+    // check if the email is duplicated
+    let id = target._id
+    let error = false
+    let resp = {}
 
-    if (user == null) {
-        resp.status = "fail"
-        resp.message = "The requester is not a valid user"
-        res.json(resp)
-        return
+    let comment = null
+
+
+
+    // generate a userid for the user
+    comment = new Comment(target)
+    try {
+        resp.comment = await comment.save()
+    }
+    catch (err) {
+        error = true
+        resp.message = "User cannot be added"
+        resp.err = err
+        console.log(err);
     }
 
-
-
-    // Create session
-    let session = await mongoose.startSession()
-    session.startTransaction()
-    
     if (error) {
         resp.status = "fail"
         res.json(resp)
-        await session.abortTransaction()
-        session.endSession()
         return
     }
-
-
-    if (error) {
-        resp.status = "fail"
-        res.json(resp)
-        await session.abortTransaction()
-        session.endSession()
-        return
-    }
-
-    await session.commitTransaction()
-    session.endSession()
-
     resp.status = "success"
     res.json(resp)
+})
+router.get('/', (req, res) => {
+
+    Comment.find().exec().then(result => {
+        res.json({ status: "success", comment: result })
+    }).catch(err => {
+        res.json({ status: "fail", message: err })
+    })
 })
 module.exports = router

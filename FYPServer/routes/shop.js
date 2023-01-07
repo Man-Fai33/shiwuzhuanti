@@ -1,61 +1,50 @@
 const mongoose = require('mongoose')
 const express = require('express')
 const router = express.Router()
-const Shop = require('../models/shop');
-
-//get all shop 
-router.get('/shop', (req, res) => {
-    let requesterid = req.query.requesterid
-
-    Shop.find().exec().then(result => {
-        res.json({ status: "success", users: result })
-    }).catch(err => {
-        res.json({ status: "fail", message: err })
-    })
-})
-//get singe shop by id
-router.get('/shop/:id', (req, res) => {
-    let shopid = req.params.id
-    let shopFound = false
-    let resp = {}
-    let shop = Shop.findById({ _id: shopid }).exec()
-    if (shop != null) {
-        shopFound = true
-    }
-    if (shopFound) {
-        resp.shop = shop
-        resp.message = "Shop found"
-        resp.status = "success"
-        console.log(resp.shop);
-    } else {
-        resp.message = "Shop not found"
-        resp.status = "fail"
-    }
-    res.json(resp)
-})
-
-// create the new shop 
-router.post('/shop', async (req, res) => {
+const Food = require('../models/food')
+const Shop = require('../models/shop')
+router.post('/', async (req, res) => {
     let requesterid = req.body.requesterid
-    let data = req.body.food
+    let target = req.body.shop
+    // check if the email is duplicated
+    let id = target.shopManager
     let error = false
     let resp = {}
+    let foods = target.food
     let shop = null
-    let isCreate = true
 
-    // if (data.isCreate != undefined || data.isCreate == true) {
-
-    // } else {
-
-    // }
-
-    shop = new Shop(data)
     try {
-        shop.food = await shop.save()
+        // find a user with a duplicated email
+        shop = await Shop.findOne({ shopManager: id }).exec()
+        if (shop != null) {
+            resp.message = "Email already existed"
+            error = true
+        }
+    }
+    catch (err) {
+        // if the user cannot be found, do nothing
+    }
 
-    } catch (err) {
+    if (error) {
+        resp.status = "fail"
+        res.json(resp)
+        return
+    }
+
+    foods.forEach(element => {
+        new Food(element).save()
+
+    });
+
+
+    // generate a userid for the user
+    shop = new Shop(target)
+    try {
+        resp.shop = await shop.save()
+    }
+    catch (err) {
         error = true
-        resp.message = "food cannot be added"
+        resp.message = "User cannot be added"
         resp.err = err
         console.log(err);
     }
@@ -66,17 +55,35 @@ router.post('/shop', async (req, res) => {
         return
     }
 
-    console.log(resp)
     resp.status = "success"
     res.json(resp)
+})
+router.get('/', (req, res) => {
+
+    Shop.find().exec().then(result => {
+        res.json({ status: "success", shop: result })
+    }).catch(err => {
+        res.json({ status: "fail", message: err })
+    })
+})
+router.get('/:id', (req, res) => {
+    let id = req.params.id
+    Shop.findById(id).exec().then(result => {
+        res.json({ status: "success", shop: result })
+    }).catch(err => {
+        res.json({ status: "fail", message: err })
+    })
+})
+router.put('/:id', async (req, res) => {
+
+    let id = req.params.id
+
+    let target = req.body.shop
+
+    Shop.findByIdAndUpdate(target._id, target, { new: true }).exec().then(updatedShop => {
+        res.json({ status: "success", shop: updatedShop })
+    })
+
 
 })
-
-//edit the shop information
-router.put('/shop', (req, res) => {
-
-    
-})
-
-
 module.exports = router;

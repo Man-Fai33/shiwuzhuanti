@@ -50,33 +50,45 @@ export default function Profile() {
     }
     const handleQuitEditUser = () => {
         setEditUser(false);
+        setusername("")
+        setuserphone("")
+        setuserlocation("")
+        setuserintroduction("")
     }
-    const handleDoneEditUser = () => {
+    const handleDoneEditUser = async () => {
         setEditUser(false);
+        if (username !== "" && userphone !== "" && userlocation !== "" && userintroduction !== "") {
+            let edituser = ({ ...user, username: username, phone: userphone, location: userlocation, introduction: userintroduction }
+            )
+            let res = await helper.helper.AsyncUserEdit(edituser)
+            localStorage.setItem('user', JSON.stringify(res.user))
+            window.location.reload()
+        } else {
+            alert("用戶更新不成功")
+        }
 
-        username !== "" ? alert(username) : console.log(username)
-        !usereamil.includes("@") ? alert(usereamil) : console.log(usereamil)
-        userpermission !== "" ? alert(userpermission) : console.log(userpermission)
-        usergender !== "" ? alert(usergender) : console.log(usergender)
-        userphone !== "" ? alert(userphone) : console.log(userphone)
-        userlocation !== "" ? alert(userlocation) : console.log(userlocation)
-        userintroduction !== "" ? alert(userintroduction) : console.log(userintroduction)
 
     }
     const handleClickCPWD = () => {
         SetChangePwd(true);
+
     };
 
     const handleCloseCPWD = () => {
         SetChangePwd(false);
     };
-    const handleDoneCPWD = () => {
+    const handleDoneCPWD = async () => {
         SetChangePwd(false);
         if (oldpassowrd !== "" && newpassword !== "") {
             if (oldpassowrd === user.password) {
-                user.password = newpassword
-                
 
+                let editUser = ({
+                    ...user, password: newpassword
+                })
+                alert("密碼修改成功")
+                let res = await helper.helper.AsyncUserEdit(editUser)
+                localStorage.clear()
+                window.location.href = "/signin"
             } else {
                 alert("舊密碼不符合")
             }
@@ -93,7 +105,6 @@ export default function Profile() {
         data.append('Image', ImageIcon)
         let res = await helper.helper.AsyncUploadImage(data)
         user.iconUrl = res.path;
-        console.log(user.iconUrl)
         let response = await helper.helper.AsyncUserEdit(user);
         localStorage.setItem('user', JSON.stringify(response.user));
         window.location.reload();
@@ -282,7 +293,7 @@ export default function Profile() {
 
                                     </FormControl>
 
-                                    <FormControl fullWidth variant="standard">
+                                    {/* <FormControl fullWidth variant="standard">
                                         <InputLabel htmlFor="outlined-adornment-amount">User Email</InputLabel>
                                         <Input
                                             id="id_usereamil"
@@ -295,39 +306,10 @@ export default function Profile() {
                                                 setusereamil(event.target.value)
                                             }}
                                         />
-                                    </FormControl>
+                                    </FormControl> */}
 
 
-                                    <FormControl fullWidth variant="standard">
-                                        <InputLabel htmlFor="outlined-adornment-amount">User Permission</InputLabel>
-                                        <Input
-                                            id="id_permission"
-                                            placeholder={user.role}
-                                            // onChange={handleChange('amount')}
-                                            // startAdornment={<InputAdornment position="start"></InputAdornment>}
 
-                                            label="permission"
-                                            onChange={(event) => {
-                                                setuserpermission(event.target.value)
-                                            }}
-
-                                        />
-                                    </FormControl>
-
-                                    <FormControl fullWidth variant="standard">
-                                        <InputLabel htmlFor="outlined-adornment-amount">  User Gender</InputLabel>
-                                        <Input
-                                            id="id_gender"
-                                            placeholder={user.gender === true ? "Male" : "Female"}
-                                            // onChange={handleChange('amount')}
-                                            // startAdornment={<InputAdornment position="start"></InputAdornment>}
-
-                                            label="gender"
-                                            onChange={(event) => {
-                                                setusergender(event.target.value)
-                                            }}
-                                        />
-                                    </FormControl>
 
                                     <FormControl fullWidth variant="standard">
                                         <InputLabel htmlFor="outlined-adornment-amount"> User Phone</InputLabel>

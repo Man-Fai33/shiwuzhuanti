@@ -57,28 +57,26 @@ const AntSwitch = styled(Switch)(({ theme }) => ({
         boxSizing: 'border-box',
     },
 }));
-export default function SignUp() {
+export default function SignUp() { 
+ 
+
     // variable
     const [uname, setUname] = useState("")
     const [upassword, setUpassword] = useState("")
     const [ugender, setUgender] = useState(false)
     const [uphone, setUphone] = useState("")
     const [ulocation, setUlocation] = useState("")
-    const [uemail, setUemail] = useState("")
     const [error, setError] = useState("")
 
     //handle variables on changed 
-
-    const handleEmail = (event) => {
-
-    }
+ 
 
 
 
     const handleGender = (event) => {
         event.preventDefault();
         console.log(event.target.checked)
-        if (event.target.checked == false) {
+        if (event.target.checked === false) {
             setUgender(false);
 
         } else {
@@ -106,7 +104,8 @@ export default function SignUp() {
                 role: "user",
                 phone: uphone,
                 location: ulocation,
-                gender: ugender
+                gender: ugender,
+                introduction: ""
             }
         }
 
@@ -117,7 +116,7 @@ export default function SignUp() {
             let res = await helper.helper.AsyncUserCreate(user)
             console.log(res)
 
-            if (res.status == "success") {
+            if (res.status === "success") {
                 window.location.href = "/signin"
             } else {
                 // localStorage.clear();

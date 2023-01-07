@@ -28,11 +28,12 @@ var cors = require('cors')
 var usersRouter = require('./routes/users');
 var uploadRouter = require('./routes/uploadFile');
 var foodRouter = require('./routes/food');
-var shopRouter = require('./routes/shop');
+var ShopRouter = require('./routes/shop');
 var commentRouter = require('./routes/chat');
 var ImageRouter = require('./routes/images');
 var MarketRouter = require('./routes/market')
 var FeedBackRouter = require('./routes/feedback')
+var BulletinRouter =require('./routes/bulletin')
 var app = express();
 
 // app.use(formData.parse())
@@ -81,11 +82,12 @@ app.use('/users', usersRouter);
 // app.use('/auth', auth);
 app.use('/upload', uploadRouter)
 app.use('/foods', foodRouter)
-app.use('/shops', shopRouter)
+app.use('/shops',ShopRouter)
 app.use('/comment', commentRouter)
 app.use('/images', ImageRouter);
 app.use('/market', MarketRouter)
 app.use('/feedback', FeedBackRouter)
+app.use('/bulletin', BulletinRouter)
 
 
 
