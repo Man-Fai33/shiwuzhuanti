@@ -38,7 +38,7 @@ var app = express();
 
 // app.use(formData.parse())
 
-mongoose.connect("mongodb+srv://CMF:" + process.env.MONGODB_PASS + "@cluster0.vsbu5md.mongodb.net/" + process.env.MONGODB_NAME + "?retryWrites=true&w=majority", {
+mongoose.connect("mongodb+srv://CMF:" + process.env.MONGODB_PASS + "@cluster0.vsbu5md.mongodb.net/test" + process.env.MONGODB_NAME + "?retryWrites=true&w=majority", {
   useUnifiedTopology: true,
   useNewUrlParser: true
 }, (error) => {
