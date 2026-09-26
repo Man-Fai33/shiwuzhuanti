@@ -118,6 +118,8 @@ router.put('/user', async (req, res) => {
  
   User.findByIdAndUpdate(targetid, target, { new: true }).exec().then(updatedUser => {
     res.json({ status: "success", user: updatedUser })
+  }).catch(err => {
+    res.json({ status: "fail", message: err })
   })
  
 })

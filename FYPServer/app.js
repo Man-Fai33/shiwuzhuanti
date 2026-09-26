@@ -38,18 +38,19 @@ var app = express();
 
 // app.use(formData.parse())
 
-mongoose.connect("mongodb+srv://CMF:" + process.env.MONGODB_PASS + "@cluster0.vsbu5md.mongodb.net/test" + process.env.MONGODB_NAME + "?retryWrites=true&w=majority", {
-  useUnifiedTopology: true,
-  useNewUrlParser: true
-}, (error) => {
-  if (error == null) {
-    console.log("Server is connected");
-  }
-  else {
-    console.log(error)
-    console.log("Server could not be connected");
-  }
-});
+const mongoURI = process.env.MONGODB_URI || 
+  (process.env.MONGODB_PASS 
+    ? `mongodb+srv://CMF:${process.env.MONGODB_PASS}@cluster0.vsbu5md.mongodb.net/test${process.env.MONGODB_NAME || ''}?retryWrites=true&w=majority`
+    : "mongodb://127.0.0.1:27017/fyp");
+
+mongoose.connect(mongoURI)
+  .then(() => {
+    console.log("MongoDB is connected successfully to " + mongoURI.replace(/\/\/.*@/, '//***@'));
+  })
+  .catch((error) => {
+    console.log(error);
+    console.log("Server could not be connected to MongoDB");
+  });
 
 //allow other device access
 app.use(cors())

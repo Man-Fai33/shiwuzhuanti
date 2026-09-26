@@ -16,7 +16,7 @@ router.post('/', async (req, res) => {
     try {
         market = await Market.findOne({ name: marketName }).exec()
         if (market != null) {
-            resp.message = "Email already existed"
+            resp.message = "Market already existed"
             error = true
         }
     } catch (error) {
@@ -35,7 +35,7 @@ router.post('/', async (req, res) => {
     }
     catch (err) {
         error = true
-        resp.message = "User cannot be added"
+        resp.message = "Market cannot be added"
         resp.err = err
         console.log(err);
     }
@@ -58,6 +58,14 @@ router.get('/', (req, res) => {
         res.json({ status: "fail", message: err })
     })
 })
+router.get('/:id', (req, res) => {
+    let targetid = req.params.id
+    Market.findById(targetid).exec().then(result => {
+        res.json({ status: "success", market: result })
+    }).catch(err => {
+        res.json({ status: "fail", message: err })
+    })
+})
 router.post('/:id', (req, res) => {
     let targetid = req.params.id
     Market.findById(targetid).exec().then(result => {
@@ -71,6 +79,15 @@ router.post('/:id', (req, res) => {
 
 
 
+
+router.delete('/:id', (req, res) => {
+    let targetid = req.params.id;
+    Market.findByIdAndDelete(targetid).exec().then(result => {
+        res.json({ status: "success", market: result });
+    }).catch(err => {
+        res.json({ status: "fail", message: err });
+    });
+});
 
 module.exports = router;
 

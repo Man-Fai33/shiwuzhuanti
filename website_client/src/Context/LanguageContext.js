@@ -1,0 +1,187 @@
+import React, { createContext, useContext, useState, useEffect } from 'react';
+
+const LanguageContext = createContext();
+
+export const translations = {
+    zh: {
+        brand_title: '夜市好好行',
+        brand_sub: '尋味台灣在地好味道',
+        brand_badge: '逗陣迺夜市',
+
+        // Navigation
+        nav_home: '首頁推薦',
+        nav_markets: '探索夜市',
+        nav_foods: '人氣美食',
+        nav_bulletin: '最新公告',
+        nav_feedback: '遊客回饋',
+        nav_signin: '登入',
+        nav_signup: '註冊',
+        nav_profile: '個人中心',
+        nav_account: '攤位申請',
+        nav_admin: '資料後台',
+        nav_signout: '登出',
+
+        // Home Page
+        hero_tag: '台灣在地夜市指南',
+        hero_title: '呷飽未？今晚逗陣來迺夜市！',
+        hero_desc: '走入滿溢香氣的街巷，尋找那一攤傳承三代的炭火香與熱騰騰的銅板美味。全台特色夜市交通、排隊美食與在地推薦，為您完整收錄。',
+        search_placeholder: '輸入夜市名稱（例：士林、逢甲、花園）或小吃...',
+        search_btn: '搜尋',
+        quick_search: '熱門搜尋：',
+
+        card_markets_title: '全台夜市導覽',
+        card_markets_desc: '北中南各大夜市特色聚落、排隊攤位分佈與捷運公車交通指引。',
+        card_markets_btn: '探索夜市',
+
+        card_foods_title: '排隊必吃美食',
+        card_foods_desc: '比臉大雞排、黑糖珍珠奶茶、炭烤大腸包小腸等經典小吃。',
+        card_foods_btn: '品嚐美食',
+
+        card_bulletin_title: '夜市即時公告',
+        card_bulletin_desc: '掌握各夜市即時營業公告、節慶活動、市集休市及防疫資訊。',
+        card_bulletin_btn: '查看公告',
+
+        card_feedback_title: '遊客心聲回饋',
+        card_feedback_desc: '分享您的夜市探訪心得與美味評價，幫助大家找到最好吃的一攤！',
+        card_feedback_btn: '填寫意見',
+
+        featured_markets: '今日推薦夜市',
+        view_all_markets: '查看全部夜市',
+        view_market_detail: '查看詳細資訊 ➔',
+
+        // Night Markets List Page
+        markets_page_title: '探索全台夜市',
+        markets_page_desc: '精選台灣各地指標性觀光夜市，尋訪老饕推薦的在地好滋味。',
+        region_all: '全部夜市 🏮',
+        region_tp: '北部 (台北/新北/基隆)',
+        region_tz: '中部/東部 (台中/宜蘭)',
+        region_tn: '南部 (台南/高雄)',
+        market_search_placeholder: '輸入夜市名稱或小吃關鍵字搜尋...',
+        enter_market: '進入夜市導覽 🏮',
+        no_markets_found: '未找到符合條件的夜市',
+        clear_filter: '查看全部夜市 🏮',
+
+        // Food List Page
+        foods_page_title: '全台夜市美食圖鑑',
+        foods_page_desc: '匯聚台灣各大夜市招牌料理，銅板價格、澎湃美味！',
+        food_type_all: '全部小吃 🥢',
+        food_type_fried: '香酥炸物',
+        food_type_snack: '道地小吃',
+        food_type_pasta: '熱炒麵食',
+        food_type_dessert: '冰品甜點',
+        view_food_detail: '查看小吃推薦 ➔',
+
+        // General
+        rating: '評分',
+        price: '價格',
+        footer_slogan: '🏮 台灣夜市好好行 ‧ 尋味台灣在地的美好 🏮',
+        footer_copyright: '© 2026 夜市好好行 ‧ 全台在地夜市美食與生活文化推廣指南',
+        lang_switch: 'English'
+    },
+    en: {
+        brand_title: 'Taiwan Night Markets',
+        brand_sub: 'Taste Authentic Taiwanese Street Food',
+        brand_badge: 'Street Food Guide',
+
+        // Navigation
+        nav_home: 'Home',
+        nav_markets: 'Night Markets',
+        nav_foods: 'Popular Foods',
+        nav_bulletin: 'Notices',
+        nav_feedback: 'Feedback',
+        nav_signin: 'Sign In',
+        nav_signup: 'Sign Up',
+        nav_profile: 'Profile',
+        nav_account: 'Stall Application',
+        nav_admin: 'Admin Panel',
+        nav_signout: 'Sign Out',
+
+        // Home Page
+        hero_tag: 'Taiwan Street Food Guide',
+        hero_title: 'Have You Eaten? Let’s Hit the Night Market Tonight!',
+        hero_desc: 'Stroll through aromatic alleyways and discover generational charcoal grills and steaming street delicacies. Comprehensive transportation, signature eats, and local gems across Taiwan.',
+        search_placeholder: 'Search night markets (e.g. Shilin, Fengjia, Garden) or food...',
+        search_btn: 'Search',
+        quick_search: 'Popular:',
+
+        card_markets_title: 'Night Market Tour',
+        card_markets_desc: 'Iconic market clusters, popular stall maps, and MRT/bus transit directions across Taiwan.',
+        card_markets_btn: 'Explore Markets',
+
+        card_foods_title: 'Must-Eat Street Food',
+        card_foods_desc: 'Crispy oversized chicken cutlets, brown sugar boba milk, charcoal sausages, and classic treats.',
+        card_foods_btn: 'Taste Delicacies',
+
+        card_bulletin_title: 'Live Notices',
+        card_bulletin_desc: 'Stay informed with business hours, festive events, night market holidays, and tips.',
+        card_bulletin_btn: 'View Notices',
+
+        card_feedback_title: 'Visitor Voices',
+        card_feedback_desc: 'Share your dining experiences and honest reviews to guide fellow food lovers!',
+        card_feedback_btn: 'Leave Feedback',
+
+        featured_markets: 'Featured Night Markets',
+        view_all_markets: 'View All Markets',
+        view_market_detail: 'View Details ➔',
+
+        // Night Markets List Page
+        markets_page_title: 'Explore Taiwan Night Markets',
+        markets_page_desc: 'Selected landmark night markets across Taiwan with must-try local specialties.',
+        region_all: 'All Markets 🏮',
+        region_tp: 'Northern (Taipei/Keelung)',
+        region_tz: 'Central/Eastern (Taichung/Yilan)',
+        region_tn: 'Southern (Tainan/Kaohsiung)',
+        market_search_placeholder: 'Search night market name or dish...',
+        enter_market: 'Enter Market Guide 🏮',
+        no_markets_found: 'No night markets matched your search',
+        clear_filter: 'View All Markets 🏮',
+
+        // Food List Page
+        foods_page_title: 'Taiwan Street Food Gallery',
+        foods_page_desc: 'Signature street dishes from Taiwan’s top night markets at friendly pocket prices!',
+        food_type_all: 'All Delicacies 🥢',
+        food_type_fried: 'Fried & Grilled',
+        food_type_snack: 'Local Snacks',
+        food_type_pasta: 'Noodles & Mains',
+        food_type_dessert: 'Desserts & Ice',
+        view_food_detail: 'View Specialty ➔',
+
+        // General
+        rating: 'Rating',
+        price: 'Price',
+        footer_slogan: '🏮 Taiwan Night Markets ‧ Discovering Authentic Island Flavors 🏮',
+        footer_copyright: '© 2026 Taiwan Night Markets ‧ Authentic Island Food & Cultural Guide',
+        lang_switch: '繁體中文'
+    }
+};
+
+export function LanguageProvider({ children }) {
+    const [lang, setLang] = useState(() => {
+        return localStorage.getItem('site_lang') || 'zh';
+    });
+
+    useEffect(() => {
+        localStorage.setItem('site_lang', lang);
+    }, [lang]);
+
+    const toggleLang = () => {
+        setLang(prev => (prev === 'zh' ? 'en' : 'zh'));
+    };
+
+    const t = (key) => {
+        const dict = translations[lang] || translations.zh;
+        return dict[key] || translations.zh[key] || key;
+    };
+
+    return (
+        <LanguageContext.Provider value={{ lang, setLang, toggleLang, t }}>
+            {children}
+        </LanguageContext.Provider>
+    );
+}
+
+export function useLanguage() {
+    return useContext(LanguageContext);
+}
+
+export default LanguageContext;

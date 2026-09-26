@@ -25,7 +25,7 @@ router.post('/', async (req, res) => {
     }
     catch (err) {
         error = true
-        resp.message = "User cannot be added"
+        resp.message = "Comment cannot be added"
         resp.err = err
         console.log(err);
     }

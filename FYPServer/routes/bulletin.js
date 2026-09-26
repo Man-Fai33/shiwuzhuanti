@@ -14,12 +14,14 @@ router.post('/', async (req, res) => {
 
     try {
         resp.bulletin = await bulletin.save()
-
+    } catch (err) {
         error = true
         resp.message = "Bulletin cannot be added"
         resp.err = err
         console.log(err);
-    } catch (error) {
+    }
+
+    if (error) {
         resp.status = "fail"
         res.json(resp)
         return

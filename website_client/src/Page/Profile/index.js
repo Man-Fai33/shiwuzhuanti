@@ -1,429 +1,470 @@
-import { Box, Stack } from '@mui/material'
-import React, { useState } from 'react'
-import { makeStyles } from '@material-ui/core/styles';
-import { Avatar, Button, Divider, Grid, Paper, Typography } from '@material-ui/core'
-import "./index.css"
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-
-//form
-import InputLabel from '@mui/material/InputLabel';
-import FormControl from '@mui/material/FormControl';
-import Input from '@mui/material/Input';
-import TextField from '@mui/material/TextField';
+import React, { useState, useEffect } from 'react';
+import {
+    Container,
+    Paper,
+    Box,
+    Typography,
+    Avatar,
+    Button,
+    Grid,
+    Divider,
+    TextField,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Chip,
+    Alert,
+    CircularProgress,
+    Stack
+} from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import VpnKeyIcon from '@mui/icons-material/VpnKey';
+import StorefrontIcon from '@mui/icons-material/Storefront';
+import PersonIcon from '@mui/icons-material/Person';
+import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import helper from '../Helper/helper';
 
-
-
-import Cat from '../../Img/Cat.jpg'
-
-
-const useStyles = makeStyles((theme) => ({
-
-    large: {
-        width: theme.spacing(20),
-        height: theme.spacing(20),
-    },
-}));
-
 export default function Profile() {
-    const user = localStorage.getItem('user') === null ? null : JSON.parse(localStorage.getItem('user'));
+    const [user, setUser] = useState(null);
+    const [openEdit, setOpenEdit] = useState(false);
+    const [openPwd, setOpenPwd] = useState(false);
 
-    const [username, setusername] = useState("");
-    const [usereamil, setusereamil] = useState("");
-    const [userpermission, setuserpermission] = useState("");
-    const [usergender, setusergender] = useState("");
-    const [userphone, setuserphone] = useState("");
-    const [userlocation, setuserlocation] = useState("");
-    const [userintroduction, setuserintroduction] = useState("");
-    const [oldpassowrd, setOldPassword] = useState("");
-    const [newpassword, setNewPassword] = useState("")
+    // Edit profile state
+    const [editName, setEditName] = useState("");
+    const [editPhone, setEditPhone] = useState("");
+    const [editLocation, setEditLocation] = useState("");
+    const [editIntro, setEditIntro] = useState("");
 
-    const [changePwd, SetChangePwd] = React.useState(false);
-    const [editUser, setEditUser] = React.useState(false);
-    const [ImageIcon, setImageIcon] = useState(null);
-    const handleClickEditUser = () => {
-        setEditUser(true);
-    }
-    const handleQuitEditUser = () => {
-        setEditUser(false);
-        setusername("")
-        setuserphone("")
-        setuserlocation("")
-        setuserintroduction("")
-    }
-    const handleDoneEditUser = async () => {
-        setEditUser(false);
-        if (username !== "" && userphone !== "" && userlocation !== "" && userintroduction !== "") {
-            let edituser = ({ ...user, username: username, phone: userphone, location: userlocation, introduction: userintroduction }
-            )
-            let res = await helper.helper.AsyncUserEdit(edituser)
-            localStorage.setItem('user', JSON.stringify(res.user))
-            window.location.reload()
-        } else {
-            alert("用戶更新不成功")
-        }
+    // Change password state
+    const [oldPassword, setOldPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmNewPassword, setConfirmNewPassword] = useState("");
+    const [pwdMsg, setPwdMsg] = useState({ type: '', text: '' });
+    const [uploading, setUploading] = useState(false);
+    const [statusMsg, setStatusMsg] = useState({ type: '', text: '' });
 
-
-    }
-    const handleClickCPWD = () => {
-        SetChangePwd(true);
-
-    };
-
-    const handleCloseCPWD = () => {
-        SetChangePwd(false);
-    };
-    const handleDoneCPWD = async () => {
-        SetChangePwd(false);
-        if (oldpassowrd !== "" && newpassword !== "") {
-            if (oldpassowrd === user.password) {
-
-                let editUser = ({
-                    ...user, password: newpassword
-                })
-                alert("密碼修改成功")
-                let res = await helper.helper.AsyncUserEdit(editUser)
-                localStorage.clear()
-                window.location.href = "/signin"
-            } else {
-                alert("舊密碼不符合")
+    useEffect(() => {
+        try {
+            const raw = localStorage.getItem('user');
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                setUser(parsed);
+                setEditName(parsed.username || "");
+                setEditPhone(parsed.phone || "");
+                setEditLocation(parsed.location || "");
+                setEditIntro(parsed.introduction || "");
             }
-        } else {
-            alert("請輸入完整密碼")
+        } catch (e) {
+            console.error(e);
         }
+    }, []);
+
+    const handleSaveProfile = async () => {
+        if (!editName.trim()) {
+            setStatusMsg({ type: 'error', text: '使用者姓名不可為空' });
+            return;
+        }
+
+        try {
+            const updatedUser = {
+                ...user,
+                username: editName.trim(),
+                phone: editPhone.trim(),
+                location: editLocation.trim(),
+                introduction: editIntro.trim()
+            };
+            const res = await helper.helper.AsyncUserEdit(updatedUser);
+            if (res && (res.user || res.status === "success")) {
+                const finalUser = res.user || updatedUser;
+                setUser(finalUser);
+                localStorage.setItem('user', JSON.stringify(finalUser));
+                setOpenEdit(false);
+                setStatusMsg({ type: 'success', text: '✅ 個人資料更新成功！' });
+            } else {
+                setStatusMsg({ type: 'error', text: '資料更新未成功，請稍後重試' });
+            }
+        } catch (err) {
+            setStatusMsg({ type: 'error', text: '伺服器連線失敗' });
+        }
+    };
+
+    const handleSavePassword = async () => {
+        setPwdMsg({ type: '', text: '' });
+        if (!oldPassword || !newPassword) {
+            setPwdMsg({ type: 'error', text: '請輸入舊密碼與新密碼' });
+            return;
+        }
+        if (oldPassword !== user.password) {
+            setPwdMsg({ type: 'error', text: '舊密碼不相符，請重新確認' });
+            return;
+        }
+        if (newPassword.length < 4) {
+            setPwdMsg({ type: 'error', text: '新密碼長度至少需要 4 位字元' });
+            return;
+        }
+        if (newPassword !== confirmNewPassword) {
+            setPwdMsg({ type: 'error', text: '兩次輸入的新密碼不一致' });
+            return;
+        }
+
+        try {
+            const updatedUser = { ...user, password: newPassword };
+            const res = await helper.helper.AsyncUserEdit(updatedUser);
+            if (res) {
+                alert("🎉 密碼修改成功！請重新登入");
+                localStorage.clear();
+                window.location.href = "/signin";
+            }
+        } catch (err) {
+            setPwdMsg({ type: 'error', text: '密碼更新發生異常' });
+        }
+    };
+
+    const handleAvatarUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        setUploading(true);
+        try {
+            const formData = new FormData();
+            formData.append('Image', file);
+            const uploadRes = await helper.helper.AsyncUploadImage(formData);
+            if (uploadRes && uploadRes.path) {
+                const updatedUser = { ...user, iconUrl: uploadRes.path };
+                const saveRes = await helper.helper.AsyncUserEdit(updatedUser);
+                const finalUser = saveRes.user || updatedUser;
+                setUser(finalUser);
+                localStorage.setItem('user', JSON.stringify(finalUser));
+                setStatusMsg({ type: 'success', text: '頭像更新成功！' });
+            }
+        } catch (err) {
+            setStatusMsg({ type: 'error', text: '頭像上傳失敗' });
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    // 如果未登入
+    if (!user) {
+        return (
+            <Container maxWidth="sm" sx={{ py: 8, textAlign: 'center' }}>
+                <Paper
+                    elevation={3}
+                    sx={{
+                        p: 5,
+                        borderRadius: 3,
+                        border: '1px solid #f2e2d0',
+                        background: 'linear-gradient(180deg, #ffffff 0%, #fffbf5 100%)'
+                    }}
+                >
+                    <Typography variant="h3" sx={{ mb: 2 }}>🏮</Typography>
+                    <Typography variant="h5" sx={{ fontWeight: 800, color: '#2b2520', mb: 1.5 }}>
+                        尚未登入會員
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: '#6d655e', mb: 3 }}>
+                        登入即可解鎖個人專屬夜市打卡、收藏私房美食、以及申請成為夜市攤位店長！
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
+                        <Button
+                            variant="contained"
+                            href="/signin"
+                            sx={{
+                                bgcolor: '#b7282e',
+                                fontWeight: 700,
+                                px: 3,
+                                '&:hover': { bgcolor: '#941e24' }
+                            }}
+                        >
+                            前往登入
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            href="/signup"
+                            sx={{
+                                color: '#b7282e',
+                                borderColor: '#b7282e',
+                                fontWeight: 700,
+                                px: 3,
+                                '&:hover': { borderColor: '#941e24', bgcolor: '#fcedea' }
+                            }}
+                        >
+                            立即註冊
+                        </Button>
+                    </Box>
+                </Paper>
+            </Container>
+        );
     }
 
-
-    const handleSubmit = async e => {
-        e.preventDefault();
-
-        let data = new FormData();
-        data.append('Image', ImageIcon)
-        let res = await helper.helper.AsyncUploadImage(data)
-        user.iconUrl = res.path;
-        let response = await helper.helper.AsyncUserEdit(user);
-        localStorage.setItem('user', JSON.stringify(response.user));
-        window.location.reload();
-    }
-
-    const classes = useStyles();
     return (
-        <Box mt={2} mb={2} >
-            <Paper  >
-                <Box p={2}>
-                    <Grid container>
-                        <Grid item xs={12} sm={6}>
-                            <Box className='Profile_Box' display="flex" justifyContent="center" p={2}>
-                                <Box className='Profile_Icon'>
-                                    <Avatar alt="Remy Sharp" src={localStorage.getItem('user') === null ? null : user.iconUrl} className={classes.large} />
-                                </Box>
+        <Container maxWidth="md" sx={{ py: 6 }}>
+            {statusMsg.text && (
+                <Alert severity={statusMsg.type} sx={{ mb: 3, borderRadius: 2 }}>
+                    {statusMsg.text}
+                </Alert>
+            )}
 
-                            </Box>
-                            <Box display='flex' justifyContent='center'>
-                                <form action='/upload' enctype='multipart/form-data' onSubmit={handleSubmit}>
-                                    <Button variant='contained' size='small' component="label">
-                                        Upload Image
-
-                                        <input hidden type="file" multiple name="image" accept="image/jpg,image/jpeg,image/png,image/gif" onChange={e => setImageIcon(e.target.files[0])} />
-
-
-                                    </Button>
-                                    <Button variant='contained' size='small' component="label">
-                                        Sbmit
-                                        <input hidden onClick={handleSubmit} />
-                                    </Button>
-                                </form>
-                            </Box>
-                        </Grid>
-
-                        <Grid item xs={12} sm={6}>
-
-                            <Grid className='Profile_Information' >
-                                <Grid xs={12} direction="row" >
-                                    <FormControl fullWidth variant="standard">
-                                        <InputLabel htmlFor="outlined-adornment-amount">User Name</InputLabel>
-                                        <Input
-                                            id="id_username"
-                                            disabled
-                                            value={user.username}
-                                        // onChange={handleChange('amount')}
-                                        // startAdornment={<InputAdornment position="start"></InputAdornment>}
-                                        />
-
-                                    </FormControl>
-                                </Grid>
-                                <Grid>
-                                    <FormControl fullWidth variant="standard">
-                                        <InputLabel htmlFor="outlined-adornment-amount">User Email</InputLabel>
-                                        <Input
-                                            id="id_usereamil"
-                                            value={user.email}
-                                            // onChange={handleChange('amount')}
-                                            // startAdornment={<InputAdornment position="start"></InputAdornment>}
-                                            disabled
-                                            label="usereamil"
-                                        />
-                                    </FormControl>
-                                </Grid>
-                                <Grid>
-
-                                    <FormControl fullWidth variant="standard">
-                                        <InputLabel htmlFor="outlined-adornment-amount">User Permission</InputLabel>
-                                        <Input
-                                            id="id_permission"
-                                            value={user.role}
-                                            // onChange={handleChange('amount')}
-                                            // startAdornment={<InputAdornment position="start"></InputAdornment>}
-                                            disabled
-                                            label="permission"
-                                        />
-                                    </FormControl>
-                                </Grid>
-                                <Grid>
-                                    <FormControl fullWidth variant="standard">
-                                        <InputLabel htmlFor="outlined-adornment-amount">  User Gender</InputLabel>
-                                        <Input
-                                            id="id_gender"
-                                            value={user.gender === true ? "Male" : "Female"}
-                                            // onChange={handleChange('amount')}
-                                            // startAdornment={<InputAdornment position="start"></InputAdornment>}
-                                            disabled
-                                            label="gender"
-
-                                        />
-                                    </FormControl>
-                                </Grid>
-                                {/* <Grid>
-                                    User Store
-                                </Grid> */}
-                                <Grid>
-                                    <FormControl fullWidth variant="standard">
-                                        <InputLabel htmlFor="outlined-adornment-amount"> User Phone</InputLabel>
-                                        <Input
-                                            id="id_phone"
-                                            value={user.phone}
-                                            disabled
-                                            label="phone"
-
-                                        />
-                                    </FormControl>
-                                </Grid>
-                                <Grid>
-                                    <FormControl fullWidth variant="standard">
-                                        <InputLabel htmlFor="outlined-adornment-amount"> User Location</InputLabel>
-                                        <Input
-                                            id="id_location"
-                                            value={user.location}
-                                            // onChange={handleChange('amount')}
-                                            // startAdornment={<InputAdornment position="start"></InputAdornment>}
-                                            disabled
-                                            label="location"
-
-                                        />
-                                    </FormControl>
-                                </Grid>
-
-                            </Grid>
-
-
-                        </Grid>
-                        {/* button of change or application  */}
-                        <Box width="100%" mt={2} mb={2} >
-
-                            <TextField
-                                id="id_userintroduction"
-                                label="User Introduction"
-                                multiline
-                                maxRows={4}
-                                fullWidth
-                                rows={4}
-                                disabled
-                                value={user.introduction}
-                                // onChange={handleChange}
-                                variant="filled"
-
-                            />
-
+            <Paper
+                elevation={3}
+                sx={{
+                    p: { xs: 3, md: 5 },
+                    borderRadius: 3,
+                    border: '1px solid #f2e2d0',
+                    background: 'linear-gradient(180deg, #ffffff 0%, #fffdf8 100%)'
+                }}
+            >
+                {/* 頂部身分卡 */}
+                <Grid container spacing={4} alignItems="center">
+                    <Grid item xs={12} sm={4} sx={{ textAlign: 'center' }}>
+                        <Box sx={{ position: 'relative', display: 'inline-block' }}>
+                            <Avatar
+                                src={user.iconUrl}
+                                alt={user.username}
+                                sx={{
+                                    width: 130,
+                                    height: 130,
+                                    mx: 'auto',
+                                    border: '4px solid #f2e2d0',
+                                    boxShadow: '0 4px 14px rgba(0,0,0,0.1)'
+                                }}
+                            >
+                                <PersonIcon sx={{ fontSize: 70, color: '#8c8077' }} />
+                            </Avatar>
+                            <label htmlFor="avatar-upload-input">
+                                <input
+                                    hidden
+                                    id="avatar-upload-input"
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleAvatarUpload}
+                                />
+                                <Button
+                                    component="span"
+                                    size="small"
+                                    variant="contained"
+                                    disabled={uploading}
+                                    sx={{
+                                        position: 'absolute',
+                                        bottom: 0,
+                                        right: 0,
+                                        minWidth: 36,
+                                        width: 36,
+                                        height: 36,
+                                        borderRadius: '50%',
+                                        p: 0,
+                                        bgcolor: '#b7282e',
+                                        '&:hover': { bgcolor: '#941e24' }
+                                    }}
+                                >
+                                    {uploading ? <CircularProgress size={18} color="inherit" /> : <PhotoCameraIcon fontSize="small" />}
+                                </Button>
+                            </label>
                         </Box>
-
-                        <Grid item xs={12}  >
-                            <Box display="flex" justifyContent="flex-end" pr={2} >
-                                <Box pr={2}>
-                                    <Button variant="outlined" color="primary" onClick={handleClickEditUser}>Edit</Button>
-                                </Box>
-                                <Box pr={2}>
-                                    <Button variant="outlined" color="primary" onClick={handleClickCPWD}>Change Password</Button>
-                                </Box>
-
-                                <a href='/account'><Button variant="outlined" color="primary">Application Store</Button></a>
-                            </Box>
-                        </Grid>
-
+                        <Typography variant="caption" display="block" sx={{ mt: 1, color: '#8c8077' }}>
+                            點選相機更換頭像
+                        </Typography>
                     </Grid>
 
-                    <Dialog
-                        open={editUser}
-                        onClose={handleCloseCPWD}
-                        aria-labelledby="alert-dialog-title"
-                        aria-describedby="alert-dialog-description"
+                    <Grid item xs={12} sm={8}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap', mb: 1 }}>
+                            <Typography variant="h5" sx={{ fontWeight: 800, color: '#2b2520' }}>
+                                {user.username}
+                            </Typography>
+                            <Chip
+                                label={user.role === 'admin' ? '🏮 平台管理員' : '🥢 夜市饕客會員'}
+                                sx={{
+                                    bgcolor: user.role === 'admin' ? '#b7282e' : '#fcedea',
+                                    color: user.role === 'admin' ? '#fff' : '#b7282e',
+                                    fontWeight: 700
+                                }}
+                            />
+                            <Chip
+                                label={user.gender ? "先生" : "女士"}
+                                variant="outlined"
+                                size="small"
+                                sx={{ borderColor: '#d9cbbe' }}
+                            />
+                        </Box>
+
+                        <Typography variant="body2" sx={{ color: '#6d655e', mb: 2 }}>
+                            帳號信箱：{user.email}
+                        </Typography>
+
+                        <Grid container spacing={2} sx={{ mt: 1 }}>
+                            <Grid item xs={6}>
+                                <Typography variant="caption" sx={{ color: '#8c8077', fontWeight: 600 }}>聯絡電話</Typography>
+                                <Typography variant="body2" sx={{ fontWeight: 600 }}>{user.phone || "尚未提供"}</Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <Typography variant="caption" sx={{ color: '#8c8077', fontWeight: 600 }}>所在地區</Typography>
+                                <Typography variant="body2" sx={{ fontWeight: 600 }}>{user.location || "台灣"}</Typography>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Grid>
+
+                <Divider sx={{ my: 3.5 }} />
+
+                {/* 個人簡介 */}
+                <Box sx={{ mb: 3 }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#2b2520', mb: 1 }}>
+                        🏮 饕客心得簡介
+                    </Typography>
+                    <Paper
+                        variant="outlined"
+                        sx={{
+                            p: 2,
+                            borderRadius: 2,
+                            bgcolor: '#fdfbfa',
+                            borderColor: '#efe3d5',
+                            color: '#4a423a',
+                            minHeight: 60
+                        }}
                     >
-                        <DialogTitle id="alert-dialog-title">{"改個人資料"}</DialogTitle>
-                        <Divider />
-                        <DialogContent>
-                            <DialogContentText id="alert-dialog-description">
-                                <Box pl={2} pr={2}>
-
-
-                                    <FormControl fullWidth variant="standard">
-                                        <InputLabel htmlFor="outlined-adornment-amount">User Name</InputLabel>
-                                        <Input
-                                            id="id_username"
-                                            placeholder={user.username}
-
-                                            // onChange={handleChange('amount')}
-                                            // startAdornment={<InputAdornment position="start"></InputAdornment>}
-                                            onChange={(event) => {
-                                                setusername(event.target.value)
-                                            }}
-                                        />
-
-                                    </FormControl>
-
-                                    {/* <FormControl fullWidth variant="standard">
-                                        <InputLabel htmlFor="outlined-adornment-amount">User Email</InputLabel>
-                                        <Input
-                                            id="id_usereamil"
-                                            placeholder={user.email}
-                                            // onChange={handleChange('amount')}
-                                            // startAdornment={<InputAdornment position="start"></InputAdornment>}
-                                            type="email"
-                                            label="usereamil"
-                                            onChange={(event) => {
-                                                setusereamil(event.target.value)
-                                            }}
-                                        />
-                                    </FormControl> */}
-
-
-
-
-                                    <FormControl fullWidth variant="standard">
-                                        <InputLabel htmlFor="outlined-adornment-amount"> User Phone</InputLabel>
-                                        <Input
-                                            id="id_phone"
-                                            placeholder={user.phone}
-                                            // onChange={handleChange('amount')}
-                                            // startAdornment={<InputAdornment position="start"></InputAdornment>}
-
-                                            label="phone"
-                                            onChange={(event) => {
-                                                setuserphone(event.target.value)
-                                            }}
-                                        />
-                                    </FormControl>
-
-                                    <FormControl fullWidth variant="standard">
-                                        <InputLabel htmlFor="outlined-adornment-amount"> User Location</InputLabel>
-                                        <Input
-                                            id="id_location"
-                                            placeholder={user.location}
-                                            // onChange={handleChange('amount')}
-                                            // startAdornment={<InputAdornment position="start"></InputAdornment>}
-
-                                            label="location"
-                                            onChange={(event) => {
-                                                setuserlocation(event.target.value)
-                                            }}
-                                        />
-                                    </FormControl>
-                                    <Box mt={2}>
-                                        <TextField
-                                            id="id_userintroduction"
-                                            label="User Introduction"
-                                            multiline
-                                            maxRows={4}
-                                            fullWidth
-                                            rows={4}
-
-
-                                            onChange={(event) => {
-                                                setuserintroduction(event.target.value)
-                                            }}
-                                        />
-                                    </Box>
-                                </Box>
-                            </DialogContentText>
-                        </DialogContent>
-                        <DialogActions>
-
-                            <Button onClick={handleQuitEditUser} color="primary">
-                                退出
-                            </Button>
-                            <Button onClick={handleDoneEditUser} color="primary" autoFocus>
-                                更改
-                            </Button>
-                        </DialogActions>
-
-                    </Dialog>
-
-
-                    <Dialog
-                        open={changePwd}
-                        onClose={handleCloseCPWD}
-                        aria-labelledby="alert-dialog-title"
-                        aria-describedby="alert-dialog-description"
-                    >
-                        <DialogTitle id="alert-dialog-title">{"改密碼?"}</DialogTitle>
-                        <Divider />
-                        <DialogContent>
-                            <DialogContentText id="alert-dialog-description">
-                                <Box pl={2} pr={2}>
-                                    <FormControl fullWidth variant="standard">
-                                        <InputLabel htmlFor="outlined-adornment-amount">舊密碼</InputLabel>
-                                        <Input
-                                            id="oldpassowrd"
-                                            // value={values.amount}
-                                            // onChange={handleChange('amount')}
-                                            // startAdornment={<InputAdornment position="start"></InputAdornment>}
-                                            // disabled
-                                            type='password'
-                                            label="oldpassowrd"
-                                            onChange={e => setOldPassword(e.target.value)}
-                                        />
-                                    </FormControl>
-                                    <FormControl fullWidth variant="standard">
-                                        <InputLabel htmlFor="outlined-adornment-amount">新密碼</InputLabel>
-                                        <Input
-                                            id="password"
-                                            // value={values.amount}
-                                            // onChange={handleChange('amount')}
-                                            // startAdornment={<InputAdornment position="start"></InputAdornment>}
-                                            type='password'
-                                            label="password"
-                                            onChange={e => setNewPassword(e.target.value)}
-                                        />
-                                    </FormControl>
-
-                                </Box>
-                            </DialogContentText>
-                        </DialogContent>
-                        <DialogActions>
-
-                            <Button onClick={handleCloseCPWD} color="primary">
-                                退出
-                            </Button>
-                            <Button onClick={handleDoneCPWD} color="primary" autoFocus>
-                                更改
-                            </Button>
-                        </DialogActions>
-                    </Dialog>
-
+                        {user.introduction || "這個夜市愛好者很神秘，還沒有填寫自我介紹喔！"}
+                    </Paper>
                 </Box>
-            </Paper >
-        </Box>
-    )
+
+                {/* 操作按鈕群 */}
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ justifyContent: 'flex-end', mt: 3 }}>
+                    <Button
+                        variant="outlined"
+                        startIcon={<EditIcon />}
+                        onClick={() => setOpenEdit(true)}
+                        sx={{
+                            color: '#5a5048',
+                            borderColor: '#c7b9ab',
+                            fontWeight: 600,
+                            '&:hover': { borderColor: '#b7282e', color: '#b7282e' }
+                        }}
+                    >
+                        編輯個人資料
+                    </Button>
+
+                    <Button
+                        variant="outlined"
+                        startIcon={<VpnKeyIcon />}
+                        onClick={() => setOpenPwd(true)}
+                        sx={{
+                            color: '#5a5048',
+                            borderColor: '#c7b9ab',
+                            fontWeight: 600,
+                            '&:hover': { borderColor: '#b7282e', color: '#b7282e' }
+                        }}
+                    >
+                        修改登入密碼
+                    </Button>
+
+                    <Button
+                        variant="contained"
+                        startIcon={<StorefrontIcon />}
+                        href="/account"
+                        sx={{
+                            bgcolor: '#e08a00',
+                            color: '#fff',
+                            fontWeight: 700,
+                            '&:hover': { bgcolor: '#be7400' }
+                        }}
+                    >
+                        申請夜市攤位
+                    </Button>
+                </Stack>
+            </Paper>
+
+            {/* 編輯個人資料 Dialog */}
+            <Dialog open={openEdit} onClose={() => setOpenEdit(false)} fullWidth maxWidth="sm">
+                <DialogTitle sx={{ fontWeight: 800, color: '#2b2520' }}>
+                    🏮 編輯個人資料
+                </DialogTitle>
+                <DialogContent dividers>
+                    <Stack spacing={2.5} sx={{ mt: 1 }}>
+                        <TextField
+                            label="使用者名稱"
+                            fullWidth
+                            value={editName}
+                            onChange={(e) => setEditName(e.target.value)}
+                        />
+                        <TextField
+                            label="聯絡電話"
+                            fullWidth
+                            value={editPhone}
+                            onChange={(e) => setEditPhone(e.target.value)}
+                        />
+                        <TextField
+                            label="所在地區"
+                            fullWidth
+                            value={editLocation}
+                            onChange={(e) => setEditLocation(e.target.value)}
+                        />
+                        <TextField
+                            label="個人自我介紹"
+                            fullWidth
+                            multiline
+                            rows={3}
+                            value={editIntro}
+                            onChange={(e) => setEditIntro(e.target.value)}
+                        />
+                    </Stack>
+                </DialogContent>
+                <DialogActions sx={{ p: 2 }}>
+                    <Button onClick={() => setOpenEdit(false)} sx={{ color: '#6d655e' }}>取消</Button>
+                    <Button
+                        variant="contained"
+                        onClick={handleSaveProfile}
+                        sx={{ bgcolor: '#b7282e', '&:hover': { bgcolor: '#941e24' } }}
+                    >
+                        儲存變更
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* 修改密碼 Dialog */}
+            <Dialog open={openPwd} onClose={() => setOpenPwd(false)} fullWidth maxWidth="xs">
+                <DialogTitle sx={{ fontWeight: 800, color: '#2b2520' }}>
+                    🔐 修改登入密碼
+                </DialogTitle>
+                <DialogContent dividers>
+                    {pwdMsg.text && (
+                        <Alert severity={pwdMsg.type} sx={{ mb: 2, borderRadius: 2 }}>
+                            {pwdMsg.text}
+                        </Alert>
+                    )}
+                    <Stack spacing={2} sx={{ mt: 1 }}>
+                        <TextField
+                            label="目前舊密碼"
+                            type="password"
+                            fullWidth
+                            value={oldPassword}
+                            onChange={(e) => setOldPassword(e.target.value)}
+                        />
+                        <TextField
+                            label="設定新密碼"
+                            type="password"
+                            fullWidth
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                        />
+                        <TextField
+                            label="再次確認新密碼"
+                            type="password"
+                            fullWidth
+                            value={confirmNewPassword}
+                            onChange={(e) => setConfirmNewPassword(e.target.value)}
+                        />
+                    </Stack>
+                </DialogContent>
+                <DialogActions sx={{ p: 2 }}>
+                    <Button onClick={() => setOpenPwd(false)} sx={{ color: '#6d655e' }}>取消</Button>
+                    <Button
+                        variant="contained"
+                        onClick={handleSavePassword}
+                        sx={{ bgcolor: '#b7282e', '&:hover': { bgcolor: '#941e24' } }}
+                    >
+                        確認變更
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </Container>
+    );
 }

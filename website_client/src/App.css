@@ -1,4 +1,167 @@
-.App{
-  margin-left: 25%;
-  margin-right: 25%;
-} 
+/* ========================================================
+   夜市好好行 🏮 台灣在地夜市生活風格設計系統
+   Taiwan Night Market Cultural Theme
+   ======================================================== */
+
+:root {
+  --tw-lantern-red: #C62828;
+  --tw-lantern-glow: #E53935;
+  --tw-amber-gold: #FF8F00;
+  --tw-warm-yellow: #FFD54F;
+  --tw-deep-charcoal: #1E1A17;
+  --tw-paper-cream: #FBF8F3;
+  --tw-card-white: #FFFFFF;
+  --tw-border-warm: #EFE7DC;
+  --tw-text-primary: #2C2622;
+  --tw-text-secondary: #6B625B;
+  --tw-shadow-warm: 0 4px 20px rgba(198, 40, 40, 0.08);
+  --tw-shadow-card: 0 4px 16px rgba(44, 38, 34, 0.06);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--tw-paper-cream);
+  color: var(--tw-text-primary);
+  font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 全站響應式容器 - 解決原先 margin-left: 25% 導致畫面過度擠壓的問題 */
+.App {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 84px 20px 48px 20px;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .App {
+    padding: 76px 12px 36px 12px;
+  }
+}
+
+/* 台灣夜市風格文字排版 */
+h1, h2, h3, .tw-title {
+  font-family: 'Noto Serif TC', 'Noto Sans TC', serif;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+}
+
+/* 復古燈籠霓虹徽章 */
+.tw-badge-red {
+  background: linear-gradient(135deg, #C62828 0%, #D84315 100%);
+  color: #FFF !important;
+  font-weight: 700;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 2px 6px rgba(198, 40, 40, 0.25);
+}
+
+.tw-badge-gold {
+  background: linear-gradient(135deg, #FF8F00 0%, #FFA000 100%);
+  color: #FFF !important;
+  font-weight: 700;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tw-badge-green {
+  background: linear-gradient(135deg, #2E7D32 0%, #388E3C 100%);
+  color: #FFF !important;
+  font-weight: 700;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 台灣夜市風格卡片 */
+.tw-card {
+  background: var(--tw-card-white);
+  border: 1px solid var(--tw-border-warm);
+  border-radius: 14px;
+  box-shadow: var(--tw-shadow-card);
+  transition: all 0.25s ease-in-out;
+  overflow: hidden;
+}
+
+.tw-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 24px rgba(44, 38, 34, 0.12);
+  border-color: #E0CDB9;
+}
+
+/* 暖色漸層按鈕 */
+.tw-btn-primary {
+  background: linear-gradient(135deg, #C62828 0%, #E64A19 100%) !important;
+  color: #FFF !important;
+  font-weight: 700 !important;
+  border-radius: 8px !important;
+  text-transform: none !important;
+  box-shadow: 0 3px 10px rgba(198, 40, 40, 0.3) !important;
+  transition: all 0.2s ease !important;
+}
+
+.tw-btn-primary:hover {
+  background: linear-gradient(135deg, #B71C1C 0%, #D84315 100%) !important;
+  box-shadow: 0 5px 14px rgba(198, 40, 40, 0.4) !important;
+}
+
+.tw-btn-secondary {
+  background: #FFF !important;
+  color: var(--tw-lantern-red) !important;
+  border: 1.5px solid var(--tw-lantern-red) !important;
+  font-weight: 700 !important;
+  border-radius: 8px !important;
+  text-transform: none !important;
+  transition: all 0.2s ease !important;
+}
+
+.tw-btn-secondary:hover {
+  background: rgba(198, 40, 40, 0.06) !important;
+}
+
+/* 價格標籤 (NT$) */
+.tw-price {
+  color: #D32F2F;
+  font-weight: 800;
+  font-size: 1.25rem;
+}
+
+/* 頁面標題列 */
+.tw-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  border-bottom: 2px solid var(--tw-border-warm);
+  padding-bottom: 12px;
+}
+
+.tw-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--tw-deep-charcoal);
+  margin: 0;
+}
+
+/* 復古燈籠微光裝飾 */
+.tw-lantern-icon {
+  filter: drop-shadow(0 2px 6px rgba(198, 40, 40, 0.4));
+}

@@ -1,222 +1,370 @@
-import { Button, Grid, Paper, Typography } from '@material-ui/core'
-import { Box, Divider } from '@mui/material'
-import React, { useState, useEffect } from 'react'
-import { GoogleMap, LoadScript } from '@react-google-maps/api';
-import Chip from '@material-ui/core/Chip';
-import Avatar from '@material-ui/core/Avatar';
-import './index.css'
-import ImageList from '@mui/material/ImageList';
-import ImageListItem from '@mui/material/ImageListItem';
-import ImageListItemBar from '@mui/material/ImageListItemBar';
-import ListSubheader from '@mui/material/ListSubheader';
-
+import React, { useState, useEffect } from 'react';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Grid from '@mui/material/Grid';
+import Paper from '@mui/material/Paper';
+import Chip from '@mui/material/Chip';
 import Rating from '@mui/material/Rating';
-import InfoIcon from '@mui/icons-material/Info';
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import CardMedia from '@mui/material/CardMedia';
+import CardContent from '@mui/material/CardContent';
+import CardActions from '@mui/material/CardActions';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+
+// Icons
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import DirectionsSubwayIcon from '@mui/icons-material/DirectionsSubway';
+import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu';
+import StorefrontIcon from '@mui/icons-material/Storefront';
+import MapIcon from '@mui/icons-material/Map';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
+import { GoogleMap, LoadScript } from '@react-google-maps/api';
 import helper from '../Helper/helper';
 
-
-
 export default function NightMarketPage() {
-    const [market, setMarket] = useState({})
-    const [shop, setShop] = useState([])
-    const [food, setFood] = useState([])
-    const loadMarketOne = async () => {
-        let res = await helper.helper.AsyncMarketOne(localStorage.getItem('nightID'));
-        setMarket(res.market)
-        let resp = await helper.helper.AsyncShopData()
-        setShop(resp.shop)
+    const [market, setMarket] = useState({});
+    const [foods, setFoods] = useState([]);
+    const [shops, setShops] = useState([]);
+    const [activeTab, setActiveTab] = useState(0);
 
-        let response = await helper.helper.AsyncFood()
-        setFood(response.food)
-
-    }
-
+    const nightID = localStorage.getItem('nightID');
 
     useEffect(() => {
-        loadMarketOne()
+        async function loadData() {
+            if (!nightID) return;
+            try {
+                const mRes = await helper.helper.AsyncMarketOne(nightID);
+                if (mRes && mRes.market) {
+                    setMarket(mRes.market);
+                }
 
-    }, [])
+                // 載入美食
+                const fRes = await helper.helper.AsyncFood();
+                if (fRes && fRes.food) {
+                    setFoods(fRes.food);
+                }
 
-    const getlocation = (location) => {
-        if (location === "TP") {
-            return (< Chip avatar={< Avatar > TP</Avatar >} label="台北" color='primary' ></Chip>)
-        } else if (location === "TN") {
-            return (< Chip avatar={< Avatar > TP</Avatar >} label="台南" color='primary' ></Chip>)
+                // 載入店家
+                const sRes = await helper.helper.AsyncShop();
+                if (sRes && sRes.shop) {
+                    setShops(sRes.shop);
+                }
+            } catch (err) {
+                console.error('Failed to load market detail:', err);
+            }
         }
-        else if (location === "TD") {
-            return (< Chip avatar={< Avatar > TP</Avatar >} label="台東" color='primary' ></Chip>)
-        }
-        else {
-            return (< Chip avatar={< Avatar > TP</Avatar >} label="台中" color='primary' ></Chip>)
-        }
-    }
-    const handleclickfood = (id) => {
-        localStorage.setItem('foodId', id)
+        loadData();
+    }, [nightID]);
 
-        window.location.href = '/foodInfo'
-    }
-    const handleclickShop = (id) => {
- 
-        localStorage.setItem('shopId', id)
-        window.location.href = '/shop'
-    }
+    const handleGoToFood = (id) => {
+        localStorage.setItem('foodId', id);
+        window.location.href = '/FoodInfo';
+    };
+
+    const handleGoToShop = (id) => {
+        localStorage.setItem('shopId', id);
+        window.location.href = '/shop';
+    };
+
+    const getLocationName = (loc) => {
+        if (loc === 'tp' || loc === 'Taipei') return '台北市';
+        if (loc === 'tz' || loc === 'Taichung') return '台中市';
+        if (loc === 'tn' || loc === 'Tainan') return '台南市';
+        return '台灣';
+    };
 
     return (
+        <Box sx={{ pb: 6 }}>
+            {/* 返回按鈕 */}
+            <Box sx={{ mb: 2 }}>
+                <Button
+                    href="/nightmarket"
+                    startIcon={<ArrowBackIcon />}
+                    sx={{ color: '#C62828', fontWeight: 700 }}
+                >
+                    返回夜市清單
+                </Button>
+            </Box>
 
-        <Box mt={2} mb={2} >
+            {/* 夜市主 Header 介紹卡片 */}
+            <Paper
+                elevation={0}
+                sx={{
+                    p: { xs: 2.5, md: 4 },
+                    borderRadius: '20px',
+                    backgroundColor: '#FFF',
+                    border: '1px solid #EFE5D8',
+                    boxShadow: '0 6px 24px rgba(44, 38, 34, 0.06)',
+                    mb: 4,
+                }}
+            >
+                <Grid container spacing={4} alignItems="center">
+                    {/* 左側：夜市代表相片 */}
+                    <Grid item xs={12} md={5}>
+                        <Box sx={{ position: 'relative', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 4px 16px rgba(0,0,0,0.1)' }}>
+                            <img
+                                src={market.marketIcon || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800'}
+                                alt={market.name || '夜市相片'}
+                                style={{ width: '100%', height: '320px', objectFit: 'cover', display: 'block' }}
+                            />
+                            <Box
+                                sx={{
+                                    position: 'absolute',
+                                    bottom: 0,
+                                    left: 0,
+                                    right: 0,
+                                    background: 'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.75) 100%)',
+                                    p: 2,
+                                    color: '#FFF',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                }}
+                            >
+                                <Chip
+                                    icon={<LocationOnIcon sx={{ color: '#FFF !important' }} />}
+                                    label={getLocationName(market.marketLocation)}
+                                    size="small"
+                                    sx={{ backgroundColor: '#C62828', color: '#FFF', fontWeight: 800 }}
+                                />
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: '#FFD54F', fontWeight: 800 }}>
+                                    <span>⭐ {market.rating || 4.8} 顆星推薦</span>
+                                </Box>
+                            </Box>
+                        </Box>
+                    </Grid>
 
-            <Paper className="nightMarketPage" elevation={24}  >
-                <Box p={2} >
-                    <Box display="flex" justifyContent="center" >
-                        <Typography className='NightName_zh' variant='h4'>
+                    {/* 右側：夜市名稱與交通簡介 */}
+                    <Grid item xs={12} md={7}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                            <span style={{ fontSize: '1.8rem' }}>🏮</span>
+                            <Typography
+                                variant="h4"
+                                sx={{ fontFamily: "'Noto Serif TC', serif", fontWeight: 900, color: '#2C2622' }}
+                            >
+                                {market.name || '夜市簡介'}
+                            </Typography>
+                        </Box>
 
-                            {market !== "" ? market.name : "hahs"}
-                        </Typography>
-                    </Box>
-                    <Box display="flex" justifyContent="center"  >
-                        <Typography className='NightName_en' variant='h4'>
+                        <Typography variant="subtitle1" sx={{ color: '#888', fontWeight: 600, mb: 2 }}>
                             {market.nameen}
                         </Typography>
-                    </Box>
-                    <Box mb={2} mt={2}>
-                        <Divider></Divider>
-                    </Box>
-                    <Grid container spacing={3} >
-                        <Grid item container className='NightMarketImg' xs={12} md={4} sm={12} justifyContent="center">
 
-                            <Paper >
-                                <img
-                                    src={market !== "" ? market.marketIcon : null}
-                                    width="400px" height="400px" />
+                        <Typography variant="body1" sx={{ color: '#4E463F', lineHeight: 1.8, mb: 2.5 }}>
+                            {market.brief || market.introduction}
+                        </Typography>
 
-                                <Box display="flex" justifyContent="flex-end">
-                                    <Typography component="legend">推薦指數</Typography>
-                                    <Rating name="read-only"
-                                        value={market.rating + 1 - 1}
-                                        readOnly />
-                                </Box>
-                            </Paper>
-
-
-                        </Grid>
-                        <Grid item className='NightMarketInfo' xs={12} md={8} sm={12} >
-                            <Grid item xs={12} md={12} sm={6}>{market !== "" ? getlocation(market.marketLocation) : <Chip avatar={<Avatar>TP</Avatar>} label="台北?" color='primary' />}<Typography variant='h7'>{market !== "" ? market.name : ""} </Typography></Grid>
-                            <Grid item xs={12} md={12} sm={6}>{market !== "" ? market.positionGuidelines : null}</Grid>
-
-                            <Grid item xs={12} md={12} sm={12}>
-                                {market !== "" ? market.brief : ""}
-                                {/* 位於台北市大同區圓環邊的寧夏夜市， 除了有讓人垂涎欲滴的小吃美食之外，夜市還夾帶著濃濃的人情味，許多在地故事、文化精神都在其中。『千歲宴』、『總統府國宴』、『環保夜市』、『夜市產品標示熱量』等許多的第一次，都是來自於寧夏夜市的創意。寧夏夜市觀光協會不但推動會長由會員直選，財務管理委由會計師事務所製作財務報表確保財務透明化，進而訂立工作規範與「攤商管理辦法」，與當地里長一起推動鄰里和諧，也結合大稻埕文化推動，當夜市與在地文化的情感緊密結合時，每個攤位的形象與口味，都成為好玩有趣的文化故事，不斷地被傳頌著。 */}
-                            </Grid>
-                        </Grid>
-                    </Grid>
-                    <Box className='NightMarketIntroduction' mt={2} mb={2}>
-                        {market !== "" ? market.introduction : ""}
-                        {/* 位於民生西路、南京西路與重慶北路中間路段的寧夏觀光夜市，被譽為「台北人的胃」，囊括了各種道地傳統台灣小吃，以及異國小吃料理等等， 2015年，寧夏夜市更於台北市政府舉辦「臺北夜市之最」投票選舉中奪得「最好逛夜市」、「最美味夜市」、「最有魅力夜市」、「最環保夜市」及「最友善夜市」冠軍。寧夏夜市，起源於日據時期的圓環，原所在地為下奎府町，二次世界大戰後，命名為「寧夏街」，後來改為「寧夏路」。在淡水線鐵路開通後成為攤販聚集地，見證了大稻埕的繁華璀璨年代。而後1973年，重慶北路拓寬工程開工，市府將圓環的攤商安置於重慶北路二段與寧夏路兩旁，寧夏夜市因而逐漸興盛發展。但隨著台北各大夜市興起，寧夏夜市光芒在各新興夜市中略顯黯淡。台北市都市發展局為了讓寧夏夜市再現風華，挑選此地為「夜市改造示範點」，經過「臺北市夜市改造計畫」的工程，增闢行人徒步區，不但改善了攤販的營業環境，也讓消費者吃得更舒適。為了讓寧夏夜市發展更健全，並促進夜市商機，民國90年，正式成立「寧夏夜市商圈發展協會」，協助臺北市政府進行整頓寧夏夜市工程。民國97年12月成立社團法人「臺北市寧夏夜市觀光協會」，並透過協會配合政府政策，全面改用環保筷、設置地下化大型油脂截留器系統、集中處理攤販營業油污廢水問題，與加裝防制油煙異味的設備，改善過往民眾對於夜市髒亂的形象，打造全新的「環保示範夜市」，因此也吸引了海內外觀光客的青睞，成為全台指標性的夜市。 */}
-                    </Box>
-                    <div className="NightMarketFoodList">
-                        <ImageList sx={{ width: "100%", height: 450 }}>
-                            <ImageListItem key="Subheader" cols={2}>
-                                <ListSubheader component="div">頂級美食列表</ListSubheader>
-                            </ImageListItem>
-                            {food.map((item) => (
-                                <ImageListItem key={item.img} >
-                                    <img
-                                        src={`${item.foodIcon}?w=248&fit=crop&auto=format`}
-                                        srcSet={`${item.foodIcon}?w=248&fit=crop&auto=format&dpr=2 2x`}
-                                        alt={item.foodName}
-                                        loading="lazy"
-                                    />
-                                    <ImageListItemBar
-                                        title={item.foodName}
-
-
-                                        actionIcon={
-                                            <Box mr={2}>
-
-                                                <Button
-                                                    sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
-                                                    aria-label={`info about ${item.foodName}`}
-                                                    variant='contained'
-                                                    onClick={e => handleclickfood(item._id)}
-                                                >
-                                                    <InfoIcon color="primary" />
-                                                    查看
-                                                </Button>
-
-                                            </Box>
-                                        }
-                                    />
-                                </ImageListItem>
-                            ))}
-                        </ImageList>
-                    </div>
-
-                    {/* 攤位 */}
-                    <Box mt={2} mb={2}>
-
-                        <Box display='flex' justifyContent='flex-start'>夜市攤位列表Top 10</Box>
-                        <Box spacing={2} display='flex' justifyContent='space-between'>
-                            <ImageList sx={{ width: "100%", height: 300 }} variant='masonry'>
-                                {shop.map((item) => (
-                                    <ImageListItem key={item.shopIcon} >
-                                        <img
-                                            src={`${item.shopIcon}?w=248&fit=crop&auto=format`}
-                                            srcSet={`${item.shopIcon}?w=248&fit=crop&auto=format&dpr=2 2x`}
-                                            alt={item.shopName}
-                                            loading="lazy"
-                                        />
-                                        {console.log(item.id)}
-                                        <ImageListItemBar
-                                            title={item.shopName}
-                                            actionIcon={
-                                                <Box mr={2}>
-
-                                                    <Button
-                                                        sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
-                                                        aria-label={`info about ${item.shopName}`}
-                                                        variant='contained'
-                                                    onClick={e => handleclickShop(item._id)}
-                                                    >
-                                                        <InfoIcon color="primary" />
-                                                        查看
-                                                    </Button>
-
-                                                </Box>
-                                            }
-
-                                        />
-                                    </ImageListItem>
-                                ))}
-                            </ImageList>
-                        </Box>
-                    </Box>
-
-                    <Box className='NightMarketMap'>
-                        地圖
-                        <LoadScript
-                            googleMapsApiKey="AIzaSyAEKOyS_X1yQAGmiZBO9zBjCeFqEsKa5DQ"
-                        >
-                            <GoogleMap
-                                mapContainerStyle={{ width: "100%", height: '400px' }}
-                                center={{
-
-                                    lat: market.lat,
-                                    lng: market.lng
+                        {market.positionGuidelines && (
+                            <Box
+                                sx={{
+                                    p: 2,
+                                    borderRadius: '12px',
+                                    backgroundColor: '#FFF8E1',
+                                    border: '1px solid #FFE082',
+                                    display: 'flex',
+                                    alignItems: 'flex-start',
+                                    gap: 1.5,
+                                    mb: 2,
                                 }}
-                                // center={
-                                //     market !== "" ? market.mapLocation : null
-                                // }
-                                zoom={17}
                             >
-                                { /* Child components, such as markers, info windows, etc. */}
-                                <></>
-                            </GoogleMap>
+                                <DirectionsSubwayIcon sx={{ color: '#E65100', mt: 0.3 }} />
+                                <Box>
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#BF360C' }}>
+                                        交通指引 / 抵達方式
+                                    </Typography>
+                                    <Typography variant="body2" sx={{ color: '#5D4037', mt: 0.3 }}>
+                                        {market.positionGuidelines}
+                                    </Typography>
+                                </Box>
+                            </Box>
+                        )}
+
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography variant="body2" sx={{ fontWeight: 700, color: '#666' }}>
+                                遊客好評指數：
+                            </Typography>
+                            <Rating value={Number(market.rating) || 4.8} precision={0.1} readOnly />
+                            <Typography variant="body2" sx={{ fontWeight: 800, color: '#C62828' }}>
+                                ({market.rating || 4.8})
+                            </Typography>
+                        </Box>
+                    </Grid>
+                </Grid>
+
+                {/* 夜市深度故事 / 背景介紹 */}
+                {market.introduction && market.introduction !== market.brief && (
+                    <Box sx={{ mt: 4, pt: 3, borderTop: '1px solid #EFE5D8' }}>
+                        <Typography variant="h6" sx={{ fontWeight: 900, color: '#C62828', mb: 1.5 }}>
+                            📖 夜市故事與文化傳承
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#555', lineHeight: 1.8 }}>
+                            {market.introduction}
+                        </Typography>
+                    </Box>
+                )}
+            </Paper>
+
+            {/* 標籤頁籤切換：特色美食、人氣攤位、地圖 */}
+            <Box sx={{ borderBottom: 2, borderColor: '#E5D8C8', mb: 3 }}>
+                <Tabs
+                    value={activeTab}
+                    onChange={(e, val) => setActiveTab(val)}
+                    textColor="inherit"
+                    TabIndicatorProps={{ sx: { backgroundColor: '#C62828', height: 3 } }}
+                >
+                    <Tab
+                        icon={<RestaurantMenuIcon />}
+                        iconPosition="start"
+                        label="人氣必吃美食"
+                        sx={{ fontWeight: 800, fontSize: '1rem', color: activeTab === 0 ? '#C62828' : '#666' }}
+                    />
+                    <Tab
+                        icon={<StorefrontIcon />}
+                        iconPosition="start"
+                        label="推薦排隊店家"
+                        sx={{ fontWeight: 800, fontSize: '1rem', color: activeTab === 1 ? '#C62828' : '#666' }}
+                    />
+                    <Tab
+                        icon={<MapIcon />}
+                        iconPosition="start"
+                        label="周邊地圖導航"
+                        sx={{ fontWeight: 800, fontSize: '1rem', color: activeTab === 2 ? '#C62828' : '#666' }}
+                    />
+                </Tabs>
+            </Box>
+
+            {/* Tab 0: 美食列表 */}
+            {activeTab === 0 && (
+                <Grid container spacing={3}>
+                    {foods.length > 0 ? (
+                        foods.map((fItem, fIdx) => (
+                            <Grid item xs={12} sm={6} md={4} key={fItem._id || fIdx}>
+                                <Card className="tw-card" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                                    <CardMedia
+                                        component="img"
+                                        height="180"
+                                        image={fItem.foodIcon || 'https://images.unsplash.com/photo-1562967914-608f82629710?w=600'}
+                                        alt={fItem.foodName}
+                                        sx={{ objectFit: 'cover' }}
+                                    />
+                                    <CardContent sx={{ flexGrow: 1, p: 2 }}>
+                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                                            <Typography variant="h6" sx={{ fontWeight: 800, color: '#2C2622' }}>
+                                                {fItem.foodName}
+                                            </Typography>
+                                            <Typography variant="h6" className="tw-price">
+                                                NT$ {fItem.foodPrice || 60}
+                                            </Typography>
+                                        </Box>
+                                        <Typography variant="body2" sx={{ color: '#666', lineHeight: 1.6, minHeight: '44px' }}>
+                                            {fItem.foodInfo || '在地老饕必推的經典招牌小吃！'}
+                                        </Typography>
+                                    </CardContent>
+                                    <CardActions sx={{ p: 2, pt: 0 }}>
+                                        <Button
+                                            fullWidth
+                                            className="tw-btn-primary"
+                                            onClick={() => handleGoToFood(fItem._id)}
+                                        >
+                                            美食詳情與評價
+                                        </Button>
+                                    </CardActions>
+                                </Card>
+                            </Grid>
+                        ))
+                    ) : (
+                        <Grid item xs={12}>
+                            <Typography sx={{ color: '#888', textAlign: 'center', py: 4 }}>目前暫無此夜市的美食資料</Typography>
+                        </Grid>
+                    )}
+                </Grid>
+            )}
+
+            {/* Tab 1: 店家列表 */}
+            {activeTab === 1 && (
+                <Grid container spacing={3}>
+                    {shops.length > 0 ? (
+                        shops.map((sItem, sIdx) => (
+                            <Grid item xs={12} sm={6} md={4} key={sItem._id || sIdx}>
+                                <Card className="tw-card" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                                    <CardMedia
+                                        component="img"
+                                        height="180"
+                                        image={sItem.shopIcon || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600'}
+                                        alt={sItem.shopName}
+                                        sx={{ objectFit: 'cover' }}
+                                    />
+                                    <CardContent sx={{ flexGrow: 1, p: 2 }}>
+                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                                            <Typography variant="h6" sx={{ fontWeight: 800, color: '#2C2622' }}>
+                                                {sItem.shopName}
+                                            </Typography>
+                                            <Chip label={sItem.shopNumber || '攤位'} size="small" sx={{ backgroundColor: '#F0EAE1', fontWeight: 800 }} />
+                                        </Box>
+                                        <Typography variant="body2" sx={{ color: '#E65100', fontWeight: 700, mb: 1 }}>
+                                            📍 {sItem.shopLocation || '夜市主街區'}
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ color: '#666', lineHeight: 1.6, minHeight: '44px' }}>
+                                            {sItem.shopShortIntroduction || sItem.shopIntroduction}
+                                        </Typography>
+                                    </CardContent>
+                                    <CardActions sx={{ p: 2, pt: 0 }}>
+                                        <Button
+                                            fullWidth
+                                            className="tw-btn-primary"
+                                            onClick={() => handleGoToShop(sItem._id)}
+                                        >
+                                            查看攤位菜單
+                                        </Button>
+                                    </CardActions>
+                                </Card>
+                            </Grid>
+                        ))
+                    ) : (
+                        <Grid item xs={12}>
+                            <Typography sx={{ color: '#888', textAlign: 'center', py: 4 }}>目前暫無此夜市的店家資料</Typography>
+                        </Grid>
+                    )}
+                </Grid>
+            )}
+
+            {/* Tab 2: 地圖導航 */}
+            {activeTab === 2 && (
+                <Paper
+                    sx={{
+                        p: 3,
+                        borderRadius: '16px',
+                        backgroundColor: '#FFF',
+                        border: '1px solid #EFE5D8',
+                    }}
+                >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                        <LocationOnIcon sx={{ color: '#C62828' }} />
+                        <Typography variant="h6" sx={{ fontWeight: 800, color: '#2C2622' }}>
+                            {market.name} 地理位置與地圖
+                        </Typography>
+                    </Box>
+                    <Typography variant="body2" sx={{ color: '#666', mb: 2 }}>
+                        經緯度座標：{market.lat || 25.088}, {market.lng || 121.524} ｜ 捷運/交通導引：{market.positionGuidelines || '請搭乘大眾運輸前往'}
+                    </Typography>
+
+                    <Box sx={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid #DDD' }}>
+                        <LoadScript googleMapsApiKey="AIzaSyAEKOyS_X1yQAGmiZBO9zBjCeFqEsKa5DQ">
+                            <GoogleMap
+                                mapContainerStyle={{ width: '100%', height: '420px' }}
+                                center={{
+                                    lat: Number(market.lat) || 25.088,
+                                    lng: Number(market.lng) || 121.524
+                                }}
+                                zoom={16}
+                            />
                         </LoadScript>
                     </Box>
-                </Box>
-            </Paper >
-        </Box >
-
-
-    )
+                </Paper>
+            )}
+        </Box>
+    );
 }
