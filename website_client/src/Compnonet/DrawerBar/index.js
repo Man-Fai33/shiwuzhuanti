@@ -85,15 +85,15 @@ export default function DrawerBar() {
                     boxShadow: '0 2px 14px rgba(167, 29, 29, 0.35)',
                 }}
             >
-                <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', px: { xs: 1.5, md: 3 } }}>
+                <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: { xs: 1.5, sm: 2, md: 3 }, flexWrap: 'nowrap', minHeight: { xs: 56, sm: 64 } }}>
                     {/* 左側：漢堡選單與品牌名稱 */}
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
                         <IconButton
                             color="inherit"
                             aria-label="open drawer"
                             onClick={handleDrawerOpen}
                             edge="start"
-                            sx={{ mr: { xs: 1, md: 2 } }}
+                            sx={{ mr: { xs: 0.5, sm: 1.5 } }}
                         >
                             <MenuIcon sx={{ fontSize: 28 }} />
                         </IconButton>
@@ -110,16 +110,17 @@ export default function DrawerBar() {
                             }}
                         >
                             <Typography
-                                variant="h5"
+                                variant="h6"
                                 component="span"
                                 sx={{
                                     fontFamily: "'Noto Serif TC', serif",
                                     fontWeight: 900,
-                                    letterSpacing: '0.04em',
-                                    fontSize: { xs: '1.1rem', sm: '1.45rem' },
+                                    letterSpacing: '0.02em',
+                                    fontSize: { xs: '1rem', sm: '1.25rem', md: '1.35rem' },
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: 0.5,
+                                    whiteSpace: 'nowrap',
                                     textShadow: '0 2px 6px rgba(0,0,0,0.3)',
                                 }}
                             >
@@ -130,7 +131,7 @@ export default function DrawerBar() {
                                 label={t('brand_badge')}
                                 size="small"
                                 sx={{
-                                    display: { xs: 'none', sm: 'inline-flex' },
+                                    display: { xs: 'none', lg: 'inline-flex' },
                                     backgroundColor: 'rgba(255, 235, 59, 0.95)',
                                     color: '#8E1800',
                                     fontWeight: 800,
@@ -142,31 +143,31 @@ export default function DrawerBar() {
                     </Box>
 
                     {/* 中間：Desktop 快捷選單 */}
-                    <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 1 }}>
-                        <Button href="/nightmarket" sx={{ color: '#FFF', fontWeight: 700, fontSize: '0.95rem', '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' } }}>
+                    <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: { md: 0.4, lg: 1 }, flexShrink: 1, minWidth: 0 }}>
+                        <Button href="/nightmarket" sx={{ color: '#FFF', fontWeight: 700, fontSize: { md: '0.84rem', lg: '0.94rem' }, px: { md: 0.8, lg: 1.5 }, whiteSpace: 'nowrap', minWidth: 'auto', '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' } }}>
                             {t('nav_markets')}
                         </Button>
-                        <Button href="/Food" sx={{ color: '#FFF', fontWeight: 700, fontSize: '0.95rem', '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' } }}>
+                        <Button href="/Food" sx={{ color: '#FFF', fontWeight: 700, fontSize: { md: '0.84rem', lg: '0.94rem' }, px: { md: 0.8, lg: 1.5 }, whiteSpace: 'nowrap', minWidth: 'auto', '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' } }}>
                             {t('nav_foods')}
                         </Button>
-                        <Button href="/guide" sx={{ color: '#FFE082', fontWeight: 800, fontSize: '0.95rem', backgroundColor: 'rgba(0,0,0,0.15)', px: 1.5, borderRadius: '20px', '&:hover': { backgroundColor: 'rgba(255,255,255,0.2)' } }}>
+                        <Button href="/guide" sx={{ color: '#FFE082', fontWeight: 800, fontSize: { md: '0.84rem', lg: '0.94rem' }, px: { md: 1, lg: 1.5 }, whiteSpace: 'nowrap', minWidth: 'auto', backgroundColor: 'rgba(0,0,0,0.15)', borderRadius: '20px', '&:hover': { backgroundColor: 'rgba(255,255,255,0.2)' } }}>
                             🧭 {t('nav_guide')}
                         </Button>
-                        <Button href="/bulletinBoard" sx={{ color: '#FFF', fontWeight: 700, fontSize: '0.95rem', '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' } }}>
+                        <Button href="/bulletinBoard" sx={{ color: '#FFF', fontWeight: 700, fontSize: { md: '0.84rem', lg: '0.94rem' }, px: { md: 0.8, lg: 1.5 }, whiteSpace: 'nowrap', minWidth: 'auto', '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' } }}>
                             {t('nav_bulletin')}
                         </Button>
-                        <Button href="/feedback" sx={{ color: '#FFF', fontWeight: 700, fontSize: '0.95rem', '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' } }}>
+                        <Button href="/feedback" sx={{ color: '#FFF', fontWeight: 700, fontSize: { md: '0.84rem', lg: '0.94rem' }, px: { md: 0.8, lg: 1.5 }, whiteSpace: 'nowrap', minWidth: 'auto', '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' } }}>
                             {t('nav_feedback')}
                         </Button>
                         {user && user.role === 'admin' && (
-                            <Button href="/datamanagement" sx={{ color: '#FFE082', fontWeight: 800, fontSize: '0.95rem', border: '1px solid rgba(255,224,130,0.6)', borderRadius: '6px' }}>
+                            <Button href="/datamanagement" sx={{ color: '#FFE082', fontWeight: 800, fontSize: { md: '0.84rem', lg: '0.94rem' }, px: { md: 0.8, lg: 1.2 }, whiteSpace: 'nowrap', minWidth: 'auto', border: '1px solid rgba(255,224,130,0.6)', borderRadius: '6px' }}>
                                 ⚙️ {t('nav_admin')}
                             </Button>
                         )}
                     </Box>
 
                     {/* 右側：覓食清單 + 語言切換 + 登入 / 會員頭像 */}
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.6, sm: 1 }, flexShrink: 0 }}>
                         {/* 旅人覓食清單按鈕 */}
                         <Tooltip title={lang === 'en' ? 'My Food Wishlist' : '今晚覓食清單'}>
                             <Button
@@ -177,8 +178,10 @@ export default function DrawerBar() {
                                     fontWeight: 800,
                                     fontSize: '0.82rem',
                                     borderRadius: '20px',
-                                    px: 1.4,
+                                    px: { xs: 0.9, sm: 1.3 },
                                     py: 0.35,
+                                    minWidth: 'auto',
+                                    whiteSpace: 'nowrap',
                                     border: totalItems > 0 ? '1px solid #FFD54F' : '1px solid rgba(255,255,255,0.4)',
                                     backgroundColor: totalItems > 0 ? 'rgba(255, 213, 79, 0.25)' : 'rgba(0,0,0,0.18)',
                                     display: 'flex',
@@ -190,9 +193,9 @@ export default function DrawerBar() {
                                 <Badge badgeContent={totalItems} color="warning">
                                     <FavoriteIcon sx={{ fontSize: 18, color: totalItems > 0 ? '#FFD54F' : '#FFF' }} />
                                 </Badge>
-                                <span style={{ marginLeft: totalItems > 0 ? '6px' : '0px' }}>
+                                <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' }, ml: totalItems > 0 ? '6px' : '0px', whiteSpace: 'nowrap' }}>
                                     {lang === 'en' ? 'Wishlist' : '覓食清單'}
-                                </span>
+                                </Box>
                             </Button>
                         </Tooltip>
 
@@ -200,14 +203,16 @@ export default function DrawerBar() {
                         <Button
                             onClick={toggleLang}
                             size="small"
-                            startIcon={<TranslateIcon fontSize="small" />}
+                            startIcon={<TranslateIcon fontSize="small" sx={{ display: { xs: 'none', sm: 'inline-flex' } }} />}
                             sx={{
                                 color: '#FFF',
                                 fontWeight: 800,
                                 fontSize: '0.82rem',
                                 borderRadius: '20px',
-                                px: 1.4,
+                                px: { xs: 1, sm: 1.4 },
                                 py: 0.35,
+                                minWidth: 'auto',
+                                whiteSpace: 'nowrap',
                                 border: '1px solid rgba(255,255,255,0.65)',
                                 backgroundColor: 'rgba(0,0,0,0.18)',
                                 transition: 'all 0.2s ease',
@@ -284,17 +289,21 @@ export default function DrawerBar() {
                                 </Menu>
                             </Box>
                         ) : (
-                            <Box sx={{ display: 'flex', gap: 1 }}>
+                            <Box sx={{ display: 'flex', gap: { xs: 0.5, sm: 1 }, flexShrink: 0 }}>
                                 <Button
                                     href="/signin"
                                     variant="outlined"
                                     size="small"
-                                    startIcon={<LoginIcon />}
+                                    startIcon={<LoginIcon sx={{ display: { xs: 'none', sm: 'inline-flex' } }} />}
                                     sx={{
                                         color: '#FFF',
                                         borderColor: 'rgba(255,255,255,0.7)',
                                         fontWeight: 700,
                                         borderRadius: '8px',
+                                        px: { xs: 0.8, sm: 1.4 },
+                                        minWidth: 'auto',
+                                        whiteSpace: 'nowrap',
+                                        fontSize: '0.82rem',
                                         '&:hover': { borderColor: '#FFF', backgroundColor: 'rgba(255,255,255,0.1)' }
                                     }}
                                 >
@@ -304,12 +313,16 @@ export default function DrawerBar() {
                                     href="/signup"
                                     variant="contained"
                                     size="small"
-                                    startIcon={<PersonAddIcon />}
+                                    startIcon={<PersonAddIcon sx={{ display: { xs: 'none', sm: 'inline-flex' } }} />}
                                     sx={{
                                         backgroundColor: '#FFB300',
                                         color: '#612A00',
                                         fontWeight: 800,
                                         borderRadius: '8px',
+                                        px: { xs: 0.8, sm: 1.4 },
+                                        minWidth: 'auto',
+                                        whiteSpace: 'nowrap',
+                                        fontSize: '0.82rem',
                                         '&:hover': { backgroundColor: '#FFA000' }
                                     }}
                                 >

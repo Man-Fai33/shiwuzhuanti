@@ -182,7 +182,7 @@ export default function NightMarket() {
             >
                 <Grid container spacing={2} alignItems="center">
                     {/* 地區切換按鈕 */}
-                    <Grid item xs={12} md={7}>
+                    <Grid item xs={12} lg={8}>
                         <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                             {regions.map((r) => (
                                 <Chip
@@ -192,9 +192,10 @@ export default function NightMarket() {
                                     onClick={() => setSelectedRegion(r.id)}
                                     sx={{
                                         fontWeight: 800,
-                                        fontSize: '0.9rem',
-                                        py: 2,
-                                        px: 1,
+                                        fontSize: '0.88rem',
+                                        height: '36px',
+                                        px: 0.5,
+                                        whiteSpace: 'nowrap',
                                         backgroundColor: selectedRegion === r.id ? '#C62828' : '#F5EBE1',
                                         color: selectedRegion === r.id ? '#FFF' : '#5D4037',
                                         '&:hover': {
@@ -207,7 +208,7 @@ export default function NightMarket() {
                     </Grid>
 
                     {/* 關鍵字搜尋 */}
-                    <Grid item xs={12} md={5}>
+                    <Grid item xs={12} lg={4}>
                         <TextField
                             fullWidth
                             size="small"
@@ -323,15 +324,15 @@ export default function NightMarket() {
                                     </Box>
                                 </Box>
 
-                                <CardContent sx={{ flexGrow: 1, p: 2.5 }}>
-                                    <Typography variant="h6" sx={{ fontWeight: 900, color: '#2C2622', mb: 0.5 }}>
+                                <CardContent sx={{ flexGrow: 1, p: 2.5, display: 'flex', flexDirection: 'column' }}>
+                                    <Typography variant="h6" sx={{ fontWeight: 900, color: '#2C2622', mb: 0.5, lineHeight: 1.3, fontSize: '1.15rem' }}>
                                         {lang === 'en' ? (item.nameen || item.name) : item.name}
                                     </Typography>
                                     <Typography variant="caption" sx={{ color: '#888', display: 'block', mb: 1.5 }}>
                                         {lang === 'en' ? (item.marketLocation || 'Taiwan') : item.nameen}
                                     </Typography>
 
-                                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.8, color: '#555', mb: 1.5, fontSize: '0.85rem' }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.8, color: '#555', mb: 1.2, fontSize: '0.85rem' }}>
                                         <LocationOnIcon fontSize="small" sx={{ color: '#D84315', mt: 0.2, flexShrink: 0 }} />
                                         <Typography variant="body2" sx={{ color: '#666', lineHeight: 1.4 }}>
                                             {item.marketLocation || (lang === 'en' ? 'Taiwan night market cluster' : '在地熱門夜市聚落')}
@@ -339,18 +340,18 @@ export default function NightMarket() {
                                     </Box>
 
                                     {item.positionGuidelines && (
-                                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.8, color: '#2E7D32', mb: 1, fontSize: '0.82rem' }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.8, color: '#2E7D32', mb: 1.2, fontSize: '0.82rem' }}>
                                             <DirectionsSubwayIcon fontSize="small" sx={{ mt: 0.2, flexShrink: 0 }} />
-                                            <Typography variant="caption" sx={{ color: '#2E7D32', fontWeight: 600, lineHeight: 1.4 }}>
+                                            <Typography variant="caption" sx={{ color: '#2E7D32', fontWeight: 600, lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                                                 {item.positionGuidelines}
                                             </Typography>
                                         </Box>
                                     )}
 
                                     {/* 營運時間提醒（跨縣市旅人必備） */}
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, color: '#E65100', mb: 1.5, fontSize: '0.8rem' }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, color: '#E65100', mb: 1.5, fontSize: '0.8rem', minWidth: 0 }}>
                                         <CalendarMonthIcon fontSize="small" sx={{ flexShrink: 0 }} />
-                                        <Typography variant="caption" sx={{ fontWeight: 700, color: (item.name && item.name.includes('花園')) ? '#C62828' : '#795548' }}>
+                                        <Typography variant="caption" sx={{ fontWeight: 700, color: (item.name && item.name.includes('花園')) ? '#C62828' : '#795548', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                             {(item.name && item.name.includes('花園'))
                                                 ? (lang === 'en' ? '⚠️ Open Thu, Sat, Sun Only (17:00-00:00)' : '⚠️ 每週四、六、日限定營業 (17:00-00:00)')
                                                 : (lang === 'en' ? 'Open Daily (17:30 - 00:00)' : '每日營業 (17:30 - 00:00)')}
@@ -366,6 +367,7 @@ export default function NightMarket() {
                                             WebkitLineClamp: 3,
                                             WebkitBoxOrient: 'vertical',
                                             overflow: 'hidden',
+                                            flexGrow: 1,
                                         }}
                                     >
                                         {item.brief || item.introduction}

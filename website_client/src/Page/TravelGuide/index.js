@@ -296,6 +296,10 @@ export default function TravelGuide() {
                                     className="tw-card"
                                     sx={{
                                         p: 2.5,
+                                        height: '100%',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
                                         textAlign: 'center',
                                         backgroundColor: '#FFF',
                                         border: '1px solid #EFE5D8',
@@ -312,8 +316,23 @@ export default function TravelGuide() {
                                     <Typography variant="body2" sx={{ color: '#888', fontStyle: 'italic', mb: 1 }}>
                                         [{p.pinyin}]
                                     </Typography>
-                                    <Chip label={p.english} size="small" sx={{ backgroundColor: '#EFEBE9', color: '#4E342E', fontWeight: 800, mb: 1.5 }} />
-                                    <Typography variant="caption" sx={{ color: '#666', display: 'block', mb: 1.5, minHeight: '36px' }}>
+                                    <Box
+                                        sx={{
+                                            backgroundColor: '#EFEBE9',
+                                            color: '#4E342E',
+                                            fontWeight: 800,
+                                            fontSize: '0.78rem',
+                                            borderRadius: '12px',
+                                            px: 1.2,
+                                            py: 0.4,
+                                            mb: 1.5,
+                                            display: 'inline-block',
+                                            lineHeight: 1.3
+                                        }}
+                                    >
+                                        {p.english}
+                                    </Box>
+                                    <Typography variant="caption" sx={{ color: '#666', display: 'block', mb: 1.5, flexGrow: 1, lineHeight: 1.5 }}>
                                         {p.usage}
                                     </Typography>
                                     <Button
@@ -323,6 +342,7 @@ export default function TravelGuide() {
                                         startIcon={<VolumeUpIcon />}
                                         onClick={() => speakText(p.chinese)}
                                         sx={{
+                                            mt: 'auto',
                                             borderRadius: '20px',
                                             borderColor: speakingWord === p.chinese ? '#2E7D32' : '#C62828',
                                             color: speakingWord === p.chinese ? '#2E7D32' : '#C62828',

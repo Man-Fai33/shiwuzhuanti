@@ -165,7 +165,7 @@ export default function FoodList() {
                 }}
             >
                 <Grid container spacing={2} alignItems="center">
-                    <Grid item xs={12} md={7}>
+                    <Grid item xs={12} lg={8}>
                         <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                             {categories.map((c) => (
                                 <Chip
@@ -175,9 +175,10 @@ export default function FoodList() {
                                     onClick={() => setSelectedCategory(c.id)}
                                     sx={{
                                         fontWeight: 800,
-                                        fontSize: '0.9rem',
-                                        py: 2,
-                                        px: 1,
+                                        fontSize: '0.88rem',
+                                        height: '36px',
+                                        px: 0.5,
+                                        whiteSpace: 'nowrap',
                                         backgroundColor: selectedCategory === c.id ? '#C62828' : '#F5EBE1',
                                         color: selectedCategory === c.id ? '#FFF' : '#5D4037',
                                         '&:hover': {
@@ -189,7 +190,7 @@ export default function FoodList() {
                         </Box>
                     </Grid>
 
-                    <Grid item xs={12} md={5}>
+                    <Grid item xs={12} lg={4}>
                         <TextField
                             fullWidth
                             size="small"
@@ -255,22 +256,25 @@ export default function FoodList() {
                                     <Box
                                         sx={{
                                             position: 'absolute',
-                                            bottom: 12,
-                                            right: 12,
+                                            bottom: 10,
+                                            right: 10,
                                             backgroundColor: '#C62828',
                                             color: '#FFF',
-                                            px: 1.5,
-                                            py: 0.4,
+                                            px: 1.2,
+                                            py: 0.35,
                                             borderRadius: '8px',
                                             fontWeight: 900,
-                                            fontSize: '1rem',
+                                            fontSize: '0.92rem',
                                             boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
-                                            textAlign: 'right'
+                                            textAlign: 'right',
+                                            lineHeight: 1.2,
+                                            maxWidth: '85%',
+                                            whiteSpace: 'nowrap'
                                         }}
                                     >
                                         NT$ {item.foodPrice || 60}
                                         {lang === 'en' && (
-                                            <span style={{ fontSize: '0.72rem', fontWeight: 600, opacity: 0.9, display: 'block' }}>
+                                            <span style={{ fontSize: '0.7rem', fontWeight: 700, opacity: 0.95, display: 'block' }}>
                                                 ≈ ${(((item.foodPrice || 60)) / 32).toFixed(1)} USD
                                             </span>
                                         )}
@@ -305,8 +309,8 @@ export default function FoodList() {
                                     </IconButton>
                                 </Box>
 
-                                <CardContent sx={{ flexGrow: 1, p: 2.5 }}>
-                                    <Typography variant="h6" sx={{ fontWeight: 900, color: '#2C2622', mb: 1 }}>
+                                <CardContent sx={{ flexGrow: 1, p: 2.5, display: 'flex', flexDirection: 'column' }}>
+                                    <Typography variant="h6" sx={{ fontWeight: 900, color: '#2C2622', mb: 1, fontSize: '1.1rem', lineHeight: 1.3 }}>
                                         {item.foodName}
                                     </Typography>
 
@@ -343,6 +347,7 @@ export default function FoodList() {
                                             WebkitLineClamp: 2,
                                             WebkitBoxOrient: 'vertical',
                                             overflow: 'hidden',
+                                            flexGrow: 1,
                                         }}
                                     >
                                         {lang === 'en' ? (item.foodInfoEN || item.foodInfo) : item.foodInfo}

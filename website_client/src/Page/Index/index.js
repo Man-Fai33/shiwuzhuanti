@@ -188,17 +188,24 @@ export default function Index() {
                         <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.85)', fontWeight: 700 }}>
                             {t('quick_search')}
                         </Typography>
-                        {['士林夜市', '逢甲夜市', '花園夜市', '饒河夜市', '寧夏夜市'].map((name) => (
+                        {[
+                            { zh: '士林夜市', en: 'Shilin', q: '士林' },
+                            { zh: '逢甲夜市', en: 'Fengjia', q: '逢甲' },
+                            { zh: '花園夜市', en: 'Garden', q: '花園' },
+                            { zh: '饒河夜市', en: 'Raohe', q: '饒河' },
+                            { zh: '寧夏夜市', en: 'Ningxia', q: '寧夏' }
+                        ].map((item) => (
                             <Chip
-                                key={name}
-                                label={name}
+                                key={item.q}
+                                label={lang === 'en' ? item.en : item.zh}
                                 size="small"
-                                onClick={() => handleQuickSearch(name)}
+                                onClick={() => handleQuickSearch(item.q)}
                                 sx={{
                                     backgroundColor: 'rgba(255, 255, 255, 0.2)',
                                     color: '#FFF',
                                     fontWeight: 700,
                                     cursor: 'pointer',
+                                    whiteSpace: 'nowrap',
                                     border: '1px solid rgba(255, 255, 255, 0.4)',
                                     '&:hover': {
                                         backgroundColor: 'rgba(255, 255, 255, 0.35)',
@@ -222,12 +229,12 @@ export default function Index() {
                     {/* 卡片 1：夜市總覽 */}
                     <Grid item xs={12} sm={6} md={3}>
                         <Card className="tw-card" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                            <Box sx={{ p: 3, textAlign: 'center', background: 'linear-gradient(180deg, #FFF3E0 0%, #FFF 100%)' }}>
-                                <StorefrontIcon sx={{ fontSize: 48, color: '#E65100', mb: 1 }} />
+                            <Box sx={{ p: 3, textAlign: 'center', background: 'linear-gradient(180deg, #FFF3E0 0%, #FFF 100%)', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                                <StorefrontIcon sx={{ fontSize: 48, color: '#E65100', mb: 1, alignSelf: 'center' }} />
                                 <Typography variant="h6" sx={{ fontWeight: 800, color: '#C62828' }}>
                                     {t('card_markets_title')}
                                 </Typography>
-                                <Typography variant="body2" sx={{ color: '#666', mt: 1, minHeight: '40px' }}>
+                                <Typography variant="body2" sx={{ color: '#666', mt: 1, flexGrow: 1, lineHeight: 1.6 }}>
                                     {t('card_markets_desc')}
                                 </Typography>
                             </Box>
@@ -242,12 +249,12 @@ export default function Index() {
                     {/* 卡片 2：人氣美食 */}
                     <Grid item xs={12} sm={6} md={3}>
                         <Card className="tw-card" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                            <Box sx={{ p: 3, textAlign: 'center', background: 'linear-gradient(180deg, #FBE9E7 0%, #FFF 100%)' }}>
-                                <RestaurantMenuIcon sx={{ fontSize: 48, color: '#C62828', mb: 1 }} />
+                            <Box sx={{ p: 3, textAlign: 'center', background: 'linear-gradient(180deg, #FBE9E7 0%, #FFF 100%)', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                                <RestaurantMenuIcon sx={{ fontSize: 48, color: '#C62828', mb: 1, alignSelf: 'center' }} />
                                 <Typography variant="h6" sx={{ fontWeight: 800, color: '#C62828' }}>
                                     {t('card_foods_title')}
                                 </Typography>
-                                <Typography variant="body2" sx={{ color: '#666', mt: 1, minHeight: '40px' }}>
+                                <Typography variant="body2" sx={{ color: '#666', mt: 1, flexGrow: 1, lineHeight: 1.6 }}>
                                     {t('card_foods_desc')}
                                 </Typography>
                             </Box>
@@ -262,12 +269,12 @@ export default function Index() {
                     {/* 卡片 3：活動公告 */}
                     <Grid item xs={12} sm={6} md={3}>
                         <Card className="tw-card" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                            <Box sx={{ p: 3, textAlign: 'center', background: 'linear-gradient(180deg, #FFFDE7 0%, #FFF 100%)' }}>
-                                <CampaignIcon sx={{ fontSize: 48, color: '#F57F17', mb: 1 }} />
+                            <Box sx={{ p: 3, textAlign: 'center', background: 'linear-gradient(180deg, #FFFDE7 0%, #FFF 100%)', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                                <CampaignIcon sx={{ fontSize: 48, color: '#F57F17', mb: 1, alignSelf: 'center' }} />
                                 <Typography variant="h6" sx={{ fontWeight: 800, color: '#C62828' }}>
                                     {t('card_bulletin_title')}
                                 </Typography>
-                                <Typography variant="body2" sx={{ color: '#666', mt: 1, minHeight: '40px' }}>
+                                <Typography variant="body2" sx={{ color: '#666', mt: 1, flexGrow: 1, lineHeight: 1.6 }}>
                                     {t('card_bulletin_desc')}
                                 </Typography>
                             </Box>
@@ -282,12 +289,12 @@ export default function Index() {
                     {/* 卡片 4：訪客回饋 */}
                     <Grid item xs={12} sm={6} md={3}>
                         <Card className="tw-card" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                            <Box sx={{ p: 3, textAlign: 'center', background: 'linear-gradient(180deg, #E8F5E9 0%, #FFF 100%)' }}>
-                                <RateReviewIcon sx={{ fontSize: 48, color: '#2E7D32', mb: 1 }} />
+                            <Box sx={{ p: 3, textAlign: 'center', background: 'linear-gradient(180deg, #E8F5E9 0%, #FFF 100%)', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                                <RateReviewIcon sx={{ fontSize: 48, color: '#2E7D32', mb: 1, alignSelf: 'center' }} />
                                 <Typography variant="h6" sx={{ fontWeight: 800, color: '#C62828' }}>
                                     {t('card_feedback_title')}
                                 </Typography>
-                                <Typography variant="body2" sx={{ color: '#666', mt: 1, minHeight: '40px' }}>
+                                <Typography variant="body2" sx={{ color: '#666', mt: 1, flexGrow: 1, lineHeight: 1.6 }}>
                                     {t('card_feedback_desc')}
                                 </Typography>
                             </Box>
@@ -435,9 +442,9 @@ export default function Index() {
                                     </Box>
                                 </Box>
 
-                                <CardContent sx={{ flexGrow: 1, p: 2.5 }}>
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                                        <Typography variant="h6" sx={{ fontWeight: 900, color: '#2C2622' }}>
+                                <CardContent sx={{ flexGrow: 1, p: 2.5, display: 'flex', flexDirection: 'column' }}>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 1, mb: 1 }}>
+                                        <Typography variant="h6" sx={{ fontWeight: 900, color: '#2C2622', flex: 1, fontSize: '1.1rem', lineHeight: 1.3 }}>
                                             {lang === 'en' ? (item.nameen || item.name) : item.name}
                                         </Typography>
                                         <Chip
@@ -449,7 +456,7 @@ export default function Index() {
                                                 (item.marketLocation === 'tn' || (item.name && item.name.includes('花園'))) ? (lang === 'en' ? 'Tainan' : '台南') : '台灣'
                                             }
                                             size="small"
-                                            sx={{ backgroundColor: '#FFECB3', color: '#8E1800', fontWeight: 800 }}
+                                            sx={{ backgroundColor: '#FFECB3', color: '#8E1800', fontWeight: 800, flexShrink: 0 }}
                                         />
                                     </Box>
 
@@ -467,20 +474,25 @@ export default function Index() {
                                             WebkitBoxOrient: 'vertical',
                                             overflow: 'hidden',
                                             mb: 1.5,
+                                            flexGrow: 1,
                                         }}
                                     >
                                         {item.brief || item.introduction}
                                     </Typography>
 
                                     {/* 捷運交通與營業時間提示 */}
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: '#2E7D32', fontSize: '0.82rem', fontWeight: 700, mb: 0.8 }}>
-                                        <DirectionsSubwayIcon fontSize="small" />
-                                        <span>{item.positionGuidelines ? (item.positionGuidelines.substring(0, 24) + '...') : (item.marketLocation || '在地熱門捷運直達')}</span>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, color: '#2E7D32', fontSize: '0.82rem', fontWeight: 700, mb: 0.8, minWidth: 0 }}>
+                                        <DirectionsSubwayIcon fontSize="small" sx={{ flexShrink: 0 }} />
+                                        <Typography variant="caption" sx={{ color: '#2E7D32', fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                            {item.positionGuidelines || (item.marketLocation || '在地熱門捷運直達')}
+                                        </Typography>
                                     </Box>
 
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: (item.name && item.name.includes('花園')) ? '#C62828' : '#795548', fontSize: '0.8rem', fontWeight: 700 }}>
-                                        <CalendarMonthIcon fontSize="small" />
-                                        <span>{(item.name && item.name.includes('花園')) ? (lang === 'en' ? '⚠️ Thu, Sat, Sun Only' : '⚠️ 每週四、六、日限定營業') : (lang === 'en' ? 'Open Daily (17:30 - 00:00)' : '每日營業 (17:30 - 00:00)')}</span>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, color: (item.name && item.name.includes('花園')) ? '#C62828' : '#795548', fontSize: '0.8rem', fontWeight: 700, minWidth: 0 }}>
+                                        <CalendarMonthIcon fontSize="small" sx={{ flexShrink: 0 }} />
+                                        <Typography variant="caption" sx={{ fontWeight: 700, color: (item.name && item.name.includes('花園')) ? '#C62828' : '#795548', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                            {(item.name && item.name.includes('花園')) ? (lang === 'en' ? '⚠️ Thu, Sat, Sun Only' : '⚠️ 每週四、六、日限定營業') : (lang === 'en' ? 'Open Daily (17:30 - 00:00)' : '每日營業 (17:30 - 00:00)')}
+                                        </Typography>
                                     </Box>
                                 </CardContent>
 
