@@ -71,6 +71,23 @@ export const translations = {
         food_type_dessert: '冰品甜點',
         view_food_detail: '查看小吃推薦 ➔',
 
+        // Feedback Page
+        feedback_page_title: '遊客心聲與意見回饋',
+        feedback_page_desc: '歡迎與我們分享您的夜市探訪心得、推薦私房攤位或平台改善建議！',
+        feedback_name: '您的稱謂 / 暱稱',
+        feedback_name_ph: '例如：陳大明、夜市老饕',
+        feedback_phone: '聯絡電話 (選填)',
+        feedback_email: '電子郵件信箱',
+        feedback_opinion: '意見內容與心得回饋',
+        feedback_opinion_ph: '請告訴我們您的想法、遇到的問題，或想推薦的美食私房店家...',
+        feedback_submit: '送出回饋 🏮',
+        feedback_success: '🏮 感謝您的寶貴回饋！意見已成功送出！',
+        feedback_fail: '送出失敗，請稍候重試或檢查網路連線',
+
+        // Bulletin Page
+        bulletin_page_title: '夜市即時公告欄',
+        bulletin_page_desc: '即時掌握各大夜市營業異動、節慶特展與防疫指引！',
+
         // General
         rating: '評分',
         price: '價格',
@@ -145,6 +162,23 @@ export const translations = {
         food_type_pasta: 'Noodles & Mains',
         food_type_dessert: 'Desserts & Ice',
         view_food_detail: 'View Specialty ➔',
+
+        // Feedback Page
+        feedback_page_title: 'Visitor Feedback & Suggestions',
+        feedback_page_desc: 'Share your night market experience, recommend hidden gem stalls, or suggest improvements!',
+        feedback_name: 'Your Name / Nickname',
+        feedback_name_ph: 'e.g. John Doe, Foodie Traveler',
+        feedback_phone: 'Contact Phone (Optional)',
+        feedback_email: 'Email Address',
+        feedback_opinion: 'Your Feedback & Thoughts',
+        feedback_opinion_ph: 'Tell us your thoughts, questions, or secret stalls you recommend...',
+        feedback_submit: 'Submit Feedback 🏮',
+        feedback_success: '🏮 Thank you for your valuable feedback! Submitted successfully!',
+        feedback_fail: 'Failed to submit. Please try again or check your network connection.',
+
+        // Bulletin Page
+        bulletin_page_title: 'Live Night Market Announcements',
+        bulletin_page_desc: 'Real-time updates on market schedules, seasonal events, and health guidelines!',
 
         // General
         rating: 'Rating',

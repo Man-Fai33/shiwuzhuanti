@@ -8,18 +8,22 @@ import {
     Button,
     Grid,
     Alert,
-    CircularProgress
+    CircularProgress,
+    Snackbar
 } from '@mui/material';
 import RateReviewIcon from '@mui/icons-material/RateReview';
 import SendIcon from '@mui/icons-material/Send';
 import helper from '../Helper/helper';
+import { useLanguage } from '../../Context/LanguageContext';
 
 export default function FeedBack() {
+    const { t, lang } = useLanguage();
     const [username, setUsername] = useState("");
     const [phone, setPhone] = useState("");
     const [email, setEmail] = useState("");
     const [opinion, setOpinion] = useState("");
     const [statusMsg, setStatusMsg] = useState({ type: '', text: '' });
+    const [openSnackbar, setOpenSnackbar] = useState(false);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -41,12 +45,12 @@ export default function FeedBack() {
         setStatusMsg({ type: '', text: '' });
 
         if (!email.includes('@') || !email.includes('.')) {
-            setStatusMsg({ type: 'error', text: '請輸入正確格式的電子郵件信箱' });
+            setStatusMsg({ type: 'error', text: lang === 'en' ? 'Please enter a valid email address' : '請輸入正確格式的電子郵件信箱' });
             return;
         }
 
         if (!username.trim() || !opinion.trim()) {
-            setStatusMsg({ type: 'error', text: '請填寫您的大名或暱稱，以及寶貴的建議內容' });
+            setStatusMsg({ type: 'error', text: lang === 'en' ? 'Please fill in your name and feedback message' : '請填寫您的大名或暱稱，以及寶貴的建議內容' });
             return;
         }
 
@@ -61,7 +65,7 @@ export default function FeedBack() {
             const feedbackData = {
                 feedback: {
                     owner: username.trim(),
-                    contact: phone.trim() || "未留電話",
+                    contact: phone.trim() || (lang === 'en' ? 'None' : '未留電話'),
                     email: email.trim(),
                     opinion: opinion.trim(),
                     isMember: user ? user._id : null,
@@ -73,14 +77,15 @@ export default function FeedBack() {
             if (res && res.status === "success") {
                 setStatusMsg({
                     type: 'success',
-                    text: '🏮 感謝您的寶貴回饋！意見已成功送出！'
+                    text: t('feedback_success')
                 });
+                setOpenSnackbar(true);
                 setOpinion("");
             } else {
-                setStatusMsg({ type: 'error', text: '送出失敗，請稍候重試或檢查網路連線' });
+                setStatusMsg({ type: 'error', text: t('feedback_fail') });
             }
         } catch (err) {
-            setStatusMsg({ type: 'error', text: '連線伺服器發生異常，請重試' });
+            setStatusMsg({ type: 'error', text: lang === 'en' ? 'Server connection error, please try again' : '連線伺服器發生異常，請重試' });
         } finally {
             setLoading(false);
         }
@@ -107,10 +112,10 @@ export default function FeedBack() {
                     <RateReviewIcon sx={{ fontSize: 32 }} />
                 </Box>
                 <Typography variant="h4" sx={{ fontWeight: 800, color: '#2b2520' }}>
-                    🏮 遊客心聲與意見回饋
+                    🏮 {t('feedback_page_title')}
                 </Typography>
                 <Typography variant="body1" sx={{ color: '#6d655e', mt: 1 }}>
-                    歡迎與我們分享您的夜市探訪心得、推薦私房攤位或平台改善建議！
+                    {t('feedback_page_desc')}
                 </Typography>
             </Box>
 
@@ -137,8 +142,8 @@ export default function FeedBack() {
                             <TextField
                                 required
                                 fullWidth
-                                label="您的稱謂 / 暱稱"
-                                placeholder="例如：陳大明、夜市饕客"
+                                label={t('feedback_name')}
+                                placeholder={t('feedback_name_ph')}
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                             />
@@ -147,7 +152,7 @@ export default function FeedBack() {
                         <Grid item xs={12} sm={6}>
                             <TextField
                                 fullWidth
-                                label="聯絡電話 (選填)"
+                                label={t('feedback_phone')}
                                 placeholder="0912-345-678"
                                 value={phone}
                                 onChange={(e) => setPhone(e.target.value)}
@@ -159,7 +164,7 @@ export default function FeedBack() {
                                 required
                                 fullWidth
                                 type="email"
-                                label="電子郵件信箱"
+                                label={t('feedback_email')}
                                 placeholder="yourname@example.com"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
@@ -172,8 +177,8 @@ export default function FeedBack() {
                                 fullWidth
                                 multiline
                                 rows={6}
-                                label="意見內容與心得回饋"
-                                placeholder="請告訴我們您的想法、遇到的問題，或想推薦的美食私房店家..."
+                                label={t('feedback_opinion')}
+                                placeholder={t('feedback_opinion_ph')}
                                 value={opinion}
                                 onChange={(e) => setOpinion(e.target.value)}
                             />
@@ -200,11 +205,23 @@ export default function FeedBack() {
                                 }
                             }}
                         >
-                            {loading ? <CircularProgress size={24} color="inherit" /> : '送出回饋 🏮'}
+                            {loading ? <CircularProgress size={24} color="inherit" /> : t('feedback_submit')}
                         </Button>
                     </Box>
                 </Box>
             </Paper>
+
+            {/* MUI Snackbar 浮動通知套件 */}
+            <Snackbar
+                open={openSnackbar}
+                autoHideDuration={4000}
+                onClose={() => setOpenSnackbar(false)}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert onClose={() => setOpenSnackbar(false)} severity="success" sx={{ width: '100%', fontWeight: 700 }}>
+                    {t('feedback_success')}
+                </Alert>
+            </Snackbar>
         </Container>
     );
 }

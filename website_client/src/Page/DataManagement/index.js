@@ -19,6 +19,7 @@ import CampaignIcon from '@mui/icons-material/Campaign';
 import FeedbackIcon from '@mui/icons-material/Feedback';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import dayjs from 'dayjs';
 import helper from '../Helper/helper';
 
 export default function DataManagement() {
@@ -73,7 +74,7 @@ export default function DataManagement() {
                     contact: f.contact || '無',
                     email: f.email || '',
                     opinion: f.opinion || '',
-                    date: f.date ? new Date(f.date).toLocaleDateString('zh-TW') : '近期'
+                    date: (f.date && dayjs(f.date).isValid()) ? dayjs(f.date).format('YYYY-MM-DD HH:mm') : '近期'
                 }));
                 setFeedbacks(mapped);
             }
