@@ -71,7 +71,6 @@ export default function DrawerBar() {
                 sx={{
                     background: 'linear-gradient(90deg, #A71D1D 0%, #C62828 45%, #D84315 100%)',
                     boxShadow: '0 2px 14px rgba(167, 29, 29, 0.35)',
-                    zIndex: (theme) => theme.zIndex.drawer + 1,
                 }}
             >
                 <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', px: { xs: 1.5, md: 3 } }}>
@@ -284,6 +283,7 @@ export default function DrawerBar() {
                 open={open}
                 onClose={handleDrawerClose}
                 sx={{
+                    zIndex: (theme) => theme.zIndex.modal + 1,
                     '& .MuiDrawer-paper': {
                         width: drawerWidth,
                         boxSizing: 'border-box',
