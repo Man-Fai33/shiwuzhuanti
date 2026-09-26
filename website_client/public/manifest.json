@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "夜市好好行",
+  "name": "夜市好好行 🏮 台灣在地夜市生活與美食指南",
+  "description": "全台指標性夜市導覽、排隊銅板美食、捷運公車交通指引與外國旅人通關秘笈",
   "icons": [
     {
       "src": "favicon.ico",
@@ -18,8 +19,9 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "orientation": "portrait",
+  "theme_color": "#C62828",
+  "background_color": "#FFFDF9"
 }

@@ -20,6 +20,9 @@ import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import MapIcon from '@mui/icons-material/Map';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import UmbrellaIcon from '@mui/icons-material/Umbrella';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
 import helper from '../Helper/helper';
 import { useLanguage } from '../../Context/LanguageContext';
@@ -28,6 +31,70 @@ export default function NightMarketPage() {
     const { lang } = useLanguage();
     const [market, setMarket] = useState({});
     const [foods, setFoods] = useState([]);
+
+    const getLiveStatus = () => {
+        const now = new Date();
+        const day = now.getDay();
+        const hour = now.getHours();
+        const minute = now.getMinutes();
+        const timeDecimal = hour + minute / 60;
+        const isTainanFlower = market.name && market.name.includes('花園');
+
+        if (isTainanFlower) {
+            const isTainanOpenDay = day === 0 || day === 4 || day === 6;
+            if (!isTainanOpenDay) {
+                return {
+                    text: lang === 'en' ? '🔴 Closed Today (Open Thu, Sat, Sun)' : '🔴 今日公休 (僅每週四、六、日營業)',
+                    color: '#D32F2F',
+                    bg: '#FFEBEE',
+                    crowd: lang === 'en' ? 'Closed' : '今日不開攤'
+                };
+            }
+        }
+
+        if (timeDecimal >= 17.5 || timeDecimal < 1.0) {
+            const isPeak = timeDecimal >= 19.5 && timeDecimal <= 21.5;
+            return {
+                text: lang === 'en' ? '🟢 Open Now' : '🟢 營業中 (夜市開市)',
+                color: '#2E7D32',
+                bg: '#E8F5E9',
+                crowd: isPeak
+                    ? (lang === 'en' ? '🔥 Peak Crowd Hour (19:30-21:30)' : '🔥 尖峰熱鬧人潮 (19:30-21:30)')
+                    : (lang === 'en' ? '✨ Pleasant Crowd' : '✨ 舒適好逛時段')
+            };
+        } else if (timeDecimal >= 16.5 && timeDecimal < 17.5) {
+            return {
+                text: lang === 'en' ? '🕒 Opening Soon (~17:30)' : '🕒 攤商陸續出攤中 (約 17:30 開市)',
+                color: '#E65100',
+                bg: '#FFF8E1',
+                crowd: lang === 'en' ? 'Setting Up' : '出攤準備中'
+            };
+        } else {
+            return {
+                text: lang === 'en' ? '🌙 Opens at 17:30 Tonight' : '🌙 白天休市中 (今晚 17:30 開市)',
+                color: '#5D4037',
+                bg: '#EFEBE9',
+                crowd: lang === 'en' ? 'Opens Tonight' : '今晚開市'
+            };
+        }
+    };
+
+    const getRainyDayTip = () => {
+        const name = market.name || '';
+        if (name.includes('士林')) {
+            return lang === 'en'
+                ? '🌧️ Rainy-Day Friendly: Shilin features a large B1 Air-Conditioned Food Court. Great for rainy days!'
+                : '🌧️ 雨天備案首選：士林夜市設有超大 B1 空調美食地下街，下大雨也能舒適吃遍蚵仔煎與生炒花枝！';
+        }
+        if (name.includes('寧夏')) {
+            return lang === 'en'
+                ? '🌧️ Rainy-Day Friendly: Ningxia has sheltered covered walkways on both sides of the street.'
+                : '🌧️ 雨天備案：寧夏夜市兩側設有連續騎樓與遮雨棚，動線直線單純，雨天依然熱門好逛。';
+        }
+        return lang === 'en'
+            ? '🌧️ Rainy-Day Notice: Most stalls have awnings. Bringing an umbrella is recommended on rainy evenings.'
+            : '🌧️ 雨天提醒：夜市多數攤位均備有大型雨遮，雨天造訪建議攜帶輕便摺疊傘。';
+    };
     const [shops, setShops] = useState([]);
     const [activeTab, setActiveTab] = useState(0);
 
@@ -116,7 +183,8 @@ export default function NightMarketPage() {
 
                     {/* 右側夜市特色介紹 */}
                     <Grid item xs={12} md={7}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                        {/* 城市與標籤 */}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
                             <Chip
                                 label={getLocationName(market.marketLocation)}
                                 size="small"
@@ -126,6 +194,25 @@ export default function NightMarketPage() {
                                 label={lang === 'en' ? 'Must-Visit Night Market' : '熱門必訪觀光夜市'}
                                 size="small"
                                 sx={{ backgroundColor: '#FFECB3', color: '#8E1800', fontWeight: 800 }}
+                            />
+                            <Chip
+                                icon={<AccessTimeIcon />}
+                                label={getLiveStatus().text}
+                                size="small"
+                                sx={{
+                                    backgroundColor: getLiveStatus().bg,
+                                    color: getLiveStatus().color,
+                                    fontWeight: 800,
+                                }}
+                            />
+                            <Chip
+                                label={getLiveStatus().crowd}
+                                size="small"
+                                sx={{
+                                    backgroundColor: '#FFF3E0',
+                                    color: '#E65100',
+                                    fontWeight: 700,
+                                }}
                             />
                         </Box>
 
@@ -143,7 +230,7 @@ export default function NightMarketPage() {
 
                         {/* 交通指引 */}
                         {market.positionGuidelines && (
-                            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 2.5, p: 1.5, backgroundColor: '#F9F6F0', borderRadius: '10px' }}>
+                            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 1.5, p: 1.5, backgroundColor: '#F9F6F0', borderRadius: '10px' }}>
                                 <DirectionsSubwayIcon sx={{ color: '#C62828', mt: 0.3 }} />
                                 <Box>
                                     <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#2C2622' }}>
@@ -155,6 +242,14 @@ export default function NightMarketPage() {
                                 </Box>
                             </Box>
                         )}
+
+                        {/* 雨天備案提示 */}
+                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 2.5, p: 1.5, backgroundColor: '#E3F2FD', borderRadius: '10px' }}>
+                            <UmbrellaIcon sx={{ color: '#0288D1', mt: 0.3 }} />
+                            <Typography variant="body2" sx={{ color: '#01579B', lineHeight: 1.5, fontWeight: 600 }}>
+                                {getRainyDayTip()}
+                            </Typography>
+                        </Box>
 
                         {/* 綜合評分 */}
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -321,9 +416,29 @@ export default function NightMarketPage() {
                             {lang === 'en' ? `${market.nameen || market.name} Geographic Location` : `${market.name} 地理位置與地圖`}
                         </Typography>
                     </Box>
-                    <Typography variant="body2" sx={{ color: '#666', mb: 2 }}>
-                        {lang === 'en' ? 'Coordinates: ' : '經緯度座標：'}{market.lat || 25.088}, {market.lng || 121.524} ｜ {lang === 'en' ? 'Transit Guide: ' : '捷運/交通導引：'}{market.positionGuidelines || (lang === 'en' ? 'Accessible via public transit' : '請搭乘大眾運輸前往')}
-                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1.5, mb: 2 }}>
+                        <Typography variant="body2" sx={{ color: '#666' }}>
+                            {lang === 'en' ? 'Coordinates: ' : '經緯度座標：'}{market.lat || 25.088}, {market.lng || 121.524} ｜ {lang === 'en' ? 'Transit Guide: ' : '捷運/交通導引：'}{market.positionGuidelines || (lang === 'en' ? 'Accessible via public transit' : '請搭乘大眾運輸前往')}
+                        </Typography>
+                        <Button
+                            variant="contained"
+                            startIcon={<OpenInNewIcon />}
+                            href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent((market.name || '') + ' ' + (market.marketLocation || ''))}&travelmode=transit`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            sx={{
+                                backgroundColor: '#C62828',
+                                color: '#FFF',
+                                fontWeight: 800,
+                                borderRadius: '20px',
+                                px: 2.2,
+                                py: 0.7,
+                                '&:hover': { backgroundColor: '#B71C1C' }
+                            }}
+                        >
+                            {lang === 'en' ? 'Open in Google Maps (Take Me There) ➔' : '🗺️ Google 地圖即時導航 (帶我前往) ➔'}
+                        </Button>
+                    </Box>
 
                     <Box sx={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid #DDD', height: '420px', width: '100%' }}>
                         <iframe

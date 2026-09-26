@@ -16,6 +16,7 @@ import DirectionsSubwayIcon from '@mui/icons-material/DirectionsSubway';
 import PaymentsIcon from '@mui/icons-material/Payments';
 import TranslateIcon from '@mui/icons-material/Translate';
 import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
+import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import Button from '@mui/material/Button';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
@@ -24,6 +25,20 @@ import { useLanguage } from '../../Context/LanguageContext';
 export default function TravelGuide() {
     const { lang } = useLanguage();
     const [tabVal, setTabVal] = useState(0);
+    const [speakingWord, setSpeakingWord] = useState('');
+
+    const speakText = (text) => {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'zh-TW';
+            utterance.rate = 0.85; // slightly slower for clear learning
+            setSpeakingWord(text);
+            utterance.onend = () => setSpeakingWord('');
+            utterance.onerror = () => setSpeakingWord('');
+            window.speechSynthesis.speak(utterance);
+        }
+    };
 
     const transitGuides = [
         {
@@ -297,10 +312,31 @@ export default function TravelGuide() {
                                     <Typography variant="body2" sx={{ color: '#888', fontStyle: 'italic', mb: 1 }}>
                                         [{p.pinyin}]
                                     </Typography>
-                                    <Chip label={p.english} size="small" sx={{ backgroundColor: '#EFEBE9', color: '#4E342E', fontWeight: 800, mb: 1 }} />
-                                    <Typography variant="caption" sx={{ color: '#666', display: 'block' }}>
+                                    <Chip label={p.english} size="small" sx={{ backgroundColor: '#EFEBE9', color: '#4E342E', fontWeight: 800, mb: 1.5 }} />
+                                    <Typography variant="caption" sx={{ color: '#666', display: 'block', mb: 1.5, minHeight: '36px' }}>
                                         {p.usage}
                                     </Typography>
+                                    <Button
+                                        fullWidth
+                                        size="small"
+                                        variant="outlined"
+                                        startIcon={<VolumeUpIcon />}
+                                        onClick={() => speakText(p.chinese)}
+                                        sx={{
+                                            borderRadius: '20px',
+                                            borderColor: speakingWord === p.chinese ? '#2E7D32' : '#C62828',
+                                            color: speakingWord === p.chinese ? '#2E7D32' : '#C62828',
+                                            backgroundColor: speakingWord === p.chinese ? '#E8F5E9' : 'transparent',
+                                            fontWeight: 800,
+                                            fontSize: '0.8rem',
+                                            '&:hover': {
+                                                borderColor: '#B71C1C',
+                                                backgroundColor: 'rgba(198, 40, 40, 0.06)'
+                                            }
+                                        }}
+                                    >
+                                        {speakingWord === p.chinese ? (lang === 'en' ? 'Playing...' : '播放中...') : (lang === 'en' ? 'Listen 🔊' : '發音示範 🔊')}
+                                    </Button>
                                 </Card>
                             </Grid>
                         ))}

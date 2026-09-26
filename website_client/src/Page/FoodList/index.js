@@ -11,18 +11,22 @@ import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import Chip from '@mui/material/Chip';
 import Paper from '@mui/material/Paper';
+import IconButton from '@mui/material/IconButton';
 
 // Icons
 import SearchIcon from '@mui/icons-material/Search';
 import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu';
 import ClearIcon from '@mui/icons-material/Clear';
-import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 
 import helper from '../Helper/helper';
 import { useLanguage } from '../../Context/LanguageContext';
+import { useWishlist } from '../../Context/WishlistContext';
 
 export default function FoodList() {
     const { lang, t } = useLanguage();
+    const { toggleWishlist, isInWishlist } = useWishlist();
     const [foodList, setFoodList] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [searchText, setSearchText] = useState('');
@@ -272,27 +276,33 @@ export default function FoodList() {
                                         )}
                                     </Box>
 
-                                    {item.isSale && (
-                                        <Box
-                                            sx={{
-                                                position: 'absolute',
-                                                top: 12,
-                                                left: 12,
-                                                backgroundColor: '#FF8F00',
-                                                color: '#FFF',
-                                                px: 1.2,
-                                                py: 0.3,
-                                                borderRadius: '6px',
-                                                fontWeight: 800,
-                                                fontSize: '0.8rem',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: 0.3,
-                                            }}
-                                        >
-                                            <LocalFireDepartmentIcon fontSize="small" /> {lang === 'en' ? 'Hot Pick' : '人氣熱銷'}
-                                        </Box>
-                                    )}
+                                    {/* 收藏愛心按鈕 */}
+                                    <IconButton
+                                        size="small"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            toggleWishlist(item);
+                                        }}
+                                        sx={{
+                                            position: 'absolute',
+                                            top: 10,
+                                            right: 10,
+                                            backgroundColor: 'rgba(255, 255, 255, 0.92)',
+                                            boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                                            color: isInWishlist(item._id, item.foodName) ? '#E91E63' : '#757575',
+                                            transition: 'all 0.2s ease',
+                                            '&:hover': {
+                                                backgroundColor: '#FFF',
+                                                transform: 'scale(1.15)'
+                                            }
+                                        }}
+                                    >
+                                        {isInWishlist(item._id, item.foodName) ? (
+                                            <FavoriteIcon fontSize="small" sx={{ color: '#E91E63' }} />
+                                        ) : (
+                                            <FavoriteBorderIcon fontSize="small" />
+                                        )}
+                                    </IconButton>
                                 </Box>
 
                                 <CardContent sx={{ flexGrow: 1, p: 2.5 }}>

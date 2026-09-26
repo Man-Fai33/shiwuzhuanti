@@ -17,15 +17,17 @@ import Account from './Page/Account';
 import TravelGuide from './Page/TravelGuide';
 import UserContext from './Context/context';
 import { LanguageProvider } from './Context/LanguageContext';
+import { WishlistProvider } from './Context/WishlistContext';
 import ShopPage from './Page/Shop/shop';
 
 function App() {
   return (
     <LanguageProvider>
-      <div className="App">
-        <UserContext.Provider value={UserContext}>
-        <BrowserRouter>
-          <DrawerBar />
+      <WishlistProvider>
+        <div className="App">
+          <UserContext.Provider value={UserContext}>
+          <BrowserRouter>
+            <DrawerBar />
           <Routes>
             {/* 首頁預設直接進入精美主頁 */}
             <Route path="/" element={<Index />} />
@@ -80,6 +82,7 @@ function App() {
         <Outlet />
       </UserContext.Provider>
     </div>
+    </WishlistProvider>
   </LanguageProvider>
   );
 }

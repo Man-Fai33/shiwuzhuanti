@@ -62,8 +62,19 @@ app.use((req, res, next) => {
     return res.status(200).json({});
   }
   next();
-})
+});
 
+const rateLimit = require('express-rate-limit');
+
+// Rate limiter: 1000 requests per 15 minutes per IP
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 1000,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { status: 'error', message: 'Too many requests from this IP, please try again after 15 minutes.' }
+});
+app.use(apiLimiter);
 
 //error handle
 

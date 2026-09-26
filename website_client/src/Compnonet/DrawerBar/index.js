@@ -19,6 +19,11 @@ import Tooltip from '@mui/material/Tooltip';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Chip from '@mui/material/Chip';
+import Badge from '@mui/material/Badge';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
 
 // Specialized Icons for Taiwan Night Market
 import StorefrontIcon from '@mui/icons-material/Storefront';
@@ -33,16 +38,21 @@ import LoginIcon from '@mui/icons-material/Login';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import TranslateIcon from '@mui/icons-material/Translate';
 import ExploreIcon from '@mui/icons-material/Explore';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
 import { useLanguage } from '../../Context/LanguageContext';
+import { useWishlist } from '../../Context/WishlistContext';
 
 const drawerWidth = 270;
 
 export default function DrawerBar() {
     const { lang, toggleLang, t } = useLanguage();
+    const { wishlist, removeFromWishlist, clearWishlist, totalItems, totalPrice } = useWishlist();
     const rawUser = localStorage.getItem('user');
     const user = rawUser ? JSON.parse(rawUser) : null;
     const [open, setOpen] = useState(false);
+    const [wishlistOpen, setWishlistOpen] = useState(false);
     const [anchorElUser, setAnchorElUser] = useState(null);
 
     const handleDrawerOpen = () => setOpen(true);
@@ -155,8 +165,37 @@ export default function DrawerBar() {
                         )}
                     </Box>
 
-                    {/* 右側：語言切換 + 登入 / 會員頭像 */}
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    {/* 右側：覓食清單 + 語言切換 + 登入 / 會員頭像 */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2 }}>
+                        {/* 旅人覓食清單按鈕 */}
+                        <Tooltip title={lang === 'en' ? 'My Food Wishlist' : '今晚覓食清單'}>
+                            <Button
+                                onClick={() => setWishlistOpen(true)}
+                                size="small"
+                                sx={{
+                                    color: '#FFF',
+                                    fontWeight: 800,
+                                    fontSize: '0.82rem',
+                                    borderRadius: '20px',
+                                    px: 1.4,
+                                    py: 0.35,
+                                    border: totalItems > 0 ? '1px solid #FFD54F' : '1px solid rgba(255,255,255,0.4)',
+                                    backgroundColor: totalItems > 0 ? 'rgba(255, 213, 79, 0.25)' : 'rgba(0,0,0,0.18)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 0.5,
+                                    '&:hover': { backgroundColor: 'rgba(255,255,255,0.25)' }
+                                }}
+                            >
+                                <Badge badgeContent={totalItems} color="warning">
+                                    <FavoriteIcon sx={{ fontSize: 18, color: totalItems > 0 ? '#FFD54F' : '#FFF' }} />
+                                </Badge>
+                                <span style={{ marginLeft: totalItems > 0 ? '6px' : '0px' }}>
+                                    {lang === 'en' ? 'Wishlist' : '覓食清單'}
+                                </span>
+                            </Button>
+                        </Tooltip>
+
                         {/* 中英文切換按鈕 */}
                         <Button
                             onClick={toggleLang}
@@ -404,6 +443,137 @@ export default function DrawerBar() {
                     </Typography>
                 </Box>
             </Drawer>
+
+            {/* 旅人今晚覓食口袋名單 Dialog */}
+            <Dialog
+                open={wishlistOpen}
+                onClose={() => setWishlistOpen(false)}
+                maxWidth="sm"
+                fullWidth
+                PaperProps={{
+                    sx: {
+                        borderRadius: '16px',
+                        border: '1px solid #EFE5D8',
+                    }
+                }}
+            >
+                <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <span style={{ fontSize: '1.5rem' }}>❤️</span>
+                        <Typography variant="h6" sx={{ fontWeight: 900, color: '#C62828', fontFamily: "'Noto Serif TC', serif" }}>
+                            {lang === 'en' ? 'My Night Market Food Crawl Wishlist' : '今晚夜市必吃覓食清單'}
+                        </Typography>
+                    </Box>
+                    <Chip label={`${totalItems} ${lang === 'en' ? 'Dishes' : '道小吃'}`} size="small" sx={{ backgroundColor: '#FFEBEE', color: '#C62828', fontWeight: 800 }} />
+                </DialogTitle>
+                <DialogContent dividers sx={{ p: 2.5 }}>
+                    {wishlist.length === 0 ? (
+                        <Box sx={{ py: 5, textAlign: 'center' }}>
+                            <Box sx={{ fontSize: '3rem', mb: 1 }}>🥢</Box>
+                            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#666', mb: 1 }}>
+                                {lang === 'en' ? 'Your Wishlist is Empty!' : '您的覓食清單目前還是空的喔！'}
+                            </Typography>
+                            <Typography variant="body2" sx={{ color: '#999', mb: 3 }}>
+                                {lang === 'en'
+                                    ? 'Browse through the Food Gallery and click the heart icon to save dishes for your night out.'
+                                    : '在「人氣美食圖鑑」瀏覽時，點擊愛心即可加入口袋名單，方便出發前規劃！'}
+                            </Typography>
+                            <Button
+                                href="/Food"
+                                variant="contained"
+                                className="tw-btn-primary"
+                                onClick={() => setWishlistOpen(false)}
+                            >
+                                {lang === 'en' ? 'Explore Street Foods ➔' : '立即探索特色小吃 ➔'}
+                            </Button>
+                        </Box>
+                    ) : (
+                        <Box>
+                            <Typography variant="caption" sx={{ color: '#888', display: 'block', mb: 2 }}>
+                                {lang === 'en'
+                                    ? 'Show this screen directly to stall owners to order effortlessly without speaking!'
+                                    : '💡 貼心提示：在夜市現場，您可以直接拿著此畫面出示給攤商老闆看，點餐超方便！'}
+                            </Typography>
+
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                                {wishlist.map((item, idx) => (
+                                    <Box
+                                        key={item._id || item.id || idx}
+                                        sx={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
+                                            p: 1.5,
+                                            borderRadius: '10px',
+                                            backgroundColor: '#FFFDF9',
+                                            border: '1px solid #EFE5D8',
+                                        }}
+                                    >
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                            <img
+                                                src={item.foodIcon || 'https://images.unsplash.com/photo-1562967914-608f82629710?w=200'}
+                                                alt={item.foodName}
+                                                style={{ width: 52, height: 52, borderRadius: '8px', objectFit: 'cover' }}
+                                            />
+                                            <Box>
+                                                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#2C2622' }}>
+                                                    {item.foodName}
+                                                </Typography>
+                                                {item.foodInfoEN && (
+                                                    <Typography variant="caption" sx={{ color: '#888', display: 'block' }}>
+                                                        {item.foodInfoEN}
+                                                    </Typography>
+                                                )}
+                                                <Typography variant="caption" sx={{ color: '#C62828', fontWeight: 800 }}>
+                                                    NT$ {item.foodPrice || 60} {lang === 'en' && `(~${(((item.foodPrice || 60)) / 32).toFixed(1)} USD)`}
+                                                </Typography>
+                                            </Box>
+                                        </Box>
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => removeFromWishlist(item._id || item.id)}
+                                            sx={{ color: '#999', '&:hover': { color: '#C62828' } }}
+                                        >
+                                            <DeleteOutlineIcon fontSize="small" />
+                                        </IconButton>
+                                    </Box>
+                                ))}
+                            </Box>
+
+                            {/* 總預算試算 */}
+                            <Box sx={{ mt: 2.5, p: 2, borderRadius: '10px', backgroundColor: '#FFF8E1', border: '1px solid #FFE082', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#E65100' }}>
+                                    {lang === 'en' ? 'Estimated Total Budget:' : '預算總金額估算：'}
+                                </Typography>
+                                <Box sx={{ textAlign: 'right' }}>
+                                    <Typography variant="h6" sx={{ fontWeight: 900, color: '#C62828' }}>
+                                        NT$ {totalPrice}
+                                    </Typography>
+                                    {lang === 'en' && (
+                                        <Typography variant="caption" sx={{ color: '#888' }}>
+                                            ≈ ${(totalPrice / 32).toFixed(1)} USD
+                                        </Typography>
+                                    )}
+                                </Box>
+                            </Box>
+                        </Box>
+                    )}
+                </DialogContent>
+                <DialogActions sx={{ p: 2 }}>
+                    {wishlist.length > 0 && (
+                        <Button onClick={clearWishlist} sx={{ color: '#999', fontWeight: 700 }}>
+                            {lang === 'en' ? 'Clear List' : '清空名單'}
+                        </Button>
+                    )}
+                    <Button
+                        variant="contained"
+                        onClick={() => setWishlistOpen(false)}
+                        className="tw-btn-primary"
+                    >
+                        {lang === 'en' ? 'Close' : '關閉'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 }
