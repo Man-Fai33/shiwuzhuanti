@@ -89,83 +89,123 @@ export default function NightMarket() {
     });
 
     const regions = [
-        { id: 'all', label: lang === 'en' ? 'All Taiwan 🇹🇼' : '全部夜市 🇹🇼' },
-        { id: 'taipei', label: lang === 'en' ? 'Taipei 🏛️' : '台北市 🏛️' },
-        { id: 'taichung', label: lang === 'en' ? 'Taichung 🏙️' : '台中市 🏙️' },
-        { id: 'tainan', label: lang === 'en' ? 'Tainan 🏯' : '台南市 🏯' },
-        { id: 'kaohsiung', label: lang === 'en' ? 'Kaohsiung 🚢' : '高雄市 🚢' },
-        { id: 'yilan', label: lang === 'en' ? 'Yilan ♨️' : '宜蘭縣 ♨️' },
+        { id: 'all', label: lang === 'en' ? 'All Taiwan' : '全部夜市' },
+        { id: 'taipei', label: lang === 'en' ? 'Taipei' : '台北' },
+        { id: 'taichung', label: lang === 'en' ? 'Taichung' : '台中' },
+        { id: 'tainan', label: lang === 'en' ? 'Tainan' : '台南' },
+        { id: 'kaohsiung', label: lang === 'en' ? 'Kaohsiung' : '高雄' },
+        { id: 'yilan', label: lang === 'en' ? 'Yilan' : '宜蘭' },
     ];
 
     const getRegionBadge = (item) => {
         const loc = (item.marketLocation || '').toLowerCase();
         const name = item.name || '';
-        if (loc === 'tp' || loc === 'taipei' || name.includes('士林') || name.includes('饒河') || name.includes('寧夏')) return lang === 'en' ? 'Taipei' : '台北市';
-        if (loc === 'tz' || loc === 'taichung' || name.includes('逢甲')) return lang === 'en' ? 'Taichung' : '台中市';
-        if (name.includes('羅東')) return lang === 'en' ? 'Yilan' : '宜蘭縣';
-        if (name.includes('六合')) return lang === 'en' ? 'Kaohsiung' : '高雄市';
-        if (loc === 'tn' || loc === 'tainan' || name.includes('花園')) return lang === 'en' ? 'Tainan' : '台南市';
+        if (loc === 'tp' || loc === 'taipei' || name.includes('士林') || name.includes('饒河') || name.includes('寧夏')) return lang === 'en' ? 'Taipei' : '台北';
+        if (loc === 'tz' || loc === 'taichung' || name.includes('逢甲')) return lang === 'en' ? 'Taichung' : '台中';
+        if (name.includes('羅東')) return lang === 'en' ? 'Yilan' : '宜蘭';
+        if (name.includes('六合')) return lang === 'en' ? 'Kaohsiung' : '高雄';
+        if (loc === 'tn' || loc === 'tainan' || name.includes('花園')) return lang === 'en' ? 'Tainan' : '台南';
         return lang === 'en' ? 'Taiwan' : '台灣';
     };
 
     return (
         <Box sx={{ pb: 6 }}>
             {/* 標題與簡介 */}
-            <Box sx={{ mb: 3, textAlign: { xs: 'center', md: 'left' } }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: { xs: 'center', md: 'flex-start' }, mb: 1 }}>
-                    <span style={{ fontSize: '2rem' }}>🏮</span>
-                    <Typography variant="h4" sx={{ fontFamily: "'Noto Serif TC', serif", fontWeight: 900, color: '#C62828' }}>
-                        {t('markets_page_title')}
-                    </Typography>
-                </Box>
-                <Typography variant="body1" sx={{ color: '#666' }}>
-                    {t('markets_page_desc')} {lang === 'en' ? `(${markets.length} landmark markets featured across Taiwan)` : `精選全台 ${markets.length} 座必訪觀光夜市！`}
+            <Box sx={{ mb: 3.5, textAlign: { xs: 'center', md: 'left' } }}>
+                <Typography
+                    variant="caption"
+                    sx={{
+                        display: 'inline-block',
+                        fontWeight: 800,
+                        letterSpacing: '0.12em',
+                        textTransform: 'uppercase',
+                        color: 'var(--tw-terracotta, #B91C1C)',
+                        mb: 0.5,
+                    }}
+                >
+                    {lang === 'en' ? 'Taiwan Night Markets Directory' : '全台夜市名錄指南'}
+                </Typography>
+                <Typography
+                    variant="h4"
+                    sx={{
+                        fontFamily: "'Noto Serif TC', serif",
+                        fontWeight: 800,
+                        color: 'var(--tw-deep-charcoal, #1C1917)',
+                        fontSize: { xs: '1.75rem', sm: '2.2rem' },
+                        mb: 1,
+                    }}
+                >
+                    {t('markets_page_title')}
+                </Typography>
+                <Typography variant="body1" sx={{ color: 'var(--tw-text-muted, #78716C)', maxWidth: 720 }}>
+                    {t('markets_page_desc')} {lang === 'en' ? `(${markets.length} curated destinations across Taiwan)` : `精選全台 ${markets.length} 座必訪觀光夜市。`}
                 </Typography>
             </Box>
 
-            {/* 外縣市與外國旅人專屬通關秘笈提醒 Banner */}
+            {/* 旅人導覽捷徑 Banner */}
             <Paper
                 elevation={0}
                 sx={{
-                    p: 2,
-                    mb: 3,
-                    borderRadius: '12px',
-                    backgroundColor: '#FFF8E1',
-                    border: '1px solid #FFE082',
+                    p: { xs: 2, sm: 2.5 },
+                    mb: 3.5,
+                    borderRadius: '16px',
+                    backgroundColor: 'var(--tw-card-white, #FFFFFF)',
+                    border: '1px solid var(--tw-border-subtle, #EAE5DD)',
+                    boxShadow: '0 2px 10px rgba(28, 25, 23, 0.04)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     flexWrap: 'wrap',
-                    gap: 1.5,
+                    gap: 2,
                 }}
             >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <ExploreIcon sx={{ color: '#E65100', fontSize: 28 }} />
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Box
+                        sx={{
+                            width: 44,
+                            height: 44,
+                            borderRadius: '12px',
+                            backgroundColor: '#FEF2F2',
+                            color: 'var(--tw-terracotta, #B91C1C)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                        }}
+                    >
+                        <ExploreIcon sx={{ fontSize: 24 }} />
+                    </Box>
                     <Box>
-                        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#C62828' }}>
-                            {lang === 'en' ? '✈️ First Time Visiting from Out of Town or Abroad?' : '✈️ 第一次來台或跨縣市造訪夜市？'}
+                        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'var(--tw-deep-charcoal, #1C1917)', mb: 0.2 }}>
+                            {lang === 'en' ? 'Essential Traveler Guide 101' : '旅人行前重點指引'}
                         </Typography>
-                        <Typography variant="caption" sx={{ color: '#777' }}>
+                        <Typography variant="caption" sx={{ color: 'var(--tw-text-muted, #78716C)' }}>
                             {lang === 'en'
-                                ? 'Check our complete guide on MRT direct lines, payment methods, and essential phrases!'
-                                : '歡迎參考我們為旅人整理的「捷運大眾交通直達、現金支付習慣與點餐小抄」！'}
+                                ? 'MRT connections, cashless & cash etiquette, and ordering phrases.'
+                                : '彙整大眾交通直達指引、現金準備與常用點餐常用語彙。'}
                         </Typography>
                     </Box>
                 </Box>
                 <Button
                     href="/guide"
                     size="small"
-                    variant="contained"
+                    variant="outlined"
                     sx={{
-                        backgroundColor: '#C62828',
-                        color: '#FFF',
-                        fontWeight: 800,
+                        borderColor: 'var(--tw-border-subtle, #EAE5DD)',
+                        color: 'var(--tw-deep-charcoal, #1C1917)',
+                        fontWeight: 700,
                         borderRadius: '20px',
-                        px: 2,
-                        '&:hover': { backgroundColor: '#B71C1C' }
+                        px: 2.5,
+                        py: 0.7,
+                        textTransform: 'none',
+                        '&:hover': {
+                            borderColor: 'var(--tw-terracotta, #B91C1C)',
+                            backgroundColor: '#FEF2F2',
+                            color: 'var(--tw-terracotta, #B91C1C)',
+                        }
                     }}
                 >
-                    {lang === 'en' ? 'Traveler Guide 101 ➔' : '查看旅人秘笈 ➔'}
+                    {lang === 'en' ? 'Open Travel Guide →' : '查看完整秘笈 →'}
                 </Button>
             </Paper>
 
@@ -173,37 +213,44 @@ export default function NightMarket() {
             <Paper
                 elevation={0}
                 sx={{
-                    p: 2.5,
+                    p: { xs: 2, sm: 2.5 },
                     mb: 4,
                     borderRadius: '16px',
-                    backgroundColor: '#FFF',
-                    border: '1px solid #EAE0D5',
+                    backgroundColor: 'var(--tw-card-white, #FFFFFF)',
+                    border: '1px solid var(--tw-border-subtle, #EAE5DD)',
+                    boxShadow: '0 2px 10px rgba(28, 25, 23, 0.03)',
                 }}
             >
                 <Grid container spacing={2} alignItems="center">
                     {/* 地區切換按鈕 */}
                     <Grid item xs={12} lg={8}>
                         <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                            {regions.map((r) => (
-                                <Chip
-                                    key={r.id}
-                                    label={r.label}
-                                    clickable
-                                    onClick={() => setSelectedRegion(r.id)}
-                                    sx={{
-                                        fontWeight: 800,
-                                        fontSize: '0.88rem',
-                                        height: '36px',
-                                        px: 0.5,
-                                        whiteSpace: 'nowrap',
-                                        backgroundColor: selectedRegion === r.id ? '#C62828' : '#F5EBE1',
-                                        color: selectedRegion === r.id ? '#FFF' : '#5D4037',
-                                        '&:hover': {
-                                            backgroundColor: selectedRegion === r.id ? '#B71C1C' : '#E8D9CD',
-                                        },
-                                    }}
-                                />
-                            ))}
+                            {regions.map((r) => {
+                                const isActive = selectedRegion === r.id;
+                                return (
+                                    <Chip
+                                        key={r.id}
+                                        label={r.label}
+                                        clickable
+                                        onClick={() => setSelectedRegion(r.id)}
+                                        sx={{
+                                            fontWeight: 700,
+                                            fontSize: '0.85rem',
+                                            height: '34px',
+                                            px: 0.8,
+                                            borderRadius: '18px',
+                                            whiteSpace: 'nowrap',
+                                            transition: 'all 0.2s ease',
+                                            backgroundColor: isActive ? 'var(--tw-terracotta, #B91C1C)' : 'var(--tw-paper-cream, #FAF8F5)',
+                                            color: isActive ? '#FFF' : 'var(--tw-deep-charcoal, #1C1917)',
+                                            border: isActive ? '1px solid var(--tw-terracotta, #B91C1C)' : '1px solid var(--tw-border-subtle, #EAE5DD)',
+                                            '&:hover': {
+                                                backgroundColor: isActive ? '#991B1B' : '#F2EDE4',
+                                            },
+                                        }}
+                                    />
+                                );
+                            })}
                         </Box>
                     </Grid>
 
@@ -218,7 +265,7 @@ export default function NightMarket() {
                             InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">
-                                        <SearchIcon sx={{ color: '#C62828' }} />
+                                        <SearchIcon sx={{ color: 'var(--tw-text-muted, #78716C)' }} />
                                     </InputAdornment>
                                 ),
                                 endAdornment: searchText && (
@@ -233,9 +280,11 @@ export default function NightMarket() {
                                     </InputAdornment>
                                 ),
                                 sx: {
-                                    borderRadius: '10px',
-                                    backgroundColor: '#FAFAF9',
-                                    '&:hover': { backgroundColor: '#F5F5F4' },
+                                    borderRadius: '24px',
+                                    backgroundColor: 'var(--tw-paper-cream, #FAF8F5)',
+                                    fontSize: '0.9rem',
+                                    border: '1px solid var(--tw-border-subtle, #EAE5DD)',
+                                    '& fieldset': { border: 'none' },
                                 },
                             }}
                         />
@@ -244,14 +293,14 @@ export default function NightMarket() {
 
                 {/* 搜尋中提示標籤 */}
                 {(searchText || selectedRegion !== 'all') && (
-                    <Box sx={{ mt: 2, pt: 1.5, borderTop: '1px dashed #E0D5C7', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1 }}>
-                        <Typography variant="body2" sx={{ color: '#666' }}>
+                    <Box sx={{ mt: 2, pt: 1.5, borderTop: '1px dashed var(--tw-border-subtle, #EAE5DD)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1 }}>
+                        <Typography variant="body2" sx={{ color: 'var(--tw-text-muted, #78716C)' }}>
                             {lang === 'en' ? `Matches: ` : `符合條件的夜市：`}
-                            <strong style={{ color: '#C62828' }}>{filteredMarkets.length}</strong>
-                            {searchText && ` (${lang === 'en' ? 'Keyword' : '關鍵字'}：「${searchText}」)`}
+                            <strong style={{ color: 'var(--tw-terracotta, #B91C1C)' }}>{filteredMarkets.length}</strong>
+                            {searchText && ` (${lang === 'en' ? 'Keyword' : '關鍵字'}：“${searchText}”）`}
                         </Typography>
-                        <Button size="small" onClick={handleClearSearch} sx={{ color: '#C62828', fontWeight: 700 }}>
-                            {lang === 'en' ? 'Reset Filters' : '清除所有篩選條件'}
+                        <Button size="small" onClick={handleClearSearch} sx={{ color: 'var(--tw-terracotta, #B91C1C)', fontWeight: 700, textTransform: 'none' }}>
+                            {lang === 'en' ? 'Reset Filters' : '重設篩選'}
                         </Button>
                     </Box>
                 )}
@@ -290,19 +339,21 @@ export default function NightMarket() {
                                             position: 'absolute',
                                             top: 12,
                                             left: 12,
-                                            backgroundColor: 'rgba(0,0,0,0.8)',
-                                            color: '#FFD54F',
+                                            backgroundColor: 'rgba(28, 25, 23, 0.75)',
+                                            backdropFilter: 'blur(8px)',
+                                            color: '#FBBF24',
                                             px: 1.2,
                                             py: 0.4,
-                                            borderRadius: '6px',
+                                            borderRadius: '20px',
                                             display: 'flex',
                                             alignItems: 'center',
                                             gap: 0.5,
-                                            fontWeight: 800,
-                                            fontSize: '0.85rem',
+                                            fontWeight: 700,
+                                            fontSize: '0.8rem',
+                                            letterSpacing: '0.02em',
                                         }}
                                     >
-                                        ⭐ {item.rating || 4.8}
+                                        ★ {item.rating || 4.8}
                                     </Box>
 
                                     {/* 地區徽章 */}
@@ -311,13 +362,15 @@ export default function NightMarket() {
                                             position: 'absolute',
                                             top: 12,
                                             right: 12,
-                                            backgroundColor: '#C62828',
-                                            color: '#FFF',
-                                            fontWeight: 800,
-                                            fontSize: '0.8rem',
+                                            backgroundColor: 'rgba(255, 255, 255, 0.92)',
+                                            backdropFilter: 'blur(8px)',
+                                            color: 'var(--tw-deep-charcoal, #1C1917)',
+                                            fontWeight: 700,
+                                            fontSize: '0.78rem',
                                             px: 1.2,
                                             py: 0.4,
-                                            borderRadius: '6px',
+                                            borderRadius: '20px',
+                                            border: '1px solid rgba(0,0,0,0.06)',
                                         }}
                                     >
                                         {getRegionBadge(item)}
@@ -325,44 +378,45 @@ export default function NightMarket() {
                                 </Box>
 
                                 <CardContent sx={{ flexGrow: 1, p: 2.5, display: 'flex', flexDirection: 'column' }}>
-                                    <Typography variant="h6" sx={{ fontWeight: 900, color: '#2C2622', mb: 0.5, lineHeight: 1.3, fontSize: '1.15rem' }}>
+                                    <Typography variant="h6" sx={{ fontFamily: "'Noto Serif TC', serif", fontWeight: 800, color: 'var(--tw-deep-charcoal, #1C1917)', mb: 0.5, lineHeight: 1.3, fontSize: '1.2rem' }}>
                                         {lang === 'en' ? (item.nameen || item.name) : item.name}
                                     </Typography>
-                                    <Typography variant="caption" sx={{ color: '#888', display: 'block', mb: 1.5 }}>
+                                    <Typography variant="caption" sx={{ color: 'var(--tw-text-muted, #78716C)', display: 'block', mb: 1.5, letterSpacing: '0.02em' }}>
                                         {lang === 'en' ? (item.marketLocation || 'Taiwan') : item.nameen}
                                     </Typography>
 
-                                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.8, color: '#555', mb: 1.2, fontSize: '0.85rem' }}>
-                                        <LocationOnIcon fontSize="small" sx={{ color: '#D84315', mt: 0.2, flexShrink: 0 }} />
-                                        <Typography variant="body2" sx={{ color: '#666', lineHeight: 1.4 }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.8, color: 'var(--tw-text-muted, #78716C)', mb: 1, fontSize: '0.85rem' }}>
+                                        <LocationOnIcon fontSize="small" sx={{ color: 'var(--tw-terracotta, #B91C1C)', mt: 0.2, flexShrink: 0 }} />
+                                        <Typography variant="body2" sx={{ color: 'var(--tw-text-muted, #78716C)', lineHeight: 1.4, fontSize: '0.85rem' }}>
                                             {item.marketLocation || (lang === 'en' ? 'Taiwan night market cluster' : '在地熱門夜市聚落')}
                                         </Typography>
                                     </Box>
 
                                     {item.positionGuidelines && (
-                                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.8, color: '#2E7D32', mb: 1.2, fontSize: '0.82rem' }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.8, color: '#15803D', mb: 1, fontSize: '0.82rem' }}>
                                             <DirectionsSubwayIcon fontSize="small" sx={{ mt: 0.2, flexShrink: 0 }} />
-                                            <Typography variant="caption" sx={{ color: '#2E7D32', fontWeight: 600, lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                            <Typography variant="caption" sx={{ color: '#15803D', fontWeight: 600, lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                                                 {item.positionGuidelines}
                                             </Typography>
                                         </Box>
                                     )}
 
-                                    {/* 營運時間提醒（跨縣市旅人必備） */}
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, color: '#E65100', mb: 1.5, fontSize: '0.8rem', minWidth: 0 }}>
-                                        <CalendarMonthIcon fontSize="small" sx={{ flexShrink: 0 }} />
-                                        <Typography variant="caption" sx={{ fontWeight: 700, color: (item.name && item.name.includes('花園')) ? '#C62828' : '#795548', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                    {/* 營運時間提醒 */}
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, color: 'var(--tw-text-muted, #78716C)', mb: 1.5, fontSize: '0.8rem', minWidth: 0 }}>
+                                        <CalendarMonthIcon fontSize="small" sx={{ flexShrink: 0, color: 'var(--tw-amber, #D97706)' }} />
+                                        <Typography variant="caption" sx={{ fontWeight: 600, color: (item.name && item.name.includes('花園')) ? 'var(--tw-terracotta, #B91C1C)' : 'var(--tw-text-muted, #78716C)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                             {(item.name && item.name.includes('花園'))
-                                                ? (lang === 'en' ? '⚠️ Open Thu, Sat, Sun Only (17:00-00:00)' : '⚠️ 每週四、六、日限定營業 (17:00-00:00)')
-                                                : (lang === 'en' ? 'Open Daily (17:30 - 00:00)' : '每日營業 (17:30 - 00:00)')}
+                                                ? (lang === 'en' ? 'Thu, Sat, Sun Only (17:00-00:00)' : '週四、六、日限定營業 (17:00-00:00)')
+                                                : (lang === 'en' ? 'Daily (17:30 - 00:00)' : '每日營業 (17:30 - 00:00)')}
                                         </Typography>
                                     </Box>
 
                                     <Typography
                                         variant="body2"
                                         sx={{
-                                            color: '#555',
+                                            color: '#57534E',
                                             lineHeight: 1.6,
+                                            fontSize: '0.88rem',
                                             display: '-webkit-box',
                                             WebkitLineClamp: 3,
                                             WebkitBoxOrient: 'vertical',
@@ -374,7 +428,7 @@ export default function NightMarket() {
                                     </Typography>
                                 </CardContent>
 
-                                <CardActions sx={{ p: 2, pt: 0 }}>
+                                <CardActions sx={{ p: 2.5, pt: 0 }}>
                                     <Button
                                         fullWidth
                                         className="tw-btn-primary"
@@ -391,15 +445,18 @@ export default function NightMarket() {
                     ))}
                 </Grid>
             ) : (
-                <Paper sx={{ p: 6, textAlign: 'center', borderRadius: '16px', backgroundColor: '#FFF', border: '1px dashed #DDD' }}>
-                    <StorefrontIcon sx={{ fontSize: 60, color: '#CCC', mb: 1.5 }} />
-                    <Typography variant="h6" sx={{ fontWeight: 800, color: '#666', mb: 1 }}>
+                <Paper sx={{ p: 6, textAlign: 'center', borderRadius: '16px', backgroundColor: '#FFF', border: '1px dashed var(--tw-border-subtle, #EAE5DD)' }}>
+                    <StorefrontIcon sx={{ fontSize: 56, color: '#D6D3D1', mb: 1.5 }} />
+                    <Typography variant="h6" sx={{ fontWeight: 800, color: 'var(--tw-deep-charcoal, #1C1917)', mb: 1 }}>
                         {t('no_markets_found')}
                     </Typography>
-                    <Typography variant="body2" sx={{ color: '#999', mb: 2 }}>
+                    <Typography variant="body2" sx={{ color: 'var(--tw-text-muted, #78716C)', mb: 2.5 }}>
                         {lang === 'en' ? 'Try clearing your search term or selecting another region.' : '您可以嘗試清除搜尋關鍵字或選擇其他地區分類。'}
                     </Typography>
-                    <Button variant="contained" onClick={handleClearSearch} sx={{ bgcolor: '#C62828', color: '#FFF', fontWeight: 800 }}>
+                    <Button
+                        className="tw-btn-primary"
+                        onClick={handleClearSearch}
+                    >
                         {t('clear_filter')}
                     </Button>
                 </Paper>

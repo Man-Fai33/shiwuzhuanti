@@ -34,8 +34,6 @@ import HomeIcon from '@mui/icons-material/Home';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import LogoutIcon from '@mui/icons-material/Logout';
-import LoginIcon from '@mui/icons-material/Login';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import TranslateIcon from '@mui/icons-material/Translate';
 import ExploreIcon from '@mui/icons-material/Explore';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -77,25 +75,27 @@ export default function DrawerBar() {
 
     return (
         <Box sx={{ flexGrow: 1 }}>
-            {/* 台灣特色燈籠紅頂部導覽列 */}
+            {/* 現代台灣生活美學頂部導覽列 (Translucent Glassmorphism) */}
             <AppBar
                 position="fixed"
                 sx={{
-                    background: 'linear-gradient(90deg, #A71D1D 0%, #C62828 45%, #D84315 100%)',
-                    boxShadow: '0 2px 14px rgba(167, 29, 29, 0.35)',
+                    background: 'rgba(255, 255, 255, 0.94)',
+                    backdropFilter: 'blur(16px)',
+                    WebkitBackdropFilter: 'blur(16px)',
+                    borderBottom: '1px solid #EAE5DD',
+                    boxShadow: '0 2px 14px rgba(28, 25, 23, 0.04)',
                 }}
             >
-                <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: { xs: 1.5, sm: 2, md: 3 }, flexWrap: 'nowrap', minHeight: { xs: 56, sm: 64 } }}>
+                <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: { xs: 1.5, sm: 2, md: 3 }, flexWrap: 'nowrap', minHeight: { xs: 58, sm: 66 } }}>
                     {/* 左側：漢堡選單與品牌名稱 */}
                     <Box sx={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
                         <IconButton
-                            color="inherit"
                             aria-label="open drawer"
                             onClick={handleDrawerOpen}
                             edge="start"
-                            sx={{ mr: { xs: 0.5, sm: 1.5 } }}
+                            sx={{ mr: { xs: 0.5, sm: 1.5 }, color: '#1C1917' }}
                         >
-                            <MenuIcon sx={{ fontSize: 28 }} />
+                            <MenuIcon sx={{ fontSize: 26 }} />
                         </IconButton>
 
                         <Box
@@ -104,63 +104,77 @@ export default function DrawerBar() {
                             sx={{
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: 1,
+                                gap: 1.2,
                                 textDecoration: 'none',
-                                color: '#FFF',
                             }}
                         >
+                            <Box
+                                sx={{
+                                    width: 32,
+                                    height: 32,
+                                    borderRadius: '8px',
+                                    background: 'linear-gradient(135deg, #B91C1C 0%, #C2410C 100%)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: '#FFF',
+                                    fontWeight: 900,
+                                    fontSize: '0.95rem',
+                                    boxShadow: '0 2px 6px rgba(185, 28, 28, 0.3)',
+                                    flexShrink: 0,
+                                }}
+                            >
+                                市
+                            </Box>
                             <Typography
                                 variant="h6"
                                 component="span"
                                 sx={{
                                     fontFamily: "'Noto Serif TC', serif",
                                     fontWeight: 900,
-                                    letterSpacing: '0.02em',
-                                    fontSize: { xs: '1rem', sm: '1.25rem', md: '1.35rem' },
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: 0.5,
+                                    letterSpacing: '-0.01em',
+                                    fontSize: { xs: '1.05rem', sm: '1.25rem', md: '1.35rem' },
+                                    color: '#1C1917',
                                     whiteSpace: 'nowrap',
-                                    textShadow: '0 2px 6px rgba(0,0,0,0.3)',
                                 }}
                             >
-                                <span>🏮</span>
-                                <span>{t('brand_title')}</span>
+                                {t('brand_title')}
                             </Typography>
                             <Chip
                                 label={t('brand_badge')}
                                 size="small"
                                 sx={{
                                     display: { xs: 'none', lg: 'inline-flex' },
-                                    backgroundColor: 'rgba(255, 235, 59, 0.95)',
-                                    color: '#8E1800',
-                                    fontWeight: 800,
-                                    fontSize: '0.75rem',
+                                    backgroundColor: '#F5EBE1',
+                                    color: '#991B1B',
+                                    fontWeight: 700,
+                                    fontSize: '0.72rem',
                                     height: '22px',
+                                    border: '1px solid #EADBCC',
                                 }}
                             />
                         </Box>
                     </Box>
 
                     {/* 中間：Desktop 快捷選單 */}
-                    <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: { md: 0.4, lg: 1 }, flexShrink: 1, minWidth: 0 }}>
-                        <Button href="/nightmarket" sx={{ color: '#FFF', fontWeight: 700, fontSize: { md: '0.84rem', lg: '0.94rem' }, px: { md: 0.8, lg: 1.5 }, whiteSpace: 'nowrap', minWidth: 'auto', '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' } }}>
+                    <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: { md: 0.4, lg: 0.8 }, flexShrink: 1, minWidth: 0 }}>
+                        <Button href="/nightmarket" sx={{ color: '#44403C', fontWeight: 600, fontSize: { md: '0.85rem', lg: '0.92rem' }, px: { md: 1, lg: 1.5 }, whiteSpace: 'nowrap', minWidth: 'auto', borderRadius: '8px', '&:hover': { backgroundColor: '#F5F2EC', color: '#B91C1C' } }}>
                             {t('nav_markets')}
                         </Button>
-                        <Button href="/Food" sx={{ color: '#FFF', fontWeight: 700, fontSize: { md: '0.84rem', lg: '0.94rem' }, px: { md: 0.8, lg: 1.5 }, whiteSpace: 'nowrap', minWidth: 'auto', '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' } }}>
+                        <Button href="/Food" sx={{ color: '#44403C', fontWeight: 600, fontSize: { md: '0.85rem', lg: '0.92rem' }, px: { md: 1, lg: 1.5 }, whiteSpace: 'nowrap', minWidth: 'auto', borderRadius: '8px', '&:hover': { backgroundColor: '#F5F2EC', color: '#B91C1C' } }}>
                             {t('nav_foods')}
                         </Button>
-                        <Button href="/guide" sx={{ color: '#FFE082', fontWeight: 800, fontSize: { md: '0.84rem', lg: '0.94rem' }, px: { md: 1, lg: 1.5 }, whiteSpace: 'nowrap', minWidth: 'auto', backgroundColor: 'rgba(0,0,0,0.15)', borderRadius: '20px', '&:hover': { backgroundColor: 'rgba(255,255,255,0.2)' } }}>
+                        <Button href="/guide" sx={{ color: '#B91C1C', fontWeight: 700, fontSize: { md: '0.85rem', lg: '0.92rem' }, px: { md: 1.2, lg: 1.6 }, whiteSpace: 'nowrap', minWidth: 'auto', backgroundColor: '#FEF2F2', borderRadius: '20px', border: '1px solid #FECACA', '&:hover': { backgroundColor: '#FEE2E2' } }}>
                             🧭 {t('nav_guide')}
                         </Button>
-                        <Button href="/bulletinBoard" sx={{ color: '#FFF', fontWeight: 700, fontSize: { md: '0.84rem', lg: '0.94rem' }, px: { md: 0.8, lg: 1.5 }, whiteSpace: 'nowrap', minWidth: 'auto', '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' } }}>
+                        <Button href="/bulletinBoard" sx={{ color: '#44403C', fontWeight: 600, fontSize: { md: '0.85rem', lg: '0.92rem' }, px: { md: 1, lg: 1.5 }, whiteSpace: 'nowrap', minWidth: 'auto', borderRadius: '8px', '&:hover': { backgroundColor: '#F5F2EC', color: '#B91C1C' } }}>
                             {t('nav_bulletin')}
                         </Button>
-                        <Button href="/feedback" sx={{ color: '#FFF', fontWeight: 700, fontSize: { md: '0.84rem', lg: '0.94rem' }, px: { md: 0.8, lg: 1.5 }, whiteSpace: 'nowrap', minWidth: 'auto', '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' } }}>
+                        <Button href="/feedback" sx={{ color: '#44403C', fontWeight: 600, fontSize: { md: '0.85rem', lg: '0.92rem' }, px: { md: 1, lg: 1.5 }, whiteSpace: 'nowrap', minWidth: 'auto', borderRadius: '8px', '&:hover': { backgroundColor: '#F5F2EC', color: '#B91C1C' } }}>
                             {t('nav_feedback')}
                         </Button>
                         {user && user.role === 'admin' && (
-                            <Button href="/datamanagement" sx={{ color: '#FFE082', fontWeight: 800, fontSize: { md: '0.84rem', lg: '0.94rem' }, px: { md: 0.8, lg: 1.2 }, whiteSpace: 'nowrap', minWidth: 'auto', border: '1px solid rgba(255,224,130,0.6)', borderRadius: '6px' }}>
+                            <Button href="/datamanagement" sx={{ color: '#D97706', fontWeight: 700, fontSize: { md: '0.84rem', lg: '0.9rem' }, px: { md: 1, lg: 1.2 }, whiteSpace: 'nowrap', minWidth: 'auto', border: '1px solid #FDE68A', backgroundColor: '#FFFBEB', borderRadius: '6px' }}>
                                 ⚙️ {t('nav_admin')}
                             </Button>
                         )}
@@ -174,24 +188,24 @@ export default function DrawerBar() {
                                 onClick={() => setWishlistOpen(true)}
                                 size="small"
                                 sx={{
-                                    color: '#FFF',
-                                    fontWeight: 800,
+                                    color: '#292524',
+                                    fontWeight: 700,
                                     fontSize: '0.82rem',
                                     borderRadius: '20px',
                                     px: { xs: 0.9, sm: 1.3 },
-                                    py: 0.35,
+                                    py: 0.4,
                                     minWidth: 'auto',
                                     whiteSpace: 'nowrap',
-                                    border: totalItems > 0 ? '1px solid #FFD54F' : '1px solid rgba(255,255,255,0.4)',
-                                    backgroundColor: totalItems > 0 ? 'rgba(255, 213, 79, 0.25)' : 'rgba(0,0,0,0.18)',
+                                    border: totalItems > 0 ? '1px solid #FCD34D' : '1px solid #E7E5E4',
+                                    backgroundColor: totalItems > 0 ? '#FEF3C7' : '#F5F5F4',
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: 0.5,
-                                    '&:hover': { backgroundColor: 'rgba(255,255,255,0.25)' }
+                                    '&:hover': { backgroundColor: '#E7E5E4' }
                                 }}
                             >
-                                <Badge badgeContent={totalItems} color="warning">
-                                    <FavoriteIcon sx={{ fontSize: 18, color: totalItems > 0 ? '#FFD54F' : '#FFF' }} />
+                                <Badge badgeContent={totalItems} color="error">
+                                    <FavoriteIcon sx={{ fontSize: 17, color: totalItems > 0 ? '#B91C1C' : '#78716C' }} />
                                 </Badge>
                                 <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' }, ml: totalItems > 0 ? '6px' : '0px', whiteSpace: 'nowrap' }}>
                                     {lang === 'en' ? 'Wishlist' : '覓食清單'}
@@ -205,21 +219,20 @@ export default function DrawerBar() {
                             size="small"
                             startIcon={<TranslateIcon fontSize="small" sx={{ display: { xs: 'none', sm: 'inline-flex' } }} />}
                             sx={{
-                                color: '#FFF',
-                                fontWeight: 800,
+                                color: '#292524',
+                                fontWeight: 700,
                                 fontSize: '0.82rem',
                                 borderRadius: '20px',
                                 px: { xs: 1, sm: 1.4 },
-                                py: 0.35,
+                                py: 0.4,
                                 minWidth: 'auto',
                                 whiteSpace: 'nowrap',
-                                border: '1px solid rgba(255,255,255,0.65)',
-                                backgroundColor: 'rgba(0,0,0,0.18)',
+                                border: '1px solid #E7E5E4',
+                                backgroundColor: '#FFFFFF',
                                 transition: 'all 0.2s ease',
                                 '&:hover': {
-                                    backgroundColor: 'rgba(255,255,255,0.25)',
-                                    borderColor: '#FFF',
-                                    transform: 'scale(1.03)'
+                                    backgroundColor: '#F5F5F4',
+                                    borderColor: '#D6D3D1',
                                 }
                             }}
                         >
@@ -234,10 +247,10 @@ export default function DrawerBar() {
                                             alt={user.username || 'User'}
                                             src={user.iconUrl || undefined}
                                             sx={{
-                                                bgcolor: '#FF8F00',
+                                                bgcolor: '#B91C1C',
                                                 color: '#FFF',
                                                 fontWeight: 800,
-                                                border: '2px solid #FFF',
+                                                border: '2px solid #EAE5DD',
                                                 width: 36,
                                                 height: 36,
                                             }}
@@ -258,32 +271,33 @@ export default function DrawerBar() {
                                         sx: {
                                             mt: 1.5,
                                             minWidth: 170,
-                                            borderRadius: '10px',
-                                            boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+                                            borderRadius: '12px',
+                                            boxShadow: '0 8px 24px rgba(28,25,23,0.1)',
+                                            border: '1px solid #EAE5DD',
                                         }
                                     }}
                                 >
-                                    <Box sx={{ px: 2, py: 1, borderBottom: '1px solid #F0E6D8' }}>
-                                        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#C62828' }}>
+                                    <Box sx={{ px: 2, py: 1, borderBottom: '1px solid #EAE5DD' }}>
+                                        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#B91C1C' }}>
                                             {user.username || '會員用戶'}
                                         </Typography>
-                                        <Typography variant="caption" sx={{ color: '#666' }}>
+                                        <Typography variant="caption" sx={{ color: '#78716C' }}>
                                             {user.email}
                                         </Typography>
                                     </Box>
                                     <MenuItem component="a" href="/profile" onClick={handleCloseUserMenu}>
-                                        <AccountCircleIcon fontSize="small" sx={{ mr: 1, color: '#C62828' }} /> {t('nav_profile')}
+                                        <AccountCircleIcon fontSize="small" sx={{ mr: 1, color: '#B91C1C' }} /> {t('nav_profile')}
                                     </MenuItem>
                                     <MenuItem component="a" href="/account" onClick={handleCloseUserMenu}>
-                                        <StorefrontIcon fontSize="small" sx={{ mr: 1, color: '#C62828' }} /> {t('nav_account')}
+                                        <StorefrontIcon fontSize="small" sx={{ mr: 1, color: '#B91C1C' }} /> {t('nav_account')}
                                     </MenuItem>
                                     {user.role === 'admin' && (
                                         <MenuItem component="a" href="/datamanagement" onClick={handleCloseUserMenu}>
-                                            <AdminPanelSettingsIcon fontSize="small" sx={{ mr: 1, color: '#FF8F00' }} /> {t('nav_admin')}
+                                            <AdminPanelSettingsIcon fontSize="small" sx={{ mr: 1, color: '#D97706' }} /> {t('nav_admin')}
                                         </MenuItem>
                                     )}
                                     <Divider />
-                                    <MenuItem onClick={handleSignOut} sx={{ color: '#D32F2F', fontWeight: 700 }}>
+                                    <MenuItem onClick={handleSignOut} sx={{ color: '#DC2626', fontWeight: 700 }}>
                                         <LogoutIcon fontSize="small" sx={{ mr: 1 }} /> {t('nav_signout')}
                                     </MenuItem>
                                 </Menu>
@@ -292,19 +306,16 @@ export default function DrawerBar() {
                             <Box sx={{ display: 'flex', gap: { xs: 0.5, sm: 1 }, flexShrink: 0 }}>
                                 <Button
                                     href="/signin"
-                                    variant="outlined"
                                     size="small"
-                                    startIcon={<LoginIcon sx={{ display: { xs: 'none', sm: 'inline-flex' } }} />}
                                     sx={{
-                                        color: '#FFF',
-                                        borderColor: 'rgba(255,255,255,0.7)',
-                                        fontWeight: 700,
+                                        color: '#44403C',
+                                        fontWeight: 600,
                                         borderRadius: '8px',
                                         px: { xs: 0.8, sm: 1.4 },
                                         minWidth: 'auto',
                                         whiteSpace: 'nowrap',
                                         fontSize: '0.82rem',
-                                        '&:hover': { borderColor: '#FFF', backgroundColor: 'rgba(255,255,255,0.1)' }
+                                        '&:hover': { backgroundColor: '#F5F5F4', color: '#1C1917' }
                                     }}
                                 >
                                     {t('nav_signin')}
@@ -313,17 +324,17 @@ export default function DrawerBar() {
                                     href="/signup"
                                     variant="contained"
                                     size="small"
-                                    startIcon={<PersonAddIcon sx={{ display: { xs: 'none', sm: 'inline-flex' } }} />}
                                     sx={{
-                                        backgroundColor: '#FFB300',
-                                        color: '#612A00',
-                                        fontWeight: 800,
-                                        borderRadius: '8px',
-                                        px: { xs: 0.8, sm: 1.4 },
+                                        backgroundColor: '#B91C1C',
+                                        color: '#FFF',
+                                        fontWeight: 700,
+                                        borderRadius: '20px',
+                                        px: { xs: 1, sm: 1.6 },
                                         minWidth: 'auto',
                                         whiteSpace: 'nowrap',
                                         fontSize: '0.82rem',
-                                        '&:hover': { backgroundColor: '#FFA000' }
+                                        boxShadow: '0 2px 6px rgba(185, 28, 28, 0.25)',
+                                        '&:hover': { backgroundColor: '#991B1B' }
                                     }}
                                 >
                                     {t('nav_signup')}
@@ -334,7 +345,7 @@ export default function DrawerBar() {
                 </Toolbar>
             </AppBar>
 
-            {/* 台灣特色側邊抽屜選單 */}
+            {/* 側邊抽屜選單 */}
             <Drawer
                 anchor="left"
                 open={open}
@@ -353,22 +364,40 @@ export default function DrawerBar() {
                 <Box
                     sx={{
                         p: 2.5,
-                        background: 'linear-gradient(135deg, #A71D1D 0%, #C62828 100%)',
+                        background: 'linear-gradient(135deg, #1C1917 0%, #292524 100%)',
                         color: '#FFF',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
                     }}
                 >
-                    <Box>
-                        <Typography variant="h6" sx={{ fontWeight: 900, fontFamily: "'Noto Serif TC', serif" }}>
-                            🏮 {t('brand_title')}
-                        </Typography>
-                        <Typography variant="caption" sx={{ color: '#FFE082', fontWeight: 600 }}>
-                            {t('brand_sub')}
-                        </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Box
+                            sx={{
+                                width: 30,
+                                height: 30,
+                                borderRadius: '6px',
+                                background: '#B91C1C',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: '#FFF',
+                                fontWeight: 900,
+                                fontSize: '0.9rem',
+                            }}
+                        >
+                            市
+                        </Box>
+                        <Box>
+                            <Typography variant="h6" sx={{ fontWeight: 900, fontFamily: "'Noto Serif TC', serif", fontSize: '1.1rem' }}>
+                                {t('brand_title')}
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: '#D6CEC2', fontWeight: 500 }}>
+                                {t('brand_sub')}
+                            </Typography>
+                        </Box>
                     </Box>
-                    <IconButton onClick={handleDrawerClose} sx={{ color: '#FFF' }}>
+                    <IconButton onClick={handleDrawerClose} sx={{ color: '#D6CEC2', '&:hover': { color: '#FFF' } }}>
                         <ChevronLeftIcon />
                     </IconButton>
                 </Box>
@@ -447,11 +476,11 @@ export default function DrawerBar() {
                 </List>
 
                 {/* 抽屜底部資訊 */}
-                <Box sx={{ mt: 'auto', p: 2, textAlign: 'center', backgroundColor: '#F0EAE1' }}>
-                    <Typography variant="body2" sx={{ fontWeight: 800, color: '#C62828' }}>
-                        {lang === 'zh' ? '呷飽未？今晚逗陣迺夜市！' : 'Have you eaten? Visit night market!'}
+                <Box sx={{ mt: 'auto', p: 2.5, textAlign: 'center', backgroundColor: '#F7F5F0', borderTop: '1px solid #EAE5DD' }}>
+                    <Typography variant="body2" sx={{ fontWeight: 800, color: '#1C1917' }}>
+                        {lang === 'zh' ? '尋味台灣 ‧ 逗陣來迺夜市' : 'Taiwan Street Food & Living Guide'}
                     </Typography>
-                    <Typography variant="caption" sx={{ color: '#888', display: 'block', mt: 0.5 }}>
+                    <Typography variant="caption" sx={{ color: '#78716C', display: 'block', mt: 0.5 }}>
                         {t('brand_sub')}
                     </Typography>
                 </Box>
@@ -465,30 +494,31 @@ export default function DrawerBar() {
                 fullWidth
                 PaperProps={{
                     sx: {
-                        borderRadius: '16px',
-                        border: '1px solid #EFE5D8',
+                        borderRadius: '20px',
+                        border: '1px solid #EAE5DD',
+                        boxShadow: '0 12px 36px rgba(28, 25, 23, 0.12)',
                     }
                 }}
             >
-                <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 1 }}>
+                <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 1, px: 3, pt: 2.5 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <span style={{ fontSize: '1.5rem' }}>❤️</span>
-                        <Typography variant="h6" sx={{ fontWeight: 900, color: '#C62828', fontFamily: "'Noto Serif TC', serif" }}>
-                            {lang === 'en' ? 'My Night Market Food Crawl Wishlist' : '今晚夜市必吃覓食清單'}
+                        <FavoriteIcon sx={{ color: '#B91C1C', fontSize: 24 }} />
+                        <Typography variant="h6" sx={{ fontWeight: 800, color: '#1C1917', fontFamily: "'Noto Serif TC', serif" }}>
+                            {lang === 'en' ? 'My Food Wishlist' : '今晚夜市必吃清單'}
                         </Typography>
                     </Box>
-                    <Chip label={`${totalItems} ${lang === 'en' ? 'Dishes' : '道小吃'}`} size="small" sx={{ backgroundColor: '#FFEBEE', color: '#C62828', fontWeight: 800 }} />
+                    <Chip label={`${totalItems} ${lang === 'en' ? 'Dishes' : '道小吃'}`} size="small" sx={{ backgroundColor: '#FEE2E2', color: '#B91C1C', fontWeight: 800 }} />
                 </DialogTitle>
-                <DialogContent dividers sx={{ p: 2.5 }}>
+                <DialogContent dividers sx={{ p: 3 }}>
                     {wishlist.length === 0 ? (
-                        <Box sx={{ py: 5, textAlign: 'center' }}>
-                            <Box sx={{ fontSize: '3rem', mb: 1 }}>🥢</Box>
-                            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#666', mb: 1 }}>
-                                {lang === 'en' ? 'Your Wishlist is Empty!' : '您的覓食清單目前還是空的喔！'}
+                        <Box sx={{ py: 6, textAlign: 'center' }}>
+                            <RestaurantMenuIcon sx={{ fontSize: 52, color: '#D6D3D1', mb: 1.5 }} />
+                            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#44403C', mb: 1 }}>
+                                {lang === 'en' ? 'Your Wishlist is Empty' : '覓食清單目前還是空的喔'}
                             </Typography>
-                            <Typography variant="body2" sx={{ color: '#999', mb: 3 }}>
+                            <Typography variant="body2" sx={{ color: '#78716C', mb: 3 }}>
                                 {lang === 'en'
-                                    ? 'Browse through the Food Gallery and click the heart icon to save dishes for your night out.'
+                                    ? 'Explore the Street Food Gallery and save your favorite dishes before heading out.'
                                     : '在「人氣美食圖鑑」瀏覽時，點擊愛心即可加入口袋名單，方便出發前規劃！'}
                             </Typography>
                             <Button
@@ -502,10 +532,10 @@ export default function DrawerBar() {
                         </Box>
                     ) : (
                         <Box>
-                            <Typography variant="caption" sx={{ color: '#888', display: 'block', mb: 2 }}>
+                            <Typography variant="caption" sx={{ color: '#78716C', display: 'block', mb: 2 }}>
                                 {lang === 'en'
                                     ? 'Show this screen directly to stall owners to order effortlessly without speaking!'
-                                    : '💡 貼心提示：在夜市現場，您可以直接拿著此畫面出示給攤商老闆看，點餐超方便！'}
+                                    : '貼心提示：在夜市現場，您可以直接拿著此畫面出示給攤商老闆看，點餐超方便！'}
                             </Typography>
 
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>

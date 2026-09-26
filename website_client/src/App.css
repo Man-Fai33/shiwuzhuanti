@@ -1,21 +1,25 @@
 /* ========================================================
-   夜市好好行 🏮 台灣在地夜市生活風格設計系統
-   Taiwan Night Market Cultural Theme
+   夜市好好行 ‧ 現代台灣在地生活與國際漫遊指南設計系統
+   Taiwan Night Market Contemporary Living Design System
    ======================================================== */
 
 :root {
-  --tw-lantern-red: #C62828;
-  --tw-lantern-glow: #E53935;
-  --tw-amber-gold: #FF8F00;
-  --tw-warm-yellow: #FFD54F;
-  --tw-deep-charcoal: #1E1A17;
-  --tw-paper-cream: #FBF8F3;
+  /* 典雅台灣在地磚紅與暖調自然石色系 */
+  --tw-terracotta: #B91C1C;
+  --tw-terracotta-dark: #991B1B;
+  --tw-terracotta-light: #FEE2E2;
+  --tw-amber-glow: #D97706;
+  --tw-amber-light: #FEF3C7;
+  --tw-deep-charcoal: #1C1917;
+  --tw-paper-cream: #FAF8F5;
   --tw-card-white: #FFFFFF;
-  --tw-border-warm: #EFE7DC;
-  --tw-text-primary: #2C2622;
-  --tw-text-secondary: #6B625B;
-  --tw-shadow-warm: 0 4px 20px rgba(198, 40, 40, 0.08);
-  --tw-shadow-card: 0 4px 16px rgba(44, 38, 34, 0.06);
+  --tw-border-subtle: #EAE5DD;
+  --tw-border-hover: #D6CEC2;
+  --tw-text-primary: #1C1917;
+  --tw-text-secondary: #57534E;
+  --tw-text-muted: #8C827A;
+  --tw-shadow-card: 0 2px 10px rgba(28, 25, 23, 0.04), 0 1px 3px rgba(28, 25, 23, 0.02);
+  --tw-shadow-hover: 0 10px 24px rgba(28, 25, 23, 0.08), 0 2px 6px rgba(28, 25, 23, 0.03);
 }
 
 body {
@@ -28,140 +32,112 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* 全站響應式容器 - 解決原先 margin-left: 25% 導致畫面過度擠壓的問題 */
+/* 全站響應式容器 */
 .App {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 84px 20px 48px 20px;
+  padding: 88px 24px 56px 24px;
   min-height: 100vh;
   box-sizing: border-box;
 }
 
 @media (max-width: 768px) {
   .App {
-    padding: 76px 12px 36px 12px;
+    padding: 76px 14px 40px 14px;
   }
 }
 
-/* 台灣夜市風格文字排版 */
+/* 典雅標題字體 */
 h1, h2, h3, .tw-title {
   font-family: 'Noto Serif TC', 'Noto Sans TC', serif;
-  font-weight: 900;
-  letter-spacing: 0.02em;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--tw-deep-charcoal);
 }
 
-/* 復古燈籠霓虹徽章 */
-.tw-badge-red {
-  background: linear-gradient(135deg, #C62828 0%, #D84315 100%);
-  color: #FFF !important;
-  font-weight: 700;
-  border-radius: 6px;
-  padding: 4px 10px;
-  font-size: 0.8rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  box-shadow: 0 2px 6px rgba(198, 40, 40, 0.25);
-}
-
-.tw-badge-gold {
-  background: linear-gradient(135deg, #FF8F00 0%, #FFA000 100%);
-  color: #FFF !important;
-  font-weight: 700;
-  border-radius: 6px;
-  padding: 4px 10px;
-  font-size: 0.8rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.tw-badge-green {
-  background: linear-gradient(135deg, #2E7D32 0%, #388E3C 100%);
-  color: #FFF !important;
-  font-weight: 700;
-  border-radius: 6px;
-  padding: 4px 10px;
-  font-size: 0.8rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-/* 台灣夜市風格卡片 */
+/* 現代簡約卡片 */
 .tw-card {
   background: var(--tw-card-white);
-  border: 1px solid var(--tw-border-warm);
-  border-radius: 14px;
+  border: 1px solid var(--tw-border-subtle);
+  border-radius: 16px;
   box-shadow: var(--tw-shadow-card);
-  transition: all 0.25s ease-in-out;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
   overflow: hidden;
 }
 
 .tw-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 24px rgba(44, 38, 34, 0.12);
-  border-color: #E0CDB9;
+  transform: translateY(-3px);
+  box-shadow: var(--tw-shadow-hover);
+  border-color: var(--tw-border-hover);
 }
 
-/* 暖色漸層按鈕 */
+/* 質感主色按鈕 (台灣磚紅 / Terracotta) */
 .tw-btn-primary {
-  background: linear-gradient(135deg, #C62828 0%, #E64A19 100%) !important;
-  color: #FFF !important;
+  background-color: var(--tw-terracotta) !important;
+  color: #FFFFFF !important;
   font-weight: 700 !important;
-  border-radius: 8px !important;
+  border-radius: 10px !important;
   text-transform: none !important;
-  box-shadow: 0 3px 10px rgba(198, 40, 40, 0.3) !important;
-  transition: all 0.2s ease !important;
+  padding: 8px 18px !important;
+  box-shadow: 0 2px 8px rgba(185, 28, 28, 0.22) !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .tw-btn-primary:hover {
-  background: linear-gradient(135deg, #B71C1C 0%, #D84315 100%) !important;
-  box-shadow: 0 5px 14px rgba(198, 40, 40, 0.4) !important;
+  background-color: var(--tw-terracotta-dark) !important;
+  box-shadow: 0 4px 14px rgba(185, 28, 28, 0.32) !important;
+  transform: translateY(-1px) !important;
 }
 
+/* 現代次要按鈕 */
 .tw-btn-secondary {
-  background: #FFF !important;
-  color: var(--tw-lantern-red) !important;
-  border: 1.5px solid var(--tw-lantern-red) !important;
+  background: #FFFFFF !important;
+  color: var(--tw-text-primary) !important;
+  border: 1px solid var(--tw-border-subtle) !important;
   font-weight: 700 !important;
-  border-radius: 8px !important;
+  border-radius: 10px !important;
   text-transform: none !important;
+  padding: 8px 18px !important;
   transition: all 0.2s ease !important;
 }
 
 .tw-btn-secondary:hover {
-  background: rgba(198, 40, 40, 0.06) !important;
+  background: #F7F5F0 !important;
+  border-color: var(--tw-border-hover) !important;
 }
 
-/* 價格標籤 (NT$) */
-.tw-price {
-  color: #D32F2F;
-  font-weight: 800;
-  font-size: 1.25rem;
-}
-
-/* 頁面標題列 */
+/* 區塊標題列 */
 .tw-section-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 24px;
-  border-bottom: 2px solid var(--tw-border-warm);
-  padding-bottom: 12px;
+  border-bottom: 1px solid var(--tw-border-subtle);
+  padding-bottom: 14px;
 }
 
 .tw-section-title {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 1.5rem;
-  font-weight: 900;
+  gap: 10px;
+  font-size: 1.55rem;
+  font-weight: 800;
   color: var(--tw-deep-charcoal);
   margin: 0;
+  letter-spacing: -0.01em;
 }
 
-/* 復古燈籠微光裝飾 */
-.tw-lantern-icon {
-  filter: drop-shadow(0 2px 6px rgba(198, 40, 40, 0.4));
+/* 價格標籤 */
+.tw-price {
+  color: var(--tw-terracotta);
+  font-weight: 800;
+  font-size: 1.15rem;
+}
+
+/* 玻璃擬態效果 */
+.tw-glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
 }

@@ -20,9 +20,12 @@ import CampaignIcon from '@mui/icons-material/Campaign';
 import RateReviewIcon from '@mui/icons-material/RateReview';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
-import ExploreIcon from '@mui/icons-material/Explore';
 import DirectionsSubwayIcon from '@mui/icons-material/DirectionsSubway';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import PaymentsIcon from '@mui/icons-material/Payments';
+import TranslateIcon from '@mui/icons-material/Translate';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
 import helper from '../Helper/helper';
 import { useLanguage } from '../../Context/LanguageContext';
@@ -68,44 +71,34 @@ export default function Index() {
 
     return (
         <Box sx={{ width: '100%', pb: 6 }}>
-            {/* 1. Hero 橫幅：濃郁台灣夜市氛圍 */}
+            {/* 1. Hero 橫幅：現代台灣夜市攝影與漫遊指南 */}
             <Paper
                 elevation={0}
                 sx={{
-                    borderRadius: '20px',
-                    p: { xs: 3, md: 6 },
-                    mb: 5,
+                    borderRadius: '24px',
+                    p: { xs: 3.5, sm: 5, md: 7 },
+                    mb: 6,
                     position: 'relative',
                     overflow: 'hidden',
-                    background: 'linear-gradient(135deg, #8E1800 0%, #C62828 50%, #E65100 100%)',
+                    background: `linear-gradient(180deg, rgba(28, 25, 23, 0.38) 0%, rgba(28, 25, 23, 0.88) 100%), url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1600&q=80') center/cover no-repeat`,
                     color: '#FFF',
-                    boxShadow: '0 8px 32px rgba(142, 24, 0, 0.25)',
+                    boxShadow: '0 12px 36px rgba(28, 25, 23, 0.12)',
                 }}
             >
-                {/* 裝飾紅燈籠微光 */}
-                <Box
-                    sx={{
-                        position: 'absolute',
-                        top: -20,
-                        right: 20,
-                        fontSize: { xs: '80px', md: '140px' },
-                        opacity: 0.15,
-                        userSelect: 'none',
-                    }}
-                >
-                    🏮
-                </Box>
-
                 <Box sx={{ maxWidth: '780px', position: 'relative', zIndex: 1 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-                        <span style={{ fontSize: '1.8rem' }}>🏮</span>
+                    <Box sx={{ display: 'inline-flex', alignItems: 'center', mb: 2 }}>
                         <Chip
+                            icon={<LocationOnIcon sx={{ fontSize: 16, color: '#FCD34D !important' }} />}
                             label={t('hero_tag')}
                             sx={{
-                                backgroundColor: '#FFD54F',
-                                color: '#5D1000',
-                                fontWeight: 800,
-                                fontSize: '0.85rem',
+                                backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                                backdropFilter: 'blur(8px)',
+                                WebkitBackdropFilter: 'blur(8px)',
+                                color: '#FFF',
+                                fontWeight: 700,
+                                fontSize: '0.82rem',
+                                border: '1px solid rgba(255, 255, 255, 0.28)',
+                                px: 0.5,
                             }}
                         />
                     </Box>
@@ -115,11 +108,11 @@ export default function Index() {
                         sx={{
                             fontFamily: "'Noto Serif TC', serif",
                             fontWeight: 900,
-                            letterSpacing: '0.03em',
-                            fontSize: { xs: '1.85rem', sm: '2.5rem', md: '3.1rem' },
+                            letterSpacing: '-0.01em',
+                            fontSize: { xs: '1.9rem', sm: '2.6rem', md: '3.2rem' },
                             lineHeight: 1.25,
                             mb: 2,
-                            textShadow: '0 2px 10px rgba(0,0,0,0.3)',
+                            textShadow: '0 2px 14px rgba(0,0,0,0.5)',
                         }}
                     >
                         {t('hero_title')}
@@ -128,16 +121,18 @@ export default function Index() {
                     <Typography
                         variant="body1"
                         sx={{
-                            fontSize: { xs: '0.98rem', md: '1.15rem' },
-                            lineHeight: 1.7,
+                            fontSize: { xs: '0.98rem', md: '1.12rem' },
+                            lineHeight: 1.75,
                             color: 'rgba(255, 255, 255, 0.92)',
-                            mb: 3.5,
+                            mb: 4,
+                            maxWidth: '660px',
+                            textShadow: '0 1px 4px rgba(0,0,0,0.4)',
                         }}
                     >
                         {t('hero_desc')}
                     </Typography>
 
-                    {/* 搜尋框 */}
+                    {/* 現代膠囊搜尋框 */}
                     <Box
                         component="form"
                         onSubmit={handleSearch}
@@ -146,8 +141,8 @@ export default function Index() {
                             gap: 1,
                             backgroundColor: '#FFF',
                             p: 0.6,
-                            borderRadius: '12px',
-                            boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
+                            borderRadius: '36px',
+                            boxShadow: '0 8px 30px rgba(0,0,0,0.3)',
                             maxWidth: '560px',
                         }}
                     >
@@ -160,23 +155,25 @@ export default function Index() {
                             InputProps={{
                                 disableUnderline: true,
                                 startAdornment: (
-                                    <InputAdornment position="start" sx={{ pl: 1.5, color: '#C62828' }}>
+                                    <InputAdornment position="start" sx={{ pl: 2, color: '#B91C1C' }}>
                                         <SearchIcon />
                                     </InputAdornment>
                                 ),
-                                sx: { px: 1, py: 0.5, fontSize: '0.95rem' },
+                                sx: { px: 1, py: 0.6, fontSize: '0.95rem' },
                             }}
                         />
                         <Button
                             type="submit"
                             variant="contained"
                             sx={{
-                                backgroundColor: '#C62828',
+                                backgroundColor: '#B91C1C',
                                 color: '#FFF',
-                                fontWeight: 800,
-                                px: 3,
-                                borderRadius: '8px',
-                                '&:hover': { backgroundColor: '#B71C1C' },
+                                fontWeight: 700,
+                                px: 3.5,
+                                borderRadius: '28px',
+                                textTransform: 'none',
+                                boxShadow: 'none',
+                                '&:hover': { backgroundColor: '#991B1B' },
                             }}
                         >
                             {t('search_btn')}
@@ -201,14 +198,17 @@ export default function Index() {
                                 size="small"
                                 onClick={() => handleQuickSearch(item.q)}
                                 sx={{
-                                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                                    backgroundColor: 'rgba(255, 255, 255, 0.16)',
+                                    backdropFilter: 'blur(6px)',
+                                    WebkitBackdropFilter: 'blur(6px)',
                                     color: '#FFF',
                                     fontWeight: 700,
                                     cursor: 'pointer',
                                     whiteSpace: 'nowrap',
-                                    border: '1px solid rgba(255, 255, 255, 0.4)',
+                                    border: '1px solid rgba(255, 255, 255, 0.28)',
+                                    borderRadius: '16px',
                                     '&:hover': {
-                                        backgroundColor: 'rgba(255, 255, 255, 0.35)',
+                                        backgroundColor: 'rgba(255, 255, 255, 0.28)',
                                     },
                                 }}
                             />
@@ -218,10 +218,13 @@ export default function Index() {
             </Paper>
 
             {/* 2. 四大核心特色入口卡片 */}
-            <Box sx={{ mb: 6 }}>
-                <Box className="tw-section-header">
-                    <Typography className="tw-section-title">
-                        <span>🥢</span> {lang === 'zh' ? '探索夜市四大主題' : 'Explore Night Market Themes'}
+            <Box sx={{ mb: 7 }}>
+                <Box sx={{ mb: 3 }}>
+                    <Typography variant="overline" sx={{ color: '#B91C1C', fontWeight: 800, letterSpacing: '0.1em', display: 'block', mb: 0.5 }}>
+                        {lang === 'en' ? 'EXPLORE CATEGORIES' : '探索主題'}
+                    </Typography>
+                    <Typography variant="h4" sx={{ fontWeight: 900, color: '#1C1917', fontFamily: "'Noto Serif TC', serif", letterSpacing: '-0.01em' }}>
+                        {lang === 'zh' ? '夜市四大漫遊主題' : 'Night Market Themes'}
                     </Typography>
                 </Box>
 
@@ -229,17 +232,19 @@ export default function Index() {
                     {/* 卡片 1：夜市總覽 */}
                     <Grid item xs={12} sm={6} md={3}>
                         <Card className="tw-card" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                            <Box sx={{ p: 3, textAlign: 'center', background: 'linear-gradient(180deg, #FFF3E0 0%, #FFF 100%)', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                                <StorefrontIcon sx={{ fontSize: 48, color: '#E65100', mb: 1, alignSelf: 'center' }} />
-                                <Typography variant="h6" sx={{ fontWeight: 800, color: '#C62828' }}>
+                            <Box sx={{ p: 3.5, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                                <Box sx={{ width: 52, height: 52, borderRadius: '14px', backgroundColor: '#FFF7ED', display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
+                                    <StorefrontIcon sx={{ fontSize: 28, color: '#EA580C' }} />
+                                </Box>
+                                <Typography variant="h6" sx={{ fontWeight: 800, color: '#1C1917', mb: 1 }}>
                                     {t('card_markets_title')}
                                 </Typography>
-                                <Typography variant="body2" sx={{ color: '#666', mt: 1, flexGrow: 1, lineHeight: 1.6 }}>
+                                <Typography variant="body2" sx={{ color: '#57534E', flexGrow: 1, lineHeight: 1.65 }}>
                                     {t('card_markets_desc')}
                                 </Typography>
                             </Box>
-                            <Box sx={{ p: 2, mt: 'auto', borderTop: '1px solid #F0EAE1', textAlign: 'center' }}>
-                                <Button href="/nightmarket" endIcon={<ArrowForwardIcon />} sx={{ color: '#C62828', fontWeight: 800 }}>
+                            <Box sx={{ p: 2, px: 3.5, mt: 'auto', borderTop: '1px solid #EAE5DD' }}>
+                                <Button href="/nightmarket" endIcon={<ArrowForwardIcon />} sx={{ color: '#B91C1C', fontWeight: 700, p: 0, '&:hover': { backgroundColor: 'transparent', color: '#991B1B' } }}>
                                     {t('card_markets_btn')}
                                 </Button>
                             </Box>
@@ -249,17 +254,19 @@ export default function Index() {
                     {/* 卡片 2：人氣美食 */}
                     <Grid item xs={12} sm={6} md={3}>
                         <Card className="tw-card" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                            <Box sx={{ p: 3, textAlign: 'center', background: 'linear-gradient(180deg, #FBE9E7 0%, #FFF 100%)', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                                <RestaurantMenuIcon sx={{ fontSize: 48, color: '#C62828', mb: 1, alignSelf: 'center' }} />
-                                <Typography variant="h6" sx={{ fontWeight: 800, color: '#C62828' }}>
+                            <Box sx={{ p: 3.5, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                                <Box sx={{ width: 52, height: 52, borderRadius: '14px', backgroundColor: '#FEF2F2', display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
+                                    <RestaurantMenuIcon sx={{ fontSize: 28, color: '#B91C1C' }} />
+                                </Box>
+                                <Typography variant="h6" sx={{ fontWeight: 800, color: '#1C1917', mb: 1 }}>
                                     {t('card_foods_title')}
                                 </Typography>
-                                <Typography variant="body2" sx={{ color: '#666', mt: 1, flexGrow: 1, lineHeight: 1.6 }}>
+                                <Typography variant="body2" sx={{ color: '#57534E', flexGrow: 1, lineHeight: 1.65 }}>
                                     {t('card_foods_desc')}
                                 </Typography>
                             </Box>
-                            <Box sx={{ p: 2, mt: 'auto', borderTop: '1px solid #F0EAE1', textAlign: 'center' }}>
-                                <Button href="/Food" endIcon={<ArrowForwardIcon />} sx={{ color: '#C62828', fontWeight: 800 }}>
+                            <Box sx={{ p: 2, px: 3.5, mt: 'auto', borderTop: '1px solid #EAE5DD' }}>
+                                <Button href="/Food" endIcon={<ArrowForwardIcon />} sx={{ color: '#B91C1C', fontWeight: 700, p: 0, '&:hover': { backgroundColor: 'transparent', color: '#991B1B' } }}>
                                     {t('card_foods_btn')}
                                 </Button>
                             </Box>
@@ -269,17 +276,19 @@ export default function Index() {
                     {/* 卡片 3：活動公告 */}
                     <Grid item xs={12} sm={6} md={3}>
                         <Card className="tw-card" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                            <Box sx={{ p: 3, textAlign: 'center', background: 'linear-gradient(180deg, #FFFDE7 0%, #FFF 100%)', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                                <CampaignIcon sx={{ fontSize: 48, color: '#F57F17', mb: 1, alignSelf: 'center' }} />
-                                <Typography variant="h6" sx={{ fontWeight: 800, color: '#C62828' }}>
+                            <Box sx={{ p: 3.5, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                                <Box sx={{ width: 52, height: 52, borderRadius: '14px', backgroundColor: '#FFFBEB', display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
+                                    <CampaignIcon sx={{ fontSize: 28, color: '#D97706' }} />
+                                </Box>
+                                <Typography variant="h6" sx={{ fontWeight: 800, color: '#1C1917', mb: 1 }}>
                                     {t('card_bulletin_title')}
                                 </Typography>
-                                <Typography variant="body2" sx={{ color: '#666', mt: 1, flexGrow: 1, lineHeight: 1.6 }}>
+                                <Typography variant="body2" sx={{ color: '#57534E', flexGrow: 1, lineHeight: 1.65 }}>
                                     {t('card_bulletin_desc')}
                                 </Typography>
                             </Box>
-                            <Box sx={{ p: 2, mt: 'auto', borderTop: '1px solid #F0EAE1', textAlign: 'center' }}>
-                                <Button href="/bulletinBoard" endIcon={<ArrowForwardIcon />} sx={{ color: '#C62828', fontWeight: 800 }}>
+                            <Box sx={{ p: 2, px: 3.5, mt: 'auto', borderTop: '1px solid #EAE5DD' }}>
+                                <Button href="/bulletinBoard" endIcon={<ArrowForwardIcon />} sx={{ color: '#B91C1C', fontWeight: 700, p: 0, '&:hover': { backgroundColor: 'transparent', color: '#991B1B' } }}>
                                     {t('card_bulletin_btn')}
                                 </Button>
                             </Box>
@@ -289,17 +298,19 @@ export default function Index() {
                     {/* 卡片 4：訪客回饋 */}
                     <Grid item xs={12} sm={6} md={3}>
                         <Card className="tw-card" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                            <Box sx={{ p: 3, textAlign: 'center', background: 'linear-gradient(180deg, #E8F5E9 0%, #FFF 100%)', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                                <RateReviewIcon sx={{ fontSize: 48, color: '#2E7D32', mb: 1, alignSelf: 'center' }} />
-                                <Typography variant="h6" sx={{ fontWeight: 800, color: '#C62828' }}>
+                            <Box sx={{ p: 3.5, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                                <Box sx={{ width: 52, height: 52, borderRadius: '14px', backgroundColor: '#F0FDF4', display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
+                                    <RateReviewIcon sx={{ fontSize: 28, color: '#16A34A' }} />
+                                </Box>
+                                <Typography variant="h6" sx={{ fontWeight: 800, color: '#1C1917', mb: 1 }}>
                                     {t('card_feedback_title')}
                                 </Typography>
-                                <Typography variant="body2" sx={{ color: '#666', mt: 1, flexGrow: 1, lineHeight: 1.6 }}>
+                                <Typography variant="body2" sx={{ color: '#57534E', flexGrow: 1, lineHeight: 1.65 }}>
                                     {t('card_feedback_desc')}
                                 </Typography>
                             </Box>
-                            <Box sx={{ p: 2, mt: 'auto', borderTop: '1px solid #F0EAE1', textAlign: 'center' }}>
-                                <Button href="/feedback" endIcon={<ArrowForwardIcon />} sx={{ color: '#C62828', fontWeight: 800 }}>
+                            <Box sx={{ p: 2, px: 3.5, mt: 'auto', borderTop: '1px solid #EAE5DD' }}>
+                                <Button href="/feedback" endIcon={<ArrowForwardIcon />} sx={{ color: '#B91C1C', fontWeight: 700, p: 0, '&:hover': { backgroundColor: 'transparent', color: '#991B1B' } }}>
                                     {t('card_feedback_btn')}
                                 </Button>
                             </Box>
@@ -312,25 +323,25 @@ export default function Index() {
             <Paper
                 elevation={0}
                 sx={{
-                    p: { xs: 2.5, md: 4 },
-                    mb: 6,
+                    p: { xs: 3, md: 4.5 },
+                    mb: 7,
                     borderRadius: '20px',
-                    backgroundColor: '#FFFDF9',
-                    border: '1px solid #F0E6D8',
-                    boxShadow: '0 4px 20px rgba(142, 24, 0, 0.06)',
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #EAE5DD',
+                    boxShadow: '0 4px 20px rgba(28, 25, 23, 0.04)',
                 }}
             >
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2, mb: 3 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                        <ExploreIcon sx={{ color: '#C62828', fontSize: 32 }} />
-                        <Box>
-                            <Typography variant="h5" sx={{ fontWeight: 900, fontFamily: "'Noto Serif TC', serif", color: '#C62828' }}>
-                                {lang === 'en' ? '✈️ Traveler Essentials: Taiwan Night Market 101' : '✈️ 跨縣市旅人與國際觀光客 ‧ 迺夜市通關秘笈'}
-                            </Typography>
-                            <Typography variant="body2" sx={{ color: '#777', mt: 0.3 }}>
-                                {lang === 'en' ? 'Quick navigation tips for MRT transit, cash/mobile pay, and local ordering culture' : '一次搞懂捷運直達路線、現金小鈔與 LINE Pay 支付習慣、實用點餐常用語'}
-                            </Typography>
-                        </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2, mb: 3.5 }}>
+                    <Box>
+                        <Typography variant="overline" sx={{ color: '#B91C1C', fontWeight: 800, letterSpacing: '0.1em', display: 'block', mb: 0.5 }}>
+                            {lang === 'en' ? 'TRAVELER ESSENTIALS' : '旅人實用攻略'}
+                        </Typography>
+                        <Typography variant="h5" sx={{ fontWeight: 900, fontFamily: "'Noto Serif TC', serif", color: '#1C1917' }}>
+                            {lang === 'en' ? 'Taiwan Night Market 101' : '旅人迺夜市通關秘笈'}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#78716C', mt: 0.5 }}>
+                            {lang === 'en' ? 'Essential tips for MRT transit, payment habits, and ordering culture' : '一次搞懂捷運直達路線、多元支付習慣與實用點餐小抄'}
+                        </Typography>
                     </Box>
                     <Button
                         href="/guide"
@@ -339,43 +350,58 @@ export default function Index() {
                         endIcon={<ArrowForwardIcon />}
                         sx={{ borderRadius: '20px', px: 2.5 }}
                     >
-                        {lang === 'en' ? 'Full Traveler Guide ➔' : '完整旅人攻略 ➔'}
+                        {lang === 'en' ? 'Full Guide ➔' : '完整旅人攻略 ➔'}
                     </Button>
                 </Box>
 
-                <Grid container spacing={2}>
+                <Grid container spacing={2.5}>
                     <Grid item xs={12} sm={6} md={3}>
-                        <Paper sx={{ p: 2, borderRadius: '12px', backgroundColor: '#FFF', border: '1px solid #EFEBE9', height: '100%' }}>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#C62828', mb: 0.5 }}>
-                                🚇 {lang === 'en' ? 'MRT & Bus Direct' : '捷運公車直達'}
-                            </Typography>
-                            <Typography variant="caption" sx={{ color: '#666', lineHeight: 1.6, display: 'block' }}>
+                        <Paper sx={{ p: 2.5, borderRadius: '14px', backgroundColor: '#FAF8F5', border: '1px solid #EAE5DD', height: '100%', display: 'flex', flexDirection: 'column' }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                                <Box sx={{ width: 32, height: 32, borderRadius: '8px', backgroundColor: '#FEE2E2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <DirectionsSubwayIcon sx={{ color: '#B91C1C', fontSize: 18 }} />
+                                </Box>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#1C1917' }}>
+                                    {lang === 'en' ? 'MRT & Bus Direct' : '捷運公車直達'}
+                                </Typography>
+                            </Box>
+                            <Typography variant="caption" sx={{ color: '#57534E', lineHeight: 1.6, display: 'block', flexGrow: 1 }}>
                                 {lang === 'en'
-                                    ? '劍潭站 (士林)、松山站 (饒河)、雙連站 (寧夏)、美麗島站 (六合出站即抵)。'
+                                    ? 'Jiantan Station (Shilin), Songshan Station (Raohe), Shuanglian Station (Ningxia), Formosa Blvd (Liuhe).'
                                     : '士林搭至劍潭站、饒河搭至松山站1號口、六合出美麗島站11號口直達。'}
                             </Typography>
                         </Paper>
                     </Grid>
 
                     <Grid item xs={12} sm={6} md={3}>
-                        <Paper sx={{ p: 2, borderRadius: '12px', backgroundColor: '#FFF', border: '1px solid #EFEBE9', height: '100%' }}>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#E65100', mb: 0.5 }}>
-                                💵 {lang === 'en' ? 'Payment Tips' : '支付與小鈔自備'}
-                            </Typography>
-                            <Typography variant="caption" sx={{ color: '#666', lineHeight: 1.6, display: 'block' }}>
+                        <Paper sx={{ p: 2.5, borderRadius: '14px', backgroundColor: '#FAF8F5', border: '1px solid #EAE5DD', height: '100%', display: 'flex', flexDirection: 'column' }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                                <Box sx={{ width: 32, height: 32, borderRadius: '8px', backgroundColor: '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <PaymentsIcon sx={{ color: '#D97706', fontSize: 18 }} />
+                                </Box>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#1C1917' }}>
+                                    {lang === 'en' ? 'Payment Tips' : '支付與小鈔自備'}
+                                </Typography>
+                            </Box>
+                            <Typography variant="caption" sx={{ color: '#57534E', lineHeight: 1.6, display: 'block', flexGrow: 1 }}>
                                 {lang === 'en'
-                                    ? 'Prepare NT$50 coins & NT$100 bills. 60%+ stalls also support LINE Pay.'
+                                    ? 'Prepare NT$50 coins & NT$100 bills. 60%+ stalls also support LINE Pay & EasyCard.'
                                     : '建議備妥 50 元硬幣與百元鈔，超過 6 成店家亦支援 LINE Pay / 悠遊卡！'}
                             </Typography>
                         </Paper>
                     </Grid>
 
                     <Grid item xs={12} sm={6} md={3}>
-                        <Paper sx={{ p: 2, borderRadius: '12px', backgroundColor: '#FFF', border: '1px solid #EFEBE9', height: '100%' }}>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#2E7D32', mb: 0.5 }}>
-                                🗣️ {lang === 'en' ? 'Order Phrases' : '點餐常用小抄'}
-                            </Typography>
-                            <Typography variant="caption" sx={{ color: '#666', lineHeight: 1.6, display: 'block' }}>
+                        <Paper sx={{ p: 2.5, borderRadius: '14px', backgroundColor: '#FAF8F5', border: '1px solid #EAE5DD', height: '100%', display: 'flex', flexDirection: 'column' }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                                <Box sx={{ width: 32, height: 32, borderRadius: '8px', backgroundColor: '#CCFBF1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <TranslateIcon sx={{ color: '#0D9488', fontSize: 18 }} />
+                                </Box>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#1C1917' }}>
+                                    {lang === 'en' ? 'Order Phrases' : '點餐常用小抄'}
+                                </Typography>
+                            </Box>
+                            <Typography variant="caption" sx={{ color: '#57534E', lineHeight: 1.6, display: 'block', flexGrow: 1 }}>
                                 {lang === 'en'
                                     ? '內用 (For here), 外帶 (To go), 不要香菜 (No cilantro), 微糖微冰 (Less ice/sugar).'
                                     : '內用 (坐著吃)、外帶 (邊走邊吃)、不要香菜、微糖微冰（手搖黃金比例）。'}
@@ -384,13 +410,18 @@ export default function Index() {
                     </Grid>
 
                     <Grid item xs={12} sm={6} md={3}>
-                        <Paper sx={{ p: 2, borderRadius: '12px', backgroundColor: '#FFF', border: '1px solid #EFEBE9', height: '100%' }}>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#D84315', mb: 0.5 }}>
-                                ⚠️ {lang === 'en' ? 'Avoid Closed Days' : '營業時間避坑提醒'}
-                            </Typography>
-                            <Typography variant="caption" sx={{ color: '#666', lineHeight: 1.6, display: 'block' }}>
+                        <Paper sx={{ p: 2.5, borderRadius: '14px', backgroundColor: '#FAF8F5', border: '1px solid #EAE5DD', height: '100%', display: 'flex', flexDirection: 'column' }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                                <Box sx={{ width: 32, height: 32, borderRadius: '8px', backgroundColor: '#EEF2FF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <AccessTimeIcon sx={{ color: '#4F46E5', fontSize: 18 }} />
+                                </Box>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#1C1917' }}>
+                                    {lang === 'en' ? 'Golden Hours' : '營業時間避坑提醒'}
+                                </Typography>
+                            </Box>
+                            <Typography variant="caption" sx={{ color: '#57534E', lineHeight: 1.6, display: 'block', flexGrow: 1 }}>
                                 {lang === 'en'
-                                    ? 'Tainan Garden Night Market is ONLY open on Thu, Sat, Sun. Peak hours: 19:30 - 21:30.'
+                                    ? 'Tainan Garden Night Market: Thu, Sat, Sun ONLY. Peak hours: 19:30 - 21:30.'
                                     : '台南花園夜市僅「四、六、日」營業！全台夜市黃金時段建議 17:30 - 18:30 避開排隊。'}
                             </Typography>
                         </Paper>
@@ -399,12 +430,17 @@ export default function Index() {
             </Paper>
 
             {/* 4. 精選熱門夜市展示 (動態讀取) */}
-            <Box sx={{ mb: 6 }}>
-                <Box className="tw-section-header">
-                    <Typography className="tw-section-title">
-                        <span>🌟</span> {t('featured_markets')}
-                    </Typography>
-                    <Button href="/nightmarket" endIcon={<ArrowForwardIcon />} sx={{ color: '#C62828', fontWeight: 700 }}>
+            <Box sx={{ mb: 7 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 2, mb: 3.5, borderBottom: '1px solid #EAE5DD', pb: 2 }}>
+                    <Box>
+                        <Typography variant="overline" sx={{ color: '#B91C1C', fontWeight: 800, letterSpacing: '0.1em', display: 'block', mb: 0.5 }}>
+                            {lang === 'en' ? 'LOCAL HIGHLIGHTS' : '在地精選導覽'}
+                        </Typography>
+                        <Typography variant="h4" sx={{ fontWeight: 900, color: '#1C1917', fontFamily: "'Noto Serif TC', serif", letterSpacing: '-0.01em' }}>
+                            {t('featured_markets')}
+                        </Typography>
+                    </Box>
+                    <Button href="/nightmarket" endIcon={<ArrowForwardIcon />} sx={{ color: '#B91C1C', fontWeight: 700, '&:hover': { backgroundColor: '#FEF2F2' } }}>
                         {t('view_all_markets')}
                     </Button>
                 </Box>
@@ -413,38 +449,39 @@ export default function Index() {
                     {markets.slice(0, 6).map((item, idx) => (
                         <Grid item xs={12} sm={6} md={4} key={item._id || idx}>
                             <Card className="tw-card" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                                <Box sx={{ position: 'relative' }}>
+                                <Box sx={{ position: 'relative', overflow: 'hidden' }}>
                                     <CardMedia
                                         component="img"
-                                        height="200"
+                                        height="210"
                                         image={item.marketIcon || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600'}
                                         alt={item.name}
-                                        sx={{ objectFit: 'cover' }}
+                                        sx={{ objectFit: 'cover', transition: 'transform 0.4s ease', '&:hover': { transform: 'scale(1.04)' } }}
                                     />
                                     <Box
                                         sx={{
                                             position: 'absolute',
                                             top: 12,
                                             left: 12,
-                                            backgroundColor: 'rgba(0,0,0,0.75)',
-                                            color: '#FFD54F',
+                                            backgroundColor: 'rgba(28, 25, 23, 0.78)',
+                                            backdropFilter: 'blur(6px)',
+                                            color: '#FCD34D',
                                             px: 1.2,
-                                            py: 0.4,
-                                            borderRadius: '6px',
+                                            py: 0.35,
+                                            borderRadius: '20px',
                                             display: 'flex',
                                             alignItems: 'center',
                                             gap: 0.5,
                                             fontWeight: 800,
-                                            fontSize: '0.85rem',
+                                            fontSize: '0.8rem',
                                         }}
                                     >
-                                        ⭐ {item.rating || 4.8}
+                                        ★ {item.rating || 4.8}
                                     </Box>
                                 </Box>
 
                                 <CardContent sx={{ flexGrow: 1, p: 2.5, display: 'flex', flexDirection: 'column' }}>
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 1, mb: 1 }}>
-                                        <Typography variant="h6" sx={{ fontWeight: 900, color: '#2C2622', flex: 1, fontSize: '1.1rem', lineHeight: 1.3 }}>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 1, mb: 0.8 }}>
+                                        <Typography variant="h6" sx={{ fontWeight: 800, color: '#1C1917', flex: 1, fontSize: '1.15rem', lineHeight: 1.3 }}>
                                             {lang === 'en' ? (item.nameen || item.name) : item.name}
                                         </Typography>
                                         <Chip
@@ -456,18 +493,18 @@ export default function Index() {
                                                 (item.marketLocation === 'tn' || (item.name && item.name.includes('花園'))) ? (lang === 'en' ? 'Tainan' : '台南') : '台灣'
                                             }
                                             size="small"
-                                            sx={{ backgroundColor: '#FFECB3', color: '#8E1800', fontWeight: 800, flexShrink: 0 }}
+                                            sx={{ backgroundColor: '#F5EBE1', color: '#991B1B', fontWeight: 700, fontSize: '0.72rem', border: '1px solid #EADBCC', flexShrink: 0 }}
                                         />
                                     </Box>
 
-                                    <Typography variant="body2" sx={{ color: '#777', mb: 1.5, fontSize: '0.85rem' }}>
+                                    <Typography variant="body2" sx={{ color: '#78716C', mb: 1.5, fontSize: '0.82rem' }}>
                                         {lang === 'en' ? (item.marketLocation || 'Taiwan') : item.nameen}
                                     </Typography>
 
                                     <Typography
                                         variant="body2"
                                         sx={{
-                                            color: '#555',
+                                            color: '#57534E',
                                             lineHeight: 1.6,
                                             display: '-webkit-box',
                                             WebkitLineClamp: 2,
@@ -481,22 +518,22 @@ export default function Index() {
                                     </Typography>
 
                                     {/* 捷運交通與營業時間提示 */}
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, color: '#2E7D32', fontSize: '0.82rem', fontWeight: 700, mb: 0.8, minWidth: 0 }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, color: '#15803D', fontSize: '0.82rem', fontWeight: 600, mb: 0.8, minWidth: 0 }}>
                                         <DirectionsSubwayIcon fontSize="small" sx={{ flexShrink: 0 }} />
-                                        <Typography variant="caption" sx={{ color: '#2E7D32', fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                        <Typography variant="caption" sx={{ color: '#15803D', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                             {item.positionGuidelines || (item.marketLocation || '在地熱門捷運直達')}
                                         </Typography>
                                     </Box>
 
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, color: (item.name && item.name.includes('花園')) ? '#C62828' : '#795548', fontSize: '0.8rem', fontWeight: 700, minWidth: 0 }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, color: (item.name && item.name.includes('花園')) ? '#B91C1C' : '#78716C', fontSize: '0.8rem', fontWeight: 600, minWidth: 0 }}>
                                         <CalendarMonthIcon fontSize="small" sx={{ flexShrink: 0 }} />
-                                        <Typography variant="caption" sx={{ fontWeight: 700, color: (item.name && item.name.includes('花園')) ? '#C62828' : '#795548', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                            {(item.name && item.name.includes('花園')) ? (lang === 'en' ? '⚠️ Thu, Sat, Sun Only' : '⚠️ 每週四、六、日限定營業') : (lang === 'en' ? 'Open Daily (17:30 - 00:00)' : '每日營業 (17:30 - 00:00)')}
+                                        <Typography variant="caption" sx={{ fontWeight: 600, color: (item.name && item.name.includes('花園')) ? '#B91C1C' : '#78716C', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                            {(item.name && item.name.includes('花園')) ? (lang === 'en' ? 'Thu, Sat, Sun Only' : '每週四、六、日限定營業') : (lang === 'en' ? 'Open Daily (17:30 - 00:00)' : '每日營業 (17:30 - 00:00)')}
                                         </Typography>
                                     </Box>
                                 </CardContent>
 
-                                <CardActions sx={{ p: 2, pt: 0 }}>
+                                <CardActions sx={{ p: 2.5, pt: 0 }}>
                                     <Button
                                         fullWidth
                                         className="tw-btn-primary"

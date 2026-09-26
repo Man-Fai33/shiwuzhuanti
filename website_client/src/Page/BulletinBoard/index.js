@@ -74,14 +74,33 @@ export default function BulletinBoard() {
         <Box sx={{ pb: 6 }}>
             {/* 標題與簡介 */}
             <Box sx={{ mb: 4, textAlign: { xs: 'center', md: 'left' } }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: { xs: 'center', md: 'flex-start' }, mb: 1 }}>
-                    <span style={{ fontSize: '2rem' }}>📢</span>
-                    <Typography variant="h4" sx={{ fontFamily: "'Noto Serif TC', serif", fontWeight: 900, color: '#C62828' }}>
-                        {lang === 'en' ? 'Night Market Events & Official Notices' : '夜市活動與即時公告'}
-                    </Typography>
-                </Box>
-                <Typography variant="body1" sx={{ color: '#666' }}>
-                    {lang === 'en' ? 'Live updates on operating schedules, cultural festivals, special discounts, and market regulations across Taiwan!' : '即時發佈全台各夜市營運日程、節慶踩街活動、市集規範與好康優惠資訊！'}
+                <Typography
+                    variant="caption"
+                    sx={{
+                        display: 'inline-block',
+                        fontWeight: 800,
+                        letterSpacing: '0.12em',
+                        textTransform: 'uppercase',
+                        color: 'var(--tw-terracotta, #B91C1C)',
+                        mb: 0.5,
+                    }}
+                >
+                    {lang === 'en' ? 'Announcements & Updates' : '即時公告與活動訊息'}
+                </Typography>
+                <Typography
+                    variant="h4"
+                    sx={{
+                        fontFamily: "'Noto Serif TC', serif",
+                        fontWeight: 800,
+                        color: 'var(--tw-deep-charcoal, #1C1917)',
+                        fontSize: { xs: '1.75rem', sm: '2.2rem' },
+                        mb: 1,
+                    }}
+                >
+                    {lang === 'en' ? 'Night Market Events & Official Notices' : '夜市活動與即時公告'}
+                </Typography>
+                <Typography variant="body1" sx={{ color: 'var(--tw-text-muted, #78716C)', maxWidth: 720 }}>
+                    {lang === 'en' ? 'Live updates on operating schedules, cultural festivals, special discounts, and market regulations across Taiwan.' : '即時發佈全台各夜市營運日程、節慶活動、市集規範與好康優惠資訊。'}
                 </Typography>
             </Box>
 
@@ -128,34 +147,35 @@ export default function BulletinBoard() {
                                     <Box
                                         sx={{
                                             height: 140,
-                                            background: 'linear-gradient(135deg, #FFECB3 0%, #FFE082 100%)',
+                                            backgroundColor: 'var(--tw-paper-cream, #FAF8F5)',
+                                            borderBottom: '1px solid var(--tw-border-subtle, #EAE5DD)',
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
-                                            fontSize: '3rem',
+                                            color: 'var(--tw-terracotta, #B91C1C)',
                                         }}
                                     >
-                                        🏮
+                                        <CampaignIcon sx={{ fontSize: 44, opacity: 0.8 }} />
                                     </Box>
                                 )}
 
                                 <CardContent sx={{ flexGrow: 1, p: 2.5 }}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, color: '#888', mb: 1.5, fontSize: '0.85rem' }}>
-                                        <CalendarMonthIcon fontSize="small" sx={{ color: '#C62828' }} />
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, color: 'var(--tw-text-muted, #78716C)', mb: 1.5, fontSize: '0.85rem' }}>
+                                        <CalendarMonthIcon fontSize="small" sx={{ color: 'var(--tw-amber, #D97706)' }} />
                                         <Typography variant="caption" sx={{ fontWeight: 600 }}>
                                             {formatDate(item.date)}
                                         </Typography>
-                                        <Chip label={item.owner || (lang === 'en' ? 'Management' : '管理處')} size="small" sx={{ ml: 'auto', backgroundColor: '#F0EAE1', fontWeight: 700 }} />
+                                        <Chip label={item.owner || (lang === 'en' ? 'Management' : '管理處')} size="small" sx={{ ml: 'auto', backgroundColor: 'var(--tw-paper-cream, #FAF8F5)', border: '1px solid var(--tw-border-subtle, #EAE5DD)', fontWeight: 600, borderRadius: '6px' }} />
                                     </Box>
 
-                                    <Typography variant="h6" sx={{ fontWeight: 800, color: '#2C2622', mb: 1, lineHeight: 1.4 }}>
+                                    <Typography variant="h6" sx={{ fontFamily: "'Noto Serif TC', serif", fontWeight: 800, color: 'var(--tw-deep-charcoal, #1C1917)', mb: 1, lineHeight: 1.4 }}>
                                         {item.title}
                                     </Typography>
 
                                     <Typography
                                         variant="body2"
                                         sx={{
-                                            color: '#666',
+                                            color: '#57534E',
                                             lineHeight: 1.6,
                                             display: '-webkit-box',
                                             WebkitLineClamp: 3,
@@ -167,7 +187,7 @@ export default function BulletinBoard() {
                                     </Typography>
                                 </CardContent>
 
-                                <CardActions sx={{ p: 2, pt: 0 }}>
+                                <CardActions sx={{ p: 2.5, pt: 0 }}>
                                     <Button
                                         fullWidth
                                         className="tw-btn-secondary"
@@ -177,7 +197,7 @@ export default function BulletinBoard() {
                                             handleOpenDialog(item);
                                         }}
                                     >
-                                        {lang === 'en' ? 'Read Notice' : '閱讀全文公告'}
+                                        {lang === 'en' ? 'Read Notice' : '閱讀完整公告'}
                                     </Button>
                                 </CardActions>
                             </Card>
@@ -185,9 +205,9 @@ export default function BulletinBoard() {
                     ))}
                 </Grid>
             ) : (
-                <Paper sx={{ p: 6, textAlign: 'center', borderRadius: '16px', backgroundColor: '#FFF', border: '1px dashed #DDD' }}>
-                    <CampaignIcon sx={{ fontSize: 60, color: '#CCC', mb: 1.5 }} />
-                    <Typography variant="h6" sx={{ fontWeight: 800, color: '#666' }}>
+                <Paper sx={{ p: 6, textAlign: 'center', borderRadius: '16px', backgroundColor: '#FFF', border: '1px dashed var(--tw-border-subtle, #EAE5DD)' }}>
+                    <CampaignIcon sx={{ fontSize: 56, color: '#D6D3D1', mb: 1.5 }} />
+                    <Typography variant="h6" sx={{ fontWeight: 800, color: 'var(--tw-deep-charcoal, #1C1917)' }}>
                         {lang === 'en' ? 'No notices published currently' : '目前暫無發布的公告訊息'}
                     </Typography>
                 </Paper>
@@ -200,7 +220,7 @@ export default function BulletinBoard() {
                 maxWidth="sm"
                 fullWidth
                 PaperProps={{
-                    sx: { borderRadius: '16px', p: 1 }
+                    sx: { borderRadius: '20px', p: 1 }
                 }}
             >
                 {selectedBulletin && (
@@ -211,29 +231,29 @@ export default function BulletinBoard() {
                                 height="220"
                                 image={selectedBulletin.imgUrl}
                                 alt={selectedBulletin.title}
-                                sx={{ objectFit: 'cover', borderRadius: '12px 12px 0 0' }}
+                                sx={{ objectFit: 'cover', borderRadius: '14px 14px 0 0' }}
                             />
                         )}
-                        <DialogTitle sx={{ fontWeight: 900, color: '#C62828', pt: 2, pb: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <DialogTitle sx={{ fontFamily: "'Noto Serif TC', serif", fontWeight: 800, color: 'var(--tw-deep-charcoal, #1C1917)', pt: 2, pb: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <span>{selectedBulletin.title}</span>
                             <Button size="small" onClick={handleCloseDialog} sx={{ minWidth: 'auto', color: '#999' }}>
                                 <CloseIcon fontSize="small" />
                             </Button>
                         </DialogTitle>
                         <DialogContent dividers sx={{ borderBottom: 'none' }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, color: '#888' }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, color: 'var(--tw-text-muted, #78716C)' }}>
                                 <CalendarMonthIcon fontSize="small" />
                                 <Typography variant="caption" sx={{ fontWeight: 600 }}>
                                     {formatDate(selectedBulletin.date)}
                                 </Typography>
                                 <Chip label={selectedBulletin.owner || (lang === 'en' ? 'Management' : '管理處')} size="small" sx={{ ml: 'auto' }} />
                             </Box>
-                            <Typography variant="body1" sx={{ color: '#444', lineHeight: 1.8, whiteSpace: 'pre-line' }}>
+                            <Typography variant="body1" sx={{ color: '#44403C', lineHeight: 1.8, whiteSpace: 'pre-line' }}>
                                 {selectedBulletin.context}
                             </Typography>
                         </DialogContent>
                         <DialogActions sx={{ px: 3, pb: 2 }}>
-                            <Button onClick={handleCloseDialog} variant="contained" sx={{ backgroundColor: '#C62828', color: '#FFF', fontWeight: 800, '&:hover': { backgroundColor: '#B71C1C' } }}>
+                            <Button onClick={handleCloseDialog} className="tw-btn-primary" sx={{ px: 3, py: 0.8 }}>
                                 {lang === 'en' ? 'Close' : '關閉公告'}
                             </Button>
                         </DialogActions>

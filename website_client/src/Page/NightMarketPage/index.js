@@ -138,9 +138,9 @@ export default function NightMarketPage() {
     };
 
     const getLocationName = (loc) => {
-        if (loc === 'tp' || loc === 'Taipei') return lang === 'en' ? 'Taipei' : '台北市';
-        if (loc === 'tz' || loc === 'Taichung') return lang === 'en' ? 'Taichung' : '台中市';
-        if (loc === 'tn' || loc === 'Tainan') return lang === 'en' ? 'Tainan' : '台南市';
+        if (loc === 'tp' || loc === 'Taipei') return lang === 'en' ? 'Taipei' : '台北';
+        if (loc === 'tz' || loc === 'Taichung') return lang === 'en' ? 'Taichung' : '台中';
+        if (loc === 'tn' || loc === 'Tainan') return lang === 'en' ? 'Tainan' : '台南';
         return lang === 'en' ? 'Taiwan' : '台灣';
     };
 
@@ -151,9 +151,15 @@ export default function NightMarketPage() {
                 <Button
                     startIcon={<ArrowBackIcon />}
                     href="/nightmarket"
-                    sx={{ color: '#C62828', fontWeight: 800, fontSize: '0.95rem' }}
+                    sx={{
+                        color: 'var(--tw-deep-charcoal, #1C1917)',
+                        fontWeight: 700,
+                        fontSize: '0.9rem',
+                        textTransform: 'none',
+                        '&:hover': { color: 'var(--tw-terracotta, #B91C1C)', backgroundColor: 'transparent' }
+                    }}
                 >
-                    {lang === 'en' ? 'Back to Night Markets' : '返回夜市探索列表'}
+                    {lang === 'en' ? '← Back to Night Markets' : '← 返回夜市名錄'}
                 </Button>
             </Box>
 
@@ -163,16 +169,16 @@ export default function NightMarketPage() {
                 sx={{
                     p: { xs: 2.5, md: 4 },
                     mb: 4,
-                    borderRadius: '20px',
-                    backgroundColor: '#FFF',
-                    border: '1px solid #EFE5D8',
-                    boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+                    borderRadius: '24px',
+                    backgroundColor: 'var(--tw-card-white, #FFFFFF)',
+                    border: '1px solid var(--tw-border-subtle, #EAE5DD)',
+                    boxShadow: '0 4px 20px rgba(28, 25, 23, 0.05)',
                 }}
             >
                 <Grid container spacing={4} alignItems="center">
                     {/* 左側照片 */}
                     <Grid item xs={12} md={5}>
-                        <Box sx={{ borderRadius: '16px', overflow: 'hidden', height: { xs: '240px', md: '320px' }, boxShadow: '0 4px 16px rgba(0,0,0,0.1)' }}>
+                        <Box sx={{ borderRadius: '18px', overflow: 'hidden', height: { xs: '240px', md: '320px' }, boxShadow: '0 4px 16px rgba(0,0,0,0.08)' }}>
                             <img
                                 src={market.marketIcon || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800'}
                                 alt={market.name}
@@ -184,16 +190,16 @@ export default function NightMarketPage() {
                     {/* 右側夜市特色介紹 */}
                     <Grid item xs={12} md={7}>
                         {/* 城市與標籤 */}
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5, flexWrap: 'wrap' }}>
                             <Chip
                                 label={getLocationName(market.marketLocation)}
                                 size="small"
-                                sx={{ backgroundColor: '#FFD54F', color: '#5D1000', fontWeight: 800 }}
+                                sx={{ backgroundColor: 'var(--tw-paper-cream, #FAF8F5)', color: 'var(--tw-deep-charcoal, #1C1917)', border: '1px solid var(--tw-border-subtle, #EAE5DD)', fontWeight: 700, borderRadius: '12px' }}
                             />
                             <Chip
-                                label={lang === 'en' ? 'Must-Visit Night Market' : '熱門必訪觀光夜市'}
+                                label={lang === 'en' ? 'Featured Destination' : '在地指標熱門夜市'}
                                 size="small"
-                                sx={{ backgroundColor: '#FFECB3', color: '#8E1800', fontWeight: 800 }}
+                                sx={{ backgroundColor: '#FEF2F2', color: 'var(--tw-terracotta, #B91C1C)', fontWeight: 700, borderRadius: '12px' }}
                             />
                             <Chip
                                 icon={<AccessTimeIcon />}
@@ -202,41 +208,33 @@ export default function NightMarketPage() {
                                 sx={{
                                     backgroundColor: getLiveStatus().bg,
                                     color: getLiveStatus().color,
-                                    fontWeight: 800,
-                                }}
-                            />
-                            <Chip
-                                label={getLiveStatus().crowd}
-                                size="small"
-                                sx={{
-                                    backgroundColor: '#FFF3E0',
-                                    color: '#E65100',
                                     fontWeight: 700,
+                                    borderRadius: '12px'
                                 }}
                             />
                         </Box>
 
-                        <Typography variant="h3" sx={{ fontFamily: "'Noto Serif TC', serif", fontWeight: 900, color: '#C62828', mb: 1, fontSize: { xs: '1.8rem', md: '2.4rem' } }}>
+                        <Typography variant="h3" sx={{ fontFamily: "'Noto Serif TC', serif", fontWeight: 800, color: 'var(--tw-deep-charcoal, #1C1917)', mb: 0.5, fontSize: { xs: '1.8rem', md: '2.4rem' } }}>
                             {lang === 'en' ? (market.nameen || market.name) : market.name}
                         </Typography>
 
-                        <Typography variant="subtitle1" sx={{ color: '#888', mb: 2, fontWeight: 600 }}>
+                        <Typography variant="subtitle1" sx={{ color: 'var(--tw-text-muted, #78716C)', mb: 2, fontWeight: 500, letterSpacing: '0.02em' }}>
                             {lang === 'en' ? (market.marketLocation || 'Taiwan') : market.nameen}
                         </Typography>
 
-                        <Typography variant="body1" sx={{ color: '#444', lineHeight: 1.8, mb: 2.5 }}>
+                        <Typography variant="body1" sx={{ color: '#57534E', lineHeight: 1.8, mb: 2.5, fontSize: '0.95rem' }}>
                             {market.brief || market.introduction || (lang === 'en' ? 'Famous night market full of authentic Taiwanese street delicacies.' : '熱門觀光夜市，集結各色在地經典美食與熱鬧攤位。')}
                         </Typography>
 
                         {/* 交通指引 */}
                         {market.positionGuidelines && (
-                            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 1.5, p: 1.5, backgroundColor: '#F9F6F0', borderRadius: '10px' }}>
-                                <DirectionsSubwayIcon sx={{ color: '#C62828', mt: 0.3 }} />
+                            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 1.5, p: 2, backgroundColor: 'var(--tw-paper-cream, #FAF8F5)', border: '1px solid var(--tw-border-subtle, #EAE5DD)', borderRadius: '12px' }}>
+                                <DirectionsSubwayIcon sx={{ color: 'var(--tw-terracotta, #B91C1C)', mt: 0.3 }} />
                                 <Box>
-                                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#2C2622' }}>
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'var(--tw-deep-charcoal, #1C1917)' }}>
                                         {lang === 'en' ? 'Transit & Directions' : '捷運 / 交通指引'}
                                     </Typography>
-                                    <Typography variant="body2" sx={{ color: '#666', lineHeight: 1.5 }}>
+                                    <Typography variant="body2" sx={{ color: 'var(--tw-text-muted, #78716C)', lineHeight: 1.5 }}>
                                         {market.positionGuidelines}
                                     </Typography>
                                 </Box>
@@ -244,17 +242,17 @@ export default function NightMarketPage() {
                         )}
 
                         {/* 雨天備案提示 */}
-                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 2.5, p: 1.5, backgroundColor: '#E3F2FD', borderRadius: '10px' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 2.5, p: 2, backgroundColor: '#F0F9FF', border: '1px solid #E0F2FE', borderRadius: '12px' }}>
                             <UmbrellaIcon sx={{ color: '#0288D1', mt: 0.3 }} />
-                            <Typography variant="body2" sx={{ color: '#01579B', lineHeight: 1.5, fontWeight: 600 }}>
+                            <Typography variant="body2" sx={{ color: '#0369A1', lineHeight: 1.5, fontWeight: 600 }}>
                                 {getRainyDayTip()}
                             </Typography>
                         </Box>
 
                         {/* 綜合評分 */}
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Rating value={Number(market.rating) || 4.8} precision={0.1} readOnly sx={{ color: '#FFB300' }} />
-                            <Typography variant="body2" sx={{ fontWeight: 800, color: '#C62828' }}>
+                            <Rating value={Number(market.rating) || 4.8} precision={0.1} readOnly sx={{ color: '#FBBF24' }} />
+                            <Typography variant="body2" sx={{ fontWeight: 800, color: 'var(--tw-deep-charcoal, #1C1917)' }}>
                                 ({market.rating || 4.8})
                             </Typography>
                         </Box>
@@ -263,11 +261,11 @@ export default function NightMarketPage() {
 
                 {/* 夜市深度故事 / 背景介紹 */}
                 {market.introduction && market.introduction !== market.brief && (
-                    <Box sx={{ mt: 4, pt: 3, borderTop: '1px solid #EFE5D8' }}>
-                        <Typography variant="h6" sx={{ fontWeight: 900, color: '#C62828', mb: 1.5 }}>
-                            📖 {lang === 'en' ? 'Market History & Heritage' : '夜市故事與文化傳承'}
+                    <Box sx={{ mt: 4, pt: 3, borderTop: '1px solid var(--tw-border-subtle, #EAE5DD)' }}>
+                        <Typography variant="h6" sx={{ fontFamily: "'Noto Serif TC', serif", fontWeight: 800, color: 'var(--tw-deep-charcoal, #1C1917)', mb: 1.5 }}>
+                            {lang === 'en' ? 'Market History & Heritage' : '夜市故事與文化傳承'}
                         </Typography>
-                        <Typography variant="body2" sx={{ color: '#555', lineHeight: 1.8 }}>
+                        <Typography variant="body2" sx={{ color: 'var(--tw-text-muted, #78716C)', lineHeight: 1.8 }}>
                             {market.introduction}
                         </Typography>
                     </Box>
@@ -422,21 +420,17 @@ export default function NightMarketPage() {
                         </Typography>
                         <Button
                             variant="contained"
+                            className="tw-btn-primary"
                             startIcon={<OpenInNewIcon />}
                             href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent((market.name || '') + ' ' + (market.marketLocation || ''))}&travelmode=transit`}
                             target="_blank"
                             rel="noopener noreferrer"
                             sx={{
-                                backgroundColor: '#C62828',
-                                color: '#FFF',
-                                fontWeight: 800,
-                                borderRadius: '20px',
-                                px: 2.2,
-                                py: 0.7,
-                                '&:hover': { backgroundColor: '#B71C1C' }
+                                px: 2.5,
+                                py: 0.8,
                             }}
                         >
-                            {lang === 'en' ? 'Open in Google Maps (Take Me There) ➔' : '🗺️ Google 地圖即時導航 (帶我前往) ➔'}
+                            {lang === 'en' ? 'Open in Google Maps' : 'Google 地圖即時導航'}
                         </Button>
                     </Box>
 

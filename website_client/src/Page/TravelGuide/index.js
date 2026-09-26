@@ -177,47 +177,51 @@ export default function TravelGuide() {
                 elevation={0}
                 sx={{
                     p: { xs: 3, md: 5 },
-                    borderRadius: '20px',
-                    background: 'linear-gradient(135deg, #8E1800 0%, #C62828 50%, #D84315 100%)',
+                    borderRadius: '24px',
+                    background: 'linear-gradient(145deg, #1C1917 0%, #292524 70%, #44403C 100%)',
                     color: '#FFF',
                     mb: 4,
-                    boxShadow: '0 8px 30px rgba(198, 40, 40, 0.25)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    boxShadow: '0 8px 32px rgba(28, 25, 23, 0.16)',
                     position: 'relative',
                     overflow: 'hidden'
                 }}
             >
                 <Box sx={{ position: 'relative', zIndex: 2, maxWidth: '800px' }}>
                     <Chip
-                        label={lang === 'en' ? '✈️ Tourist & Traveler Essentials' : '✈️ 外縣市旅人與國際觀光客必讀'}
+                        label={lang === 'en' ? 'Visitor & Traveler Companion' : '外縣市旅人與國際觀光客必讀'}
                         sx={{
-                            backgroundColor: '#FFD54F',
-                            color: '#5D1000',
-                            fontWeight: 800,
+                            backgroundColor: '#FEF2F2',
+                            color: 'var(--tw-terracotta, #B91C1C)',
+                            fontWeight: 700,
+                            fontSize: '0.8rem',
                             mb: 2,
+                            borderRadius: '16px',
                         }}
                     />
                     <Typography
                         variant="h3"
                         sx={{
                             fontFamily: "'Noto Serif TC', serif",
-                            fontWeight: 900,
-                            fontSize: { xs: '1.8rem', md: '2.5rem' },
+                            fontWeight: 800,
+                            fontSize: { xs: '1.8rem', md: '2.4rem' },
                             lineHeight: 1.3,
                             mb: 1.5,
+                            color: '#FFF',
                         }}
                     >
-                        {lang === 'en' ? 'Taiwan Night Market 101: Complete Traveler’s Guide' : '台灣迺夜市新手通關秘笈 ‧ 旅人首選攻略'}
+                        {lang === 'en' ? 'Taiwan Night Market 101: Essential Traveler Guide' : '台灣夜市新手通關秘笈 ‧ 旅人首選攻略'}
                     </Typography>
-                    <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.92)', fontSize: '1.05rem', lineHeight: 1.7 }}>
+                    <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.85)', fontSize: '1rem', lineHeight: 1.7 }}>
                         {lang === 'en'
-                            ? 'Visiting from another city or abroad? Master MRT transit, essential ordering phrases, payment tips, and avoid closed days with our comprehensive traveler kit!'
-                            : '專為跨縣市來訪旅人與國際觀光客量身打造！一次搞懂全台夜市捷運大眾運輸、排隊點餐常用語、支付習慣與必訪時程，讓您像在地人一樣暢快迺夜市！'}
+                            ? 'Visiting from another city or abroad? Master MRT transit routes, handy ordering phrases with audio, cashless payment habits, and avoid closed days with our comprehensive traveler kit.'
+                            : '專為跨縣市來訪旅人與海外觀光客量身打造。一次搞懂捷運直達路線、點餐常用語發音、支付工具與營業日曆，讓您體驗最道地的台灣在地夜市生活！'}
                     </Typography>
                 </Box>
             </Paper>
 
             {/* 功能切換 Tabs */}
-            <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3.5 }}>
+            <Box sx={{ borderBottom: 1, borderColor: 'var(--tw-border-subtle, #EAE5DD)', mb: 3.5 }}>
                 <Tabs
                     value={tabVal}
                     onChange={(e, val) => setTabVal(val)}
@@ -227,18 +231,19 @@ export default function TravelGuide() {
                     indicatorColor="secondary"
                     sx={{
                         '& .MuiTab-root': {
-                            fontWeight: 800,
-                            fontSize: '1rem',
-                            color: '#666',
-                            '&.Mui-selected': { color: '#C62828' }
+                            fontWeight: 700,
+                            fontSize: '0.95rem',
+                            color: 'var(--tw-text-muted, #78716C)',
+                            textTransform: 'none',
+                            '&.Mui-selected': { color: 'var(--tw-terracotta, #B91C1C)' }
                         },
-                        '& .MuiTabs-indicator': { backgroundColor: '#C62828', height: 3 }
+                        '& .MuiTabs-indicator': { backgroundColor: 'var(--tw-terracotta, #B91C1C)', height: 3, borderRadius: '3px' }
                     }}
                 >
-                    <Tab icon={<DirectionsSubwayIcon />} iconPosition="start" label={lang === 'en' ? '1. MRT & Transit Guide' : '1. 全台捷運與交通直達'} />
-                    <Tab icon={<TranslateIcon />} iconPosition="start" label={lang === 'en' ? '2. Ordering Phrases & Pinyin' : '2. 點餐常用語與發音'} />
-                    <Tab icon={<PaymentsIcon />} iconPosition="start" label={lang === 'en' ? '3. Payments & Budget' : '3. 支付方式與預算指南'} />
-                    <Tab icon={<TipsAndUpdatesIcon />} iconPosition="start" label={lang === 'en' ? '4. Etiquette & Golden Hours' : '4. 避坑貼士與黃金時段'} />
+                    <Tab icon={<DirectionsSubwayIcon />} iconPosition="start" label={lang === 'en' ? '1. MRT & Transit Guide' : '1. 捷運與大眾交通直達'} />
+                    <Tab icon={<TranslateIcon />} iconPosition="start" label={lang === 'en' ? '2. Ordering Phrases & Audio' : '2. 點餐常用語與發音示範'} />
+                    <Tab icon={<PaymentsIcon />} iconPosition="start" label={lang === 'en' ? '3. Payments & Budget' : '3. 支付工具與預算指南'} />
+                    <Tab icon={<TipsAndUpdatesIcon />} iconPosition="start" label={lang === 'en' ? '4. Etiquette & Golden Hours' : '4. 逛夜市禮儀與避坑貼士'} />
                 </Tabs>
             </Box>
 
@@ -250,27 +255,27 @@ export default function TravelGuide() {
                             <Card className="tw-card" sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 1 }}>
                                 <CardContent sx={{ flexGrow: 1 }}>
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
-                                        <Typography variant="h6" sx={{ fontWeight: 800, color: '#C62828' }}>
-                                            🏮 {guide.market}
+                                        <Typography variant="h6" sx={{ fontFamily: "'Noto Serif TC', serif", fontWeight: 800, color: 'var(--tw-deep-charcoal, #1C1917)' }}>
+                                            {guide.market}
                                         </Typography>
-                                        <Chip label={guide.city} size="small" sx={{ backgroundColor: '#FFECB3', color: '#8E1800', fontWeight: 800 }} />
+                                        <Chip label={guide.city} size="small" sx={{ backgroundColor: '#FEF2F2', color: 'var(--tw-terracotta, #B91C1C)', fontWeight: 700, borderRadius: '6px' }} />
                                     </Box>
 
-                                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 1 }}>
-                                        <DirectionsSubwayIcon sx={{ color: '#2E7D32', fontSize: 20, mt: 0.2 }} />
+                                    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 1.2 }}>
+                                        <DirectionsSubwayIcon sx={{ color: '#15803D', fontSize: 20, mt: 0.2 }} />
                                         <Box>
-                                            <Typography variant="body2" sx={{ fontWeight: 700, color: '#2C2622' }}>
+                                            <Typography variant="body2" sx={{ fontWeight: 700, color: 'var(--tw-deep-charcoal, #1C1917)' }}>
                                                 {guide.method}
                                             </Typography>
-                                            <Typography variant="body2" sx={{ color: '#555', mt: 0.3 }}>
-                                                📍 {guide.station}
+                                            <Typography variant="body2" sx={{ color: 'var(--tw-text-muted, #78716C)', mt: 0.3 }}>
+                                                {guide.station}
                                             </Typography>
                                         </Box>
                                     </Box>
 
-                                    <Paper elevation={0} sx={{ p: 1.5, mt: 1.5, backgroundColor: '#FFFDF9', border: '1px dashed #E0D4C5', borderRadius: '8px' }}>
-                                        <Typography variant="caption" sx={{ color: '#E65100', fontWeight: 700, display: 'block' }}>
-                                            💡 {guide.tip}
+                                    <Paper elevation={0} sx={{ p: 1.5, mt: 1.5, backgroundColor: 'var(--tw-paper-cream, #FAF8F5)', border: '1px solid var(--tw-border-subtle, #EAE5DD)', borderRadius: '10px' }}>
+                                        <Typography variant="caption" sx={{ color: 'var(--tw-amber, #D97706)', fontWeight: 700, display: 'block' }}>
+                                            {guide.tip}
                                         </Typography>
                                     </Paper>
                                 </CardContent>
@@ -283,10 +288,10 @@ export default function TravelGuide() {
             {/* Tab 1: 常用點餐句子 */}
             {tabVal === 1 && (
                 <Box>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#555', mb: 2 }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'var(--tw-text-muted, #78716C)', mb: 2.5 }}>
                         {lang === 'en'
-                            ? 'Point to these words on your phone or practice saying them with Chinese Pinyin to stall vendors!'
-                            : '您可以直接出示手機上的字卡給老闆看，或參考漢語拼音輕鬆點餐！'}
+                            ? 'Point to these words on your phone or click the audio icon to listen and speak like a local!'
+                            : '您可以直接出示手機上的字卡給攤位老闆看，或點擊喇叭發音跟讀練習！'}
                     </Typography>
 
                     <Grid container spacing={2.5}>
@@ -302,25 +307,22 @@ export default function TravelGuide() {
                                         alignItems: 'center',
                                         textAlign: 'center',
                                         backgroundColor: '#FFF',
-                                        border: '1px solid #EFE5D8',
+                                        border: '1px solid var(--tw-border-subtle, #EAE5DD)',
                                         transition: 'all 0.2s ease',
-                                        '&:hover': {
-                                            transform: 'translateY(-3px)',
-                                            boxShadow: '0 6px 18px rgba(198, 40, 40, 0.12)'
-                                        }
                                     }}
                                 >
-                                    <Typography variant="h5" sx={{ fontWeight: 900, color: '#C62828', fontFamily: "'Noto Serif TC', serif", mb: 0.5 }}>
+                                    <Typography variant="h5" sx={{ fontWeight: 800, color: 'var(--tw-terracotta, #B91C1C)', fontFamily: "'Noto Serif TC', serif", mb: 0.5 }}>
                                         {p.chinese}
                                     </Typography>
-                                    <Typography variant="body2" sx={{ color: '#888', fontStyle: 'italic', mb: 1 }}>
+                                    <Typography variant="body2" sx={{ color: 'var(--tw-text-muted, #78716C)', fontStyle: 'italic', mb: 1 }}>
                                         [{p.pinyin}]
                                     </Typography>
                                     <Box
                                         sx={{
-                                            backgroundColor: '#EFEBE9',
-                                            color: '#4E342E',
-                                            fontWeight: 800,
+                                            backgroundColor: 'var(--tw-paper-cream, #FAF8F5)',
+                                            color: 'var(--tw-deep-charcoal, #1C1917)',
+                                            border: '1px solid var(--tw-border-subtle, #EAE5DD)',
+                                            fontWeight: 700,
                                             fontSize: '0.78rem',
                                             borderRadius: '12px',
                                             px: 1.2,
@@ -332,7 +334,7 @@ export default function TravelGuide() {
                                     >
                                         {p.english}
                                     </Box>
-                                    <Typography variant="caption" sx={{ color: '#666', display: 'block', mb: 1.5, flexGrow: 1, lineHeight: 1.5 }}>
+                                    <Typography variant="caption" sx={{ color: 'var(--tw-text-muted, #78716C)', display: 'block', mb: 2, flexGrow: 1, lineHeight: 1.5 }}>
                                         {p.usage}
                                     </Typography>
                                     <Button
@@ -344,18 +346,20 @@ export default function TravelGuide() {
                                         sx={{
                                             mt: 'auto',
                                             borderRadius: '20px',
-                                            borderColor: speakingWord === p.chinese ? '#2E7D32' : '#C62828',
-                                            color: speakingWord === p.chinese ? '#2E7D32' : '#C62828',
-                                            backgroundColor: speakingWord === p.chinese ? '#E8F5E9' : 'transparent',
-                                            fontWeight: 800,
+                                            borderColor: speakingWord === p.chinese ? '#15803D' : 'var(--tw-border-subtle, #EAE5DD)',
+                                            color: speakingWord === p.chinese ? '#15803D' : 'var(--tw-deep-charcoal, #1C1917)',
+                                            backgroundColor: speakingWord === p.chinese ? '#F0FDF4' : 'transparent',
+                                            fontWeight: 700,
                                             fontSize: '0.8rem',
+                                            textTransform: 'none',
                                             '&:hover': {
-                                                borderColor: '#B71C1C',
-                                                backgroundColor: 'rgba(198, 40, 40, 0.06)'
+                                                borderColor: 'var(--tw-terracotta, #B91C1C)',
+                                                backgroundColor: '#FEF2F2',
+                                                color: 'var(--tw-terracotta, #B91C1C)',
                                             }
                                         }}
                                     >
-                                        {speakingWord === p.chinese ? (lang === 'en' ? 'Playing...' : '播放中...') : (lang === 'en' ? 'Listen 🔊' : '發音示範 🔊')}
+                                        {speakingWord === p.chinese ? (lang === 'en' ? 'Playing...' : '播放示範中...') : (lang === 'en' ? 'Listen' : '發音示範')}
                                     </Button>
                                 </Card>
                             </Grid>
@@ -368,33 +372,35 @@ export default function TravelGuide() {
             {tabVal === 2 && (
                 <Grid container spacing={3}>
                     <Grid item xs={12} md={6}>
-                        <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', border: '1px solid #EFE5D8', backgroundColor: '#FFF' }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                                <PaymentsIcon sx={{ color: '#E65100', fontSize: 28 }} />
-                                <Typography variant="h6" sx={{ fontWeight: 800, color: '#C62828' }}>
+                        <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', border: '1px solid var(--tw-border-subtle, #EAE5DD)', backgroundColor: '#FFF' }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
+                                <Box sx={{ width: 40, height: 40, borderRadius: '10px', backgroundColor: '#FFFBEB', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--tw-amber, #D97706)' }}>
+                                    <PaymentsIcon sx={{ fontSize: 24 }} />
+                                </Box>
+                                <Typography variant="h6" sx={{ fontFamily: "'Noto Serif TC', serif", fontWeight: 800, color: 'var(--tw-deep-charcoal, #1C1917)' }}>
                                     {lang === 'en' ? 'Currency & Spending Estimates' : '新台幣預算與均價參考'}
                                 </Typography>
                             </Box>
-                            <Typography variant="body2" sx={{ color: '#555', lineHeight: 1.8, mb: 2 }}>
+                            <Typography variant="body2" sx={{ color: 'var(--tw-text-muted, #78716C)', lineHeight: 1.8, mb: 2.5 }}>
                                 {lang === 'en'
-                                    ? 'Taiwan street food is renowned for incredible affordability and freshness. Most dishes cost between NT$ 50 to NT$ 120 (approx. $1.50 - $4.00 USD / €1.40 - €3.80 EUR).'
+                                    ? 'Taiwan street food is renowned for incredible freshness and affordability. Most snacks cost between NT$ 50 to NT$ 120 (approx. $1.50 - $4.00 USD).'
                                     : '台灣夜市以高CP值與真材實料聞名世界！單樣經典小吃價位多落在 50 至 120 元新台幣之間。'}
                             </Typography>
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                                <Paper sx={{ p: 1.5, backgroundColor: '#FFF8E1', borderRadius: '8px' }}>
-                                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#E65100' }}>
-                                        🍜 {lang === 'en' ? 'Light Snack Run: NT$ 100 - 150 (~$3.5 - 5 USD)' : '輕食嘗鮮 (1-2 樣)：約 NT$ 100 - 150'}
+                                <Paper elevation={0} sx={{ p: 2, backgroundColor: 'var(--tw-paper-cream, #FAF8F5)', border: '1px solid var(--tw-border-subtle, #EAE5DD)', borderRadius: '12px' }}>
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'var(--tw-amber, #D97706)' }}>
+                                        {lang === 'en' ? 'Light Tasting Run: NT$ 100 - 150 (~$3.5 - 5 USD)' : '輕食嘗鮮 (1-2 樣)：約 NT$ 100 - 150'}
                                     </Typography>
-                                    <Typography variant="caption" sx={{ color: '#666' }}>
+                                    <Typography variant="caption" sx={{ color: 'var(--tw-text-muted, #78716C)' }}>
                                         {lang === 'en' ? 'e.g. 1 Bubble Tea + 1 Sweet Potato Balls / Scallion Pancake' : '例：一杯黑糖珍奶 + 地瓜球或蔥油餅'}
                                     </Typography>
                                 </Paper>
-                                <Paper sx={{ p: 1.5, backgroundColor: '#FFEBEE', borderRadius: '8px' }}>
-                                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#C62828' }}>
-                                        🍗 {lang === 'en' ? 'Full Dinner Feast: NT$ 200 - 300 (~$6.5 - 10 USD)' : '飽足大餐 (3-4 樣)：約 NT$ 200 - 300'}
+                                <Paper elevation={0} sx={{ p: 2, backgroundColor: '#FEF2F2', border: '1px solid #FEE2E2', borderRadius: '12px' }}>
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'var(--tw-terracotta, #B91C1C)' }}>
+                                        {lang === 'en' ? 'Full Feast: NT$ 200 - 300 (~$6.5 - 10 USD)' : '飽足大餐 (3-4 樣)：約 NT$ 200 - 300'}
                                     </Typography>
-                                    <Typography variant="caption" sx={{ color: '#666' }}>
-                                        {lang === 'en' ? 'e.g. Giant Chicken Cutlet + Oyster Omelet + Stinky Tofu + Fresh Mango Juice' : '例：大雞排 + 蚵仔煎 + 炭烤香腸 + 現打果汁，超級飽足！'}
+                                    <Typography variant="caption" sx={{ color: 'var(--tw-text-muted, #78716C)' }}>
+                                        {lang === 'en' ? 'e.g. Giant Fried Chicken + Oyster Omelet + Stinky Tofu + Fresh Fruit Juice' : '例：炸雞排 + 蚵仔煎 + 炭烤香腸 + 現打果汁，超級飽足！'}
                                     </Typography>
                                 </Paper>
                             </Box>
@@ -402,28 +408,30 @@ export default function TravelGuide() {
                     </Grid>
 
                     <Grid item xs={12} md={6}>
-                        <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', border: '1px solid #EFE5D8', backgroundColor: '#FFF' }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                                <TipsAndUpdatesIcon sx={{ color: '#2E7D32', fontSize: 28 }} />
-                                <Typography variant="h6" sx={{ fontWeight: 800, color: '#C62828' }}>
+                        <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', border: '1px solid var(--tw-border-subtle, #EAE5DD)', backgroundColor: '#FFF' }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
+                                <Box sx={{ width: 40, height: 40, borderRadius: '10px', backgroundColor: '#F0FDF4', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#15803D' }}>
+                                    <TipsAndUpdatesIcon sx={{ fontSize: 24 }} />
+                                </Box>
+                                <Typography variant="h6" sx={{ fontFamily: "'Noto Serif TC', serif", fontWeight: 800, color: 'var(--tw-deep-charcoal, #1C1917)' }}>
                                     {lang === 'en' ? 'Accepted Payment Options' : '夜市支援之支付工具'}
                                 </Typography>
                             </Box>
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                                 <Box>
-                                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#2C2622' }}>
-                                        💵 {lang === 'en' ? 'Cash (NTD Notes & Coins) - 100% Accepted' : '新台幣現金（必備）'}
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'var(--tw-deep-charcoal, #1C1917)' }}>
+                                        {lang === 'en' ? 'Cash (NTD Notes & Coins) - 100% Accepted' : '新台幣現金（全面通用）'}
                                     </Typography>
-                                    <Typography variant="body2" sx={{ color: '#666', mt: 0.5 }}>
-                                        {lang === 'en' ? 'All vendors gladly take NT$50 coins and NT$100 bills. Avoid paying with NT$1000 bills for small purchases.' : '所有攤商皆接受現金。購買幾十元銅板美食時，盡量避免拿千元大鈔找零，彼此更順暢！'}
+                                    <Typography variant="body2" sx={{ color: 'var(--tw-text-muted, #78716C)', mt: 0.5, fontSize: '0.88rem' }}>
+                                        {lang === 'en' ? 'All vendors gladly take NT$50 coins and NT$100 bills. Avoid paying with NT$1000 bills for small purchases.' : '所有攤商皆接受現金。購買銅板美食時，盡量避免拿千元大鈔找零，彼此更順暢。'}
                                     </Typography>
                                 </Box>
                                 <Box>
-                                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#2C2622' }}>
-                                        📱 {lang === 'en' ? 'Mobile QR Payments (LINE Pay & JKO)' : '行動支付 (LINE Pay / 街口 / 悠遊卡)'}
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'var(--tw-deep-charcoal, #1C1917)' }}>
+                                        {lang === 'en' ? 'Mobile QR Payments (LINE Pay & JKO)' : '行動支付 (LINE Pay / 街口 / 悠遊卡)'}
                                     </Typography>
-                                    <Typography variant="body2" sx={{ color: '#666', mt: 0.5 }}>
-                                        {lang === 'en' ? 'Look for the green LINE Pay QR standee on the stall counter. Just scan to pay!' : '各大指標夜市均有顯著行動支付綠色立牌，外籍旅客綁定國際信用卡之 LINE Pay 亦可輕鬆掃碼。'}
+                                    <Typography variant="body2" sx={{ color: 'var(--tw-text-muted, #78716C)', mt: 0.5, fontSize: '0.88rem' }}>
+                                        {lang === 'en' ? 'Look for the green LINE Pay QR standee on the stall counter. Just scan with your camera to pay!' : '各大指標夜市均有顯著行動支付綠色立牌，外籍旅客綁定國際信用卡之 LINE Pay 亦可掃碼。'}
                                     </Typography>
                                 </Box>
                             </Box>
@@ -436,14 +444,14 @@ export default function TravelGuide() {
             {tabVal === 3 && (
                 <Box>
                     {etiquetteTips.map((tip, idx) => (
-                        <Accordion key={idx} defaultExpanded={idx === 0} sx={{ mb: 1.5, borderRadius: '12px !important', border: '1px solid #EAE0D5', boxShadow: 'none' }}>
+                        <Accordion key={idx} defaultExpanded={idx === 0} sx={{ mb: 1.5, borderRadius: '14px !important', border: '1px solid var(--tw-border-subtle, #EAE5DD)', boxShadow: 'none' }}>
                             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#C62828' }}>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'var(--tw-deep-charcoal, #1C1917)' }}>
                                     {tip.title}
                                 </Typography>
                             </AccordionSummary>
                             <AccordionDetails>
-                                <Typography variant="body2" sx={{ color: '#555', lineHeight: 1.8 }}>
+                                <Typography variant="body2" sx={{ color: 'var(--tw-text-muted, #78716C)', lineHeight: 1.8 }}>
                                     {tip.desc}
                                 </Typography>
                             </AccordionDetails>
@@ -453,16 +461,16 @@ export default function TravelGuide() {
             )}
 
             {/* 底部行動導引 */}
-            <Box sx={{ mt: 5, textAlign: 'center', p: 3, borderRadius: '16px', backgroundColor: '#FFFDF9', border: '1px dashed #E0D4C5' }}>
-                <Typography variant="h6" sx={{ fontWeight: 800, color: '#2C2622', mb: 1 }}>
+            <Box sx={{ mt: 5, textAlign: 'center', p: 4, borderRadius: '20px', backgroundColor: 'var(--tw-card-white, #FFFFFF)', border: '1px solid var(--tw-border-subtle, #EAE5DD)', boxShadow: '0 2px 12px rgba(28,25,23,0.04)' }}>
+                <Typography variant="h6" sx={{ fontFamily: "'Noto Serif TC', serif", fontWeight: 800, color: 'var(--tw-deep-charcoal, #1C1917)', mb: 1 }}>
                     {lang === 'en' ? 'Ready to embark on your night market journey?' : '準備好踏上今晚的台灣夜市尋味之旅了嗎？'}
                 </Typography>
-                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 2, flexWrap: 'wrap' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 2.5, flexWrap: 'wrap' }}>
                     <Button href="/nightmarket" variant="contained" className="tw-btn-primary" endIcon={<ArrowForwardIcon />}>
-                        {lang === 'en' ? 'Explore All Night Markets' : '立即探索全台夜市 🏮'}
+                        {lang === 'en' ? 'Explore All Night Markets' : '探索全台夜市名錄'}
                     </Button>
-                    <Button href="/Food" variant="outlined" sx={{ color: '#C62828', borderColor: '#C62828', fontWeight: 800 }}>
-                        {lang === 'en' ? 'View Food Menu & Prices' : '查看人氣美食圖鑑 🥢'}
+                    <Button href="/Food" variant="outlined" sx={{ color: 'var(--tw-deep-charcoal, #1C1917)', borderColor: 'var(--tw-border-subtle, #EAE5DD)', fontWeight: 700, borderRadius: '20px', px: 3, textTransform: 'none', '&:hover': { borderColor: 'var(--tw-terracotta, #B91C1C)', color: 'var(--tw-terracotta, #B91C1C)', backgroundColor: '#FEF2F2' } }}>
+                        {lang === 'en' ? 'View Food Menu & Prices' : '查看人氣美食圖鑑'}
                     </Button>
                 </Box>
             </Box>

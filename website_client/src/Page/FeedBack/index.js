@@ -100,34 +100,40 @@ export default function FeedBack() {
                         display: 'inline-flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        width: 60,
-                        height: 60,
-                        borderRadius: '50%',
-                        bgcolor: '#fcedea',
-                        color: '#b7282e',
-                        mb: 1.5,
-                        border: '2px solid #f8c3ba'
+                        width: 56,
+                        height: 56,
+                        borderRadius: '16px',
+                        bgcolor: '#FEF2F2',
+                        color: 'var(--tw-terracotta, #B91C1C)',
+                        mb: 2,
                     }}
                 >
-                    <RateReviewIcon sx={{ fontSize: 32 }} />
+                    <RateReviewIcon sx={{ fontSize: 28 }} />
                 </Box>
-                <Typography variant="h4" sx={{ fontWeight: 800, color: '#2b2520' }}>
-                    🏮 {t('feedback_page_title')}
+                <Typography
+                    variant="h4"
+                    sx={{
+                        fontFamily: "'Noto Serif TC', serif",
+                        fontWeight: 800,
+                        color: 'var(--tw-deep-charcoal, #1C1917)',
+                    }}
+                >
+                    {t('feedback_page_title')}
                 </Typography>
-                <Typography variant="body1" sx={{ color: '#6d655e', mt: 1 }}>
+                <Typography variant="body1" sx={{ color: 'var(--tw-text-muted, #78716C)', mt: 1 }}>
                     {t('feedback_page_desc')}
                 </Typography>
             </Box>
 
             {/* 回饋表單 */}
             <Paper
-                elevation={3}
+                elevation={0}
                 sx={{
-                    p: { xs: 3, sm: 4 },
-                    borderRadius: 3,
-                    border: '1px solid #f2e2d0',
-                    background: 'linear-gradient(180deg, #ffffff 0%, #fffdf9 100%)',
-                    boxShadow: '0 8px 24px rgba(183, 40, 46, 0.08)'
+                    p: { xs: 3, sm: 4.5 },
+                    borderRadius: '20px',
+                    border: '1px solid var(--tw-border-subtle, #EAE5DD)',
+                    backgroundColor: 'var(--tw-card-white, #FFFFFF)',
+                    boxShadow: '0 4px 20px rgba(28, 25, 23, 0.05)',
                 }}
             >
                 {statusMsg.text && (
@@ -190,19 +196,12 @@ export default function FeedBack() {
                             type="submit"
                             variant="contained"
                             disabled={loading}
+                            className="tw-btn-primary"
                             endIcon={!loading && <SendIcon />}
                             sx={{
                                 px: 4,
                                 py: 1.2,
-                                bgcolor: '#b7282e',
-                                color: '#fff',
-                                fontWeight: 700,
-                                fontSize: '1rem',
-                                borderRadius: 2,
-                                boxShadow: '0 4px 12px rgba(183, 40, 46, 0.25)',
-                                '&:hover': {
-                                    bgcolor: '#941e24'
-                                }
+                                fontSize: '0.95rem',
                             }}
                         >
                             {loading ? <CircularProgress size={24} color="inherit" /> : t('feedback_submit')}
