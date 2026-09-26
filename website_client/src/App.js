@@ -14,6 +14,7 @@ import FoodInfo from './Page/FoodInfo';
 import Profile from './Page/Profile';
 import DataManagement from './Page/DataManagement';
 import Account from './Page/Account';
+import TravelGuide from './Page/TravelGuide';
 import UserContext from './Context/context';
 import { LanguageProvider } from './Context/LanguageContext';
 import ShopPage from './Page/Shop/shop';
@@ -43,6 +44,10 @@ function App() {
             <Route path="/nightMarket" element={<NightMarket />} />
             <Route path="/nightmarketpage" element={<NightMarketPage />} />
             <Route path="/nightMarketPage" element={<NightMarketPage />} />
+
+            {/* 跨縣市與外國旅人攻略指南 */}
+            <Route path="/guide" element={<TravelGuide />} />
+            <Route path="/Guide" element={<TravelGuide />} />
 
             {/* 美食模組 */}
             <Route path="/food" element={<FoodList />} />

@@ -18,9 +18,11 @@ import StorefrontIcon from '@mui/icons-material/Storefront';
 import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu';
 import CampaignIcon from '@mui/icons-material/Campaign';
 import RateReviewIcon from '@mui/icons-material/RateReview';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import ExploreIcon from '@mui/icons-material/Explore';
+import DirectionsSubwayIcon from '@mui/icons-material/DirectionsSubway';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
 import helper from '../Helper/helper';
 import { useLanguage } from '../../Context/LanguageContext';
@@ -299,7 +301,97 @@ export default function Index() {
                 </Grid>
             </Box>
 
-            {/* 3. 精選熱門夜市展示 (動態讀取) */}
+            {/* 3. 跨縣市旅人與國際觀光客 ‧ 迺夜市 101 秘笈速查 */}
+            <Paper
+                elevation={0}
+                sx={{
+                    p: { xs: 2.5, md: 4 },
+                    mb: 6,
+                    borderRadius: '20px',
+                    backgroundColor: '#FFFDF9',
+                    border: '1px solid #F0E6D8',
+                    boxShadow: '0 4px 20px rgba(142, 24, 0, 0.06)',
+                }}
+            >
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2, mb: 3 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                        <ExploreIcon sx={{ color: '#C62828', fontSize: 32 }} />
+                        <Box>
+                            <Typography variant="h5" sx={{ fontWeight: 900, fontFamily: "'Noto Serif TC', serif", color: '#C62828' }}>
+                                {lang === 'en' ? '✈️ Traveler Essentials: Taiwan Night Market 101' : '✈️ 跨縣市旅人與國際觀光客 ‧ 迺夜市通關秘笈'}
+                            </Typography>
+                            <Typography variant="body2" sx={{ color: '#777', mt: 0.3 }}>
+                                {lang === 'en' ? 'Quick navigation tips for MRT transit, cash/mobile pay, and local ordering culture' : '一次搞懂捷運直達路線、現金小鈔與 LINE Pay 支付習慣、實用點餐常用語'}
+                            </Typography>
+                        </Box>
+                    </Box>
+                    <Button
+                        href="/guide"
+                        variant="contained"
+                        className="tw-btn-primary"
+                        endIcon={<ArrowForwardIcon />}
+                        sx={{ borderRadius: '20px', px: 2.5 }}
+                    >
+                        {lang === 'en' ? 'Full Traveler Guide ➔' : '完整旅人攻略 ➔'}
+                    </Button>
+                </Box>
+
+                <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6} md={3}>
+                        <Paper sx={{ p: 2, borderRadius: '12px', backgroundColor: '#FFF', border: '1px solid #EFEBE9', height: '100%' }}>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#C62828', mb: 0.5 }}>
+                                🚇 {lang === 'en' ? 'MRT & Bus Direct' : '捷運公車直達'}
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: '#666', lineHeight: 1.6, display: 'block' }}>
+                                {lang === 'en'
+                                    ? '劍潭站 (士林)、松山站 (饒河)、雙連站 (寧夏)、美麗島站 (六合出站即抵)。'
+                                    : '士林搭至劍潭站、饒河搭至松山站1號口、六合出美麗島站11號口直達。'}
+                            </Typography>
+                        </Paper>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} md={3}>
+                        <Paper sx={{ p: 2, borderRadius: '12px', backgroundColor: '#FFF', border: '1px solid #EFEBE9', height: '100%' }}>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#E65100', mb: 0.5 }}>
+                                💵 {lang === 'en' ? 'Payment Tips' : '支付與小鈔自備'}
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: '#666', lineHeight: 1.6, display: 'block' }}>
+                                {lang === 'en'
+                                    ? 'Prepare NT$50 coins & NT$100 bills. 60%+ stalls also support LINE Pay.'
+                                    : '建議備妥 50 元硬幣與百元鈔，超過 6 成店家亦支援 LINE Pay / 悠遊卡！'}
+                            </Typography>
+                        </Paper>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} md={3}>
+                        <Paper sx={{ p: 2, borderRadius: '12px', backgroundColor: '#FFF', border: '1px solid #EFEBE9', height: '100%' }}>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#2E7D32', mb: 0.5 }}>
+                                🗣️ {lang === 'en' ? 'Order Phrases' : '點餐常用小抄'}
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: '#666', lineHeight: 1.6, display: 'block' }}>
+                                {lang === 'en'
+                                    ? '內用 (For here), 外帶 (To go), 不要香菜 (No cilantro), 微糖微冰 (Less ice/sugar).'
+                                    : '內用 (坐著吃)、外帶 (邊走邊吃)、不要香菜、微糖微冰（手搖黃金比例）。'}
+                            </Typography>
+                        </Paper>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} md={3}>
+                        <Paper sx={{ p: 2, borderRadius: '12px', backgroundColor: '#FFF', border: '1px solid #EFEBE9', height: '100%' }}>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#D84315', mb: 0.5 }}>
+                                ⚠️ {lang === 'en' ? 'Avoid Closed Days' : '營業時間避坑提醒'}
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: '#666', lineHeight: 1.6, display: 'block' }}>
+                                {lang === 'en'
+                                    ? 'Tainan Garden Night Market is ONLY open on Thu, Sat, Sun. Peak hours: 19:30 - 21:30.'
+                                    : '台南花園夜市僅「四、六、日」營業！全台夜市黃金時段建議 17:30 - 18:30 避開排隊。'}
+                            </Typography>
+                        </Paper>
+                    </Grid>
+                </Grid>
+            </Paper>
+
+            {/* 4. 精選熱門夜市展示 (動態讀取) */}
             <Box sx={{ mb: 6 }}>
                 <Box className="tw-section-header">
                     <Typography className="tw-section-title">
@@ -374,15 +466,21 @@ export default function Index() {
                                             WebkitLineClamp: 2,
                                             WebkitBoxOrient: 'vertical',
                                             overflow: 'hidden',
-                                            mb: 2,
+                                            mb: 1.5,
                                         }}
                                     >
                                         {item.brief || item.introduction}
                                     </Typography>
 
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: '#C62828', fontSize: '0.85rem', fontWeight: 700 }}>
-                                        <LocationOnIcon fontSize="small" />
-                                        <span>{item.positionGuidelines ? (item.positionGuidelines.substring(0, 22) + '...') : (item.marketLocation || '在地熱門')}</span>
+                                    {/* 捷運交通與營業時間提示 */}
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: '#2E7D32', fontSize: '0.82rem', fontWeight: 700, mb: 0.8 }}>
+                                        <DirectionsSubwayIcon fontSize="small" />
+                                        <span>{item.positionGuidelines ? (item.positionGuidelines.substring(0, 24) + '...') : (item.marketLocation || '在地熱門捷運直達')}</span>
+                                    </Box>
+
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: (item.name && item.name.includes('花園')) ? '#C62828' : '#795548', fontSize: '0.8rem', fontWeight: 700 }}>
+                                        <CalendarMonthIcon fontSize="small" />
+                                        <span>{(item.name && item.name.includes('花園')) ? (lang === 'en' ? '⚠️ Thu, Sat, Sun Only' : '⚠️ 每週四、六、日限定營業') : (lang === 'en' ? 'Open Daily (17:30 - 00:00)' : '每日營業 (17:30 - 00:00)')}</span>
                                     </Box>
                                 </CardContent>
 

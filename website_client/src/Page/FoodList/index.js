@@ -51,16 +51,39 @@ export default function FoodList() {
         { id: '炸物', label: lang === 'en' ? 'Crispy Fried 🍗' : '酥脆炸物 🍗' },
         { id: '烤物', label: lang === 'en' ? 'Charcoal Grilled 🍢' : '炭烤串燒 🍢' },
         { id: '飲品', label: lang === 'en' ? 'Drinks & Boba 🧋' : '清涼手搖飲 🧋' },
+        { id: '素食', label: lang === 'en' ? 'Vegetarian 🥬' : '蔬食奶素 🥬' },
         { id: '人氣必吃', label: lang === 'en' ? 'Chef Picks 🌟' : '老饕推薦 🌟' },
     ];
+
+    const getDietaryTag = (item) => {
+        const name = (item.foodName || '').toLowerCase();
+        if (name.includes('地瓜球') || name.includes('豆花') || name.includes('果汁') || name.includes('奶茶') || name.includes('黑糖')) {
+            return { label: lang === 'en' ? '🥬 Vegetarian' : '🥬 蔬食/奶素', bg: '#E8F5E9', color: '#2E7D32' };
+        }
+        if (name.includes('香腸') || name.includes('肉圓') || name.includes('大腸') || name.includes('滷肉')) {
+            return { label: lang === 'en' ? '🐷 Taiwan Pork' : '🐷 台灣在地豬', bg: '#FBE9E7', color: '#C62828' };
+        }
+        if (name.includes('雞排') || name.includes('鹽酥雞')) {
+            return { label: lang === 'en' ? '🍗 Chicken' : '🍗 鮮嫩雞肉', bg: '#FFF8E1', color: '#E65100' };
+        }
+        if (name.includes('蚵仔') || name.includes('海鮮') || name.includes('花枝') || name.includes('魷魚')) {
+            return { label: lang === 'en' ? '🦐 Seafood' : '🦐 新鮮海味', bg: '#E0F7FA', color: '#00838F' };
+        }
+        return null;
+    };
 
     const filteredFoods = foodList.filter((item) => {
         let matchesCategory = true;
         if (selectedCategory !== 'all') {
-            const types = item.foodType || [];
-            matchesCategory = types.some((t) => t.includes(selectedCategory)) ||
-                (item.foodName && item.foodName.includes(selectedCategory)) ||
-                (item.foodInfo && item.foodInfo.includes(selectedCategory));
+            if (selectedCategory === '素食') {
+                const name = item.foodName || '';
+                matchesCategory = name.includes('地瓜球') || name.includes('豆花') || name.includes('果汁') || name.includes('奶茶') || name.includes('黑糖');
+            } else {
+                const types = item.foodType || [];
+                matchesCategory = types.some((t) => t.includes(selectedCategory)) ||
+                    (item.foodName && item.foodName.includes(selectedCategory)) ||
+                    (item.foodInfo && item.foodInfo.includes(selectedCategory));
+            }
         }
 
         let matchesSearch = true;
@@ -78,7 +101,7 @@ export default function FoodList() {
     return (
         <Box sx={{ pb: 6 }}>
             {/* 頁面標題 */}
-            <Box sx={{ mb: 4, textAlign: { xs: 'center', md: 'left' } }}>
+            <Box sx={{ mb: 3, textAlign: { xs: 'center', md: 'left' } }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: { xs: 'center', md: 'flex-start' }, mb: 1 }}>
                     <span style={{ fontSize: '2rem' }}>🍢</span>
                     <Typography variant="h4" sx={{ fontFamily: "'Noto Serif TC', serif", fontWeight: 900, color: '#C62828' }}>
@@ -89,6 +112,42 @@ export default function FoodList() {
                     {t('foods_page_desc')}
                 </Typography>
             </Box>
+
+            {/* 旅人美食小抄貼士 */}
+            <Paper
+                elevation={0}
+                sx={{
+                    p: 2,
+                    mb: 3,
+                    borderRadius: '12px',
+                    backgroundColor: '#FFF8E1',
+                    border: '1px solid #FFE082',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: 1.5,
+                }}
+            >
+                <Box>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#C62828' }}>
+                        💡 {lang === 'en' ? 'Traveler Tip: Customize Your Food & Beverage' : '旅人吃貨秘笈：客製化甜度辣度與配料'}
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: '#666' }}>
+                        {lang === 'en'
+                            ? 'Drink boba tea like a local with "Less Ice, Half Sugar" (微糖微冰). Don’t like fresh coriander/cilantro? Just say "不要香菜" (bù yào xiāng cài)!'
+                            : '手搖飲最受歡迎比例為「微糖微冰」；不吃香菜可在點餐時告知「不要香菜」；雞排與炸物亦可指定「小辣」或「胡椒多」！'}
+                    </Typography>
+                </Box>
+                <Button
+                    href="/guide"
+                    size="small"
+                    variant="outlined"
+                    sx={{ color: '#C62828', borderColor: '#C62828', fontWeight: 800, borderRadius: '20px' }}
+                >
+                    {lang === 'en' ? 'Ordering Phrases ➔' : '點餐常用語小抄 ➔'}
+                </Button>
+            </Paper>
 
             {/* 篩選與搜尋工具列 */}
             <Paper
@@ -188,7 +247,7 @@ export default function FoodList() {
                                             '&:hover': { transform: 'scale(1.05)' },
                                         }}
                                     />
-                                    {/* 價格標籤 */}
+                                    {/* 價格標籤與外幣估算 */}
                                     <Box
                                         sx={{
                                             position: 'absolute',
@@ -200,11 +259,17 @@ export default function FoodList() {
                                             py: 0.4,
                                             borderRadius: '8px',
                                             fontWeight: 900,
-                                            fontSize: '1.05rem',
+                                            fontSize: '1rem',
                                             boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                                            textAlign: 'right'
                                         }}
                                     >
                                         NT$ {item.foodPrice || 60}
+                                        {lang === 'en' && (
+                                            <span style={{ fontSize: '0.72rem', fontWeight: 600, opacity: 0.9, display: 'block' }}>
+                                                ≈ ${(((item.foodPrice || 60)) / 32).toFixed(1)} USD
+                                            </span>
+                                        )}
                                     </Box>
 
                                     {item.isSale && (
@@ -235,8 +300,20 @@ export default function FoodList() {
                                         {item.foodName}
                                     </Typography>
 
-                                    {/* 分類標籤 Chip */}
+                                    {/* 分類標籤 & 飲食標記 Chip */}
                                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8, mb: 1.5 }}>
+                                        {getDietaryTag(item) && (
+                                            <Chip
+                                                label={getDietaryTag(item).label}
+                                                size="small"
+                                                sx={{
+                                                    backgroundColor: getDietaryTag(item).bg,
+                                                    color: getDietaryTag(item).color,
+                                                    fontWeight: 800,
+                                                    fontSize: '0.75rem'
+                                                }}
+                                            />
+                                        )}
                                         {Array.isArray(item.foodType) && item.foodType.map((t, i) => (
                                             <Chip
                                                 key={i}

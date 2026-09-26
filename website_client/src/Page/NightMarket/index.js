@@ -18,6 +18,8 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import ClearIcon from '@mui/icons-material/Clear';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import DirectionsSubwayIcon from '@mui/icons-material/DirectionsSubway';
+import ExploreIcon from '@mui/icons-material/Explore';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
 import helper from '../Helper/helper';
 import { useLanguage } from '../../Context/LanguageContext';
@@ -57,18 +59,22 @@ export default function NightMarket() {
         localStorage.removeItem('search');
     };
 
-    // 篩選邏輯：同時考量地區與關鍵字
+    // 篩選邏輯：同時考量城市地區與關鍵字
     const filteredMarkets = markets.filter((item) => {
         let matchesRegion = true;
         const loc = (item.marketLocation || '').toLowerCase();
         const name = (item.name || '').toLowerCase();
 
-        if (selectedRegion === 'tp') {
+        if (selectedRegion === 'taipei') {
             matchesRegion = loc === 'tp' || loc === 'taipei' || name.includes('士林') || name.includes('饒河') || name.includes('寧夏') || name.includes('台北');
-        } else if (selectedRegion === 'tz') {
-            matchesRegion = loc === 'tz' || loc === 'taichung' || name.includes('逢甲') || name.includes('羅東') || name.includes('台中');
-        } else if (selectedRegion === 'tn') {
-            matchesRegion = loc === 'tn' || loc === 'tainan' || loc === 'kaohsiung' || name.includes('花園') || name.includes('六合') || name.includes('台南') || name.includes('高雄');
+        } else if (selectedRegion === 'taichung') {
+            matchesRegion = loc === 'tz' || loc === 'taichung' || name.includes('逢甲') || name.includes('台中');
+        } else if (selectedRegion === 'tainan') {
+            matchesRegion = loc === 'tn' || loc === 'tainan' || name.includes('花園') || name.includes('台南');
+        } else if (selectedRegion === 'kaohsiung') {
+            matchesRegion = loc === 'kaohsiung' || name.includes('六合') || name.includes('高雄');
+        } else if (selectedRegion === 'yilan') {
+            matchesRegion = loc === 'yilan' || name.includes('羅東') || name.includes('宜蘭');
         }
 
         let matchesSearch = true;
@@ -83,10 +89,12 @@ export default function NightMarket() {
     });
 
     const regions = [
-        { id: 'all', label: t('region_all') },
-        { id: 'tp', label: t('region_tp') },
-        { id: 'tz', label: t('region_tz') },
-        { id: 'tn', label: t('region_tn') },
+        { id: 'all', label: lang === 'en' ? 'All Taiwan 🇹🇼' : '全部夜市 🇹🇼' },
+        { id: 'taipei', label: lang === 'en' ? 'Taipei 🏛️' : '台北市 🏛️' },
+        { id: 'taichung', label: lang === 'en' ? 'Taichung 🏙️' : '台中市 🏙️' },
+        { id: 'tainan', label: lang === 'en' ? 'Tainan 🏯' : '台南市 🏯' },
+        { id: 'kaohsiung', label: lang === 'en' ? 'Kaohsiung 🚢' : '高雄市 🚢' },
+        { id: 'yilan', label: lang === 'en' ? 'Yilan ♨️' : '宜蘭縣 ♨️' },
     ];
 
     const getRegionBadge = (item) => {
@@ -103,7 +111,7 @@ export default function NightMarket() {
     return (
         <Box sx={{ pb: 6 }}>
             {/* 標題與簡介 */}
-            <Box sx={{ mb: 4, textAlign: { xs: 'center', md: 'left' } }}>
+            <Box sx={{ mb: 3, textAlign: { xs: 'center', md: 'left' } }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, justifyContent: { xs: 'center', md: 'flex-start' }, mb: 1 }}>
                     <span style={{ fontSize: '2rem' }}>🏮</span>
                     <Typography variant="h4" sx={{ fontFamily: "'Noto Serif TC', serif", fontWeight: 900, color: '#C62828' }}>
@@ -111,9 +119,55 @@ export default function NightMarket() {
                     </Typography>
                 </Box>
                 <Typography variant="body1" sx={{ color: '#666' }}>
-                    {t('markets_page_desc')} {lang === 'en' ? `(${markets.length} night markets available)` : `目前收錄 ${markets.length} 座特色夜市聚落！`}
+                    {t('markets_page_desc')} {lang === 'en' ? `(${markets.length} landmark markets featured across Taiwan)` : `精選全台 ${markets.length} 座必訪觀光夜市！`}
                 </Typography>
             </Box>
+
+            {/* 外縣市與外國旅人專屬通關秘笈提醒 Banner */}
+            <Paper
+                elevation={0}
+                sx={{
+                    p: 2,
+                    mb: 3,
+                    borderRadius: '12px',
+                    backgroundColor: '#FFF8E1',
+                    border: '1px solid #FFE082',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: 1.5,
+                }}
+            >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <ExploreIcon sx={{ color: '#E65100', fontSize: 28 }} />
+                    <Box>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#C62828' }}>
+                            {lang === 'en' ? '✈️ First Time Visiting from Out of Town or Abroad?' : '✈️ 第一次來台或跨縣市造訪夜市？'}
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: '#777' }}>
+                            {lang === 'en'
+                                ? 'Check our complete guide on MRT direct lines, payment methods, and essential phrases!'
+                                : '歡迎參考我們為旅人整理的「捷運大眾交通直達、現金支付習慣與點餐小抄」！'}
+                        </Typography>
+                    </Box>
+                </Box>
+                <Button
+                    href="/guide"
+                    size="small"
+                    variant="contained"
+                    sx={{
+                        backgroundColor: '#C62828',
+                        color: '#FFF',
+                        fontWeight: 800,
+                        borderRadius: '20px',
+                        px: 2,
+                        '&:hover': { backgroundColor: '#B71C1C' }
+                    }}
+                >
+                    {lang === 'en' ? 'Traveler Guide 101 ➔' : '查看旅人秘笈 ➔'}
+                </Button>
+            </Paper>
 
             {/* 篩選與搜尋列 */}
             <Paper
@@ -285,13 +339,23 @@ export default function NightMarket() {
                                     </Box>
 
                                     {item.positionGuidelines && (
-                                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.8, color: '#2E7D32', mb: 2, fontSize: '0.82rem' }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.8, color: '#2E7D32', mb: 1, fontSize: '0.82rem' }}>
                                             <DirectionsSubwayIcon fontSize="small" sx={{ mt: 0.2, flexShrink: 0 }} />
                                             <Typography variant="caption" sx={{ color: '#2E7D32', fontWeight: 600, lineHeight: 1.4 }}>
                                                 {item.positionGuidelines}
                                             </Typography>
                                         </Box>
                                     )}
+
+                                    {/* 營運時間提醒（跨縣市旅人必備） */}
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, color: '#E65100', mb: 1.5, fontSize: '0.8rem' }}>
+                                        <CalendarMonthIcon fontSize="small" sx={{ flexShrink: 0 }} />
+                                        <Typography variant="caption" sx={{ fontWeight: 700, color: (item.name && item.name.includes('花園')) ? '#C62828' : '#795548' }}>
+                                            {(item.name && item.name.includes('花園'))
+                                                ? (lang === 'en' ? '⚠️ Open Thu, Sat, Sun Only (17:00-00:00)' : '⚠️ 每週四、六、日限定營業 (17:00-00:00)')
+                                                : (lang === 'en' ? 'Open Daily (17:30 - 00:00)' : '每日營業 (17:30 - 00:00)')}
+                                        </Typography>
+                                    </Box>
 
                                     <Typography
                                         variant="body2"

@@ -32,6 +32,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import LoginIcon from '@mui/icons-material/Login';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import TranslateIcon from '@mui/icons-material/Translate';
+import ExploreIcon from '@mui/icons-material/Explore';
 
 import { useLanguage } from '../../Context/LanguageContext';
 
@@ -59,6 +60,7 @@ export default function DrawerBar() {
         { label: t('nav_home'), path: '/index', icon: <HomeIcon /> },
         { label: t('nav_markets'), path: '/nightmarket', icon: <StorefrontIcon /> },
         { label: t('nav_foods'), path: '/Food', icon: <RestaurantMenuIcon /> },
+        { label: t('nav_guide'), path: '/guide', icon: <ExploreIcon /> },
         { label: t('nav_bulletin'), path: '/bulletinBoard', icon: <CampaignIcon /> },
         { label: t('nav_feedback'), path: '/feedback', icon: <FeedbackIcon /> },
     ];
@@ -136,6 +138,9 @@ export default function DrawerBar() {
                         </Button>
                         <Button href="/Food" sx={{ color: '#FFF', fontWeight: 700, fontSize: '0.95rem', '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' } }}>
                             {t('nav_foods')}
+                        </Button>
+                        <Button href="/guide" sx={{ color: '#FFE082', fontWeight: 800, fontSize: '0.95rem', backgroundColor: 'rgba(0,0,0,0.15)', px: 1.5, borderRadius: '20px', '&:hover': { backgroundColor: 'rgba(255,255,255,0.2)' } }}>
+                            🧭 {t('nav_guide')}
                         </Button>
                         <Button href="/bulletinBoard" sx={{ color: '#FFF', fontWeight: 700, fontSize: '0.95rem', '&:hover': { backgroundColor: 'rgba(255,255,255,0.15)' } }}>
                             {t('nav_bulletin')}
