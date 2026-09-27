@@ -665,6 +665,70 @@ export const helper = {
         } catch (e) {
             return { status: 'fail', message: e.message };
         }
+    },
+
+    // ==========================================
+    // 智慧防爬蟲與惡意請求防禦 (Anti-Crawler & Bot Shield)
+    // ==========================================
+    AsyncAntiCrawlerStats: async () => {
+        try {
+            const res = await fetch(`${URL.Url.System}/anticrawler/stats`);
+            return await res.json();
+        } catch (e) {
+            return { status: 'fail', message: e.message };
+        }
+    },
+
+    AsyncAntiCrawlerUpdateSettings: async (settings) => {
+        try {
+            const res = await fetch(`${URL.Url.System}/anticrawler/settings`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(settings)
+            });
+            return await res.json();
+        } catch (e) {
+            return { status: 'fail', message: e.message };
+        }
+    },
+
+    AsyncAntiCrawlerBlockIp: async (ip, reason, durationMinutes) => {
+        try {
+            const res = await fetch(`${URL.Url.System}/anticrawler/ip/block`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ip, reason, durationMinutes })
+            });
+            return await res.json();
+        } catch (e) {
+            return { status: 'fail', message: e.message };
+        }
+    },
+
+    AsyncAntiCrawlerUnblockIp: async (ip) => {
+        try {
+            const res = await fetch(`${URL.Url.System}/anticrawler/ip/unblock`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ip })
+            });
+            return await res.json();
+        } catch (e) {
+            return { status: 'fail', message: e.message };
+        }
+    },
+
+    AsyncAntiCrawlerWhitelistIp: async (ip) => {
+        try {
+            const res = await fetch(`${URL.Url.System}/anticrawler/ip/whitelist`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ip })
+            });
+            return await res.json();
+        } catch (e) {
+            return { status: 'fail', message: e.message };
+        }
     }
 
 }

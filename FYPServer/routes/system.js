@@ -478,4 +478,104 @@ router.post('/database/seed', async (req, res) => {
     }
 });
 
+// ==========================================
+// 智慧防爬蟲與安全遙測 (Anti-Crawler & Bot Defense)
+// ==========================================
+const antiCrawler = require('../helper/antiCrawler');
+
+/**
+ * GET /system/anticrawler/stats
+ * 取得當前防爬蟲防護統計、黑白名單與最近攔截日誌
+ */
+router.get('/anticrawler/stats', (req, res) => {
+    try {
+        const stats = antiCrawler.getAntiCrawlerStats();
+        res.json({
+            status: 'success',
+            data: stats
+        });
+    } catch (err) {
+        res.status(500).json({ status: 'fail', message: err.message });
+    }
+});
+
+/**
+ * POST /system/anticrawler/settings
+ * 更新防爬蟲策略設定 (嚴格模式、速率上限、封鎖時長、蜜罐等)
+ */
+router.post('/anticrawler/settings', (req, res) => {
+    try {
+        const updatedConfig = antiCrawler.updateConfig(req.body);
+        res.json({
+            status: 'success',
+            message: '防爬蟲防禦策略已成功更新',
+            data: updatedConfig
+        });
+    } catch (err) {
+        res.status(400).json({ status: 'fail', message: err.message });
+    }
+});
+
+/**
+ * POST /system/anticrawler/ip/block
+ * 手動將特定 IP 加入黑名單封鎖
+ */
+router.post('/anticrawler/ip/block', (req, res) => {
+    try {
+        const { ip, reason, durationMinutes } = req.body;
+        antiCrawler.manualBlockIp(ip, reason, durationMinutes || 60);
+        res.json({
+            status: 'success',
+            message: `已將 IP: ${ip} 成功加入黑名單封鎖`
+        });
+    } catch (err) {
+        res.status(400).json({ status: 'fail', message: err.message });
+    }
+});
+
+/**
+ * POST /system/anticrawler/ip/unblock
+ * 手動解除封鎖特定 IP
+ */
+router.post('/anticrawler/ip/unblock', (req, res) => {
+    try {
+        const { ip } = req.body;
+        antiCrawler.manualUnblockIp(ip);
+        res.json({
+            status: 'success',
+            message: `已解除 IP: ${ip} 之封鎖狀態`
+        });
+    } catch (err) {
+        res.status(400).json({ status: 'fail', message: err.message });
+    }
+});
+
+/**
+ * POST /system/anticrawler/ip/whitelist
+ * 加入 IP 白名單
+ */
+router.post('/anticrawler/ip/whitelist', (req, res) => {
+    try {
+        const { ip } = req.body;
+        antiCrawler.addWhitelistIp(ip);
+        res.json({
+            status: 'success',
+            message: `已將 IP: ${ip} 加入白名單`
+        });
+    } catch (err) {
+        res.status(400).json({ status: 'fail', message: err.message });
+    }
+});
+
+/**
+ * GET /system/anticrawler/trap
+ * 蜜罐陷阱端點 (Honeypot Trap Route)
+ */
+router.get('/anticrawler/trap', (req, res) => {
+    res.status(403).json({
+        status: 'blocked',
+        message: 'Security warning: Honeypot trap triggered.'
+    });
+});
+
 module.exports = router;

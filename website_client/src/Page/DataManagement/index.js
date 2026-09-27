@@ -55,6 +55,9 @@ import TerminalIcon from '@mui/icons-material/Terminal';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import SecurityIcon from '@mui/icons-material/Security';
+import BlockIcon from '@mui/icons-material/Block';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 import dayjs from 'dayjs';
 import helper from '../Helper/helper';
@@ -119,6 +122,21 @@ export default function DataManagement() {
     const [devopsActionLoading, setDevopsActionLoading] = useState(false);
     const importFileRef = useRef(null);
 
+    // 智慧防爬蟲與安全遙測狀態
+    const [antiCrawlerStats, setAntiCrawlerStats] = useState(null);
+    const [antiCrawlerConfig, setAntiCrawlerConfig] = useState({
+        enabled: true,
+        strictMode: false,
+        rateLimitPerMin: 90,
+        blockDurationMinutes: 30,
+        honeypotEnabled: true,
+        blockEmptyUserAgent: true
+    });
+    const [newBlockIp, setNewBlockIp] = useState('');
+    const [newBlockReason, setNewBlockReason] = useState('惡意自動化高頻採集');
+    const [newBlockDuration, setNewBlockDuration] = useState(60);
+    const [newWhitelistIp, setNewWhitelistIp] = useState('');
+
     useEffect(() => {
         try {
             const rawUser = localStorage.getItem('user');
@@ -152,10 +170,11 @@ export default function DataManagement() {
 
     const loadSystemDevopsData = async () => {
         try {
-            const [statusRes, schedRes, logsRes] = await Promise.all([
+            const [statusRes, schedRes, logsRes, acRes] = await Promise.all([
                 helper.helper.AsyncSystemStatus(),
                 helper.helper.AsyncSystemSchedulers(),
-                helper.helper.AsyncSystemLogs(100)
+                helper.helper.AsyncSystemLogs(100),
+                helper.helper.AsyncAntiCrawlerStats()
             ]);
             if (statusRes && statusRes.status === 'success') {
                 setSystemStatus(statusRes.data);
@@ -165,6 +184,12 @@ export default function DataManagement() {
             }
             if (logsRes && logsRes.status === 'success' && Array.isArray(logsRes.logs)) {
                 setSystemLogs(logsRes.logs);
+            }
+            if (acRes && acRes.status === 'success' && acRes.data) {
+                setAntiCrawlerStats(acRes.data);
+                if (acRes.data.config) {
+                    setAntiCrawlerConfig(acRes.data.config);
+                }
             }
         } catch (e) {
             console.error('Failed to load devops data:', e);
@@ -648,6 +673,74 @@ export default function DataManagement() {
             setStatusMsg({ type: 'error', text: '初始化過程發生異常: ' + err.message });
         } finally {
             setDevopsActionLoading(false);
+        }
+    };
+
+    // ==========================================
+    // 9. 智慧防爬蟲策略與 IP 黑白名單控制
+    // ==========================================
+    const handleSaveAntiCrawlerConfig = async () => {
+        try {
+            setDevopsActionLoading(true);
+            const res = await helper.helper.AsyncAntiCrawlerUpdateSettings(antiCrawlerConfig);
+            if (res && res.status === 'success') {
+                setStatusMsg({ type: 'success', text: '🛡️ 防爬蟲安全防禦策略已更新生效！' });
+                loadSystemDevopsData();
+            } else {
+                setStatusMsg({ type: 'error', text: res?.message || '更新策略失敗' });
+            }
+        } catch (err) {
+            setStatusMsg({ type: 'error', text: '更新防護策略失敗: ' + err.message });
+        } finally {
+            setDevopsActionLoading(false);
+        }
+    };
+
+    const handleManualBlockIp = async () => {
+        if (!newBlockIp.trim()) {
+            setStatusMsg({ type: 'error', text: '請輸入要封鎖的 IP 位址' });
+            return;
+        }
+        try {
+            const res = await helper.helper.AsyncAntiCrawlerBlockIp(
+                newBlockIp.trim(),
+                newBlockReason.trim() || '管理者手動封鎖',
+                Number(newBlockDuration) || 60
+            );
+            if (res && res.status === 'success') {
+                setStatusMsg({ type: 'success', text: `已將 IP「${newBlockIp}」封鎖 ${newBlockDuration} 分鐘` });
+                setNewBlockIp('');
+                loadSystemDevopsData();
+            }
+        } catch (err) {
+            setStatusMsg({ type: 'error', text: '封鎖 IP 失敗: ' + err.message });
+        }
+    };
+
+    const handleManualUnblockIp = async (ip) => {
+        if (!window.confirm(`確定要解除 IP「${ip}」的封鎖狀態嗎？`)) return;
+        try {
+            const res = await helper.helper.AsyncAntiCrawlerUnblockIp(ip);
+            if (res && res.status === 'success') {
+                setStatusMsg({ type: 'success', text: `已解除 IP「${ip}」封鎖` });
+                loadSystemDevopsData();
+            }
+        } catch (err) {
+            setStatusMsg({ type: 'error', text: '解除封鎖失敗' });
+        }
+    };
+
+    const handleAddWhitelistIp = async () => {
+        if (!newWhitelistIp.trim()) return;
+        try {
+            const res = await helper.helper.AsyncAntiCrawlerWhitelistIp(newWhitelistIp.trim());
+            if (res && res.status === 'success') {
+                setStatusMsg({ type: 'success', text: `已將 IP「${newWhitelistIp}」加入信任白名單` });
+                setNewWhitelistIp('');
+                loadSystemDevopsData();
+            }
+        } catch (err) {
+            setStatusMsg({ type: 'error', text: '加入白名單失敗' });
         }
     };
 
@@ -1724,6 +1817,371 @@ export default function DataManagement() {
                                         </Card>
                                     </Grid>
                                 </Grid>
+                            </Paper>
+
+                            {/* 3.5. 智慧防爬蟲與惡意請求防禦中心 */}
+                            <Paper elevation={0} sx={{ p: 3, mb: 4, borderRadius: 3, border: '1px solid #fecaca', bgcolor: '#fffafa' }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2.5, flexWrap: 'wrap', gap: 2 }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                        <SecurityIcon sx={{ color: '#b91c1c', fontSize: 30 }} />
+                                        <Box>
+                                            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#991b1b' }}>
+                                                🛡️ 智慧防爬蟲與惡意請求防禦中心 (Anti-Crawler & Bot Shield)
+                                            </Typography>
+                                            <Typography variant="body2" sx={{ color: '#7f1d1d' }}>
+                                                結合 Nginx 邊緣過濾、動態 User-Agent 識別、滑動視窗限流與隱藏蜜罐陷阱，全天候阻擋未授權資料爬取與批次採集。
+                                            </Typography>
+                                        </Box>
+                                    </Box>
+                                    <Button
+                                        variant="outlined"
+                                        size="small"
+                                        startIcon={<RefreshIcon />}
+                                        onClick={loadSystemDevopsData}
+                                        sx={{ borderColor: '#b91c1c', color: '#b91c1c', fontWeight: 700 }}
+                                    >
+                                        刷新安全遙測數據
+                                    </Button>
+                                </Box>
+
+                                {/* 4 大防護指標卡片 */}
+                                {antiCrawlerStats && (
+                                    <Grid container spacing={2.5} sx={{ mb: 3 }}>
+                                        <Grid item xs={12} sm={6} md={3}>
+                                            <Paper elevation={0} sx={{ p: 2, borderRadius: 2, bgcolor: '#ffffff', border: '1px solid #fee2e2' }}>
+                                                <Typography variant="caption" sx={{ color: '#b91c1c', fontWeight: 800 }}>
+                                                    累計攔截惡意爬蟲請求
+                                                </Typography>
+                                                <Typography variant="h5" sx={{ fontWeight: 900, color: '#991b1b', my: 0.5 }}>
+                                                    {(antiCrawlerStats.metrics?.blocked || 0).toLocaleString()} 次
+                                                </Typography>
+                                                <Typography variant="caption" sx={{ color: '#78716c' }}>
+                                                    自動阻擋惡意 UA 與高頻請求
+                                                </Typography>
+                                            </Paper>
+                                        </Grid>
+
+                                        <Grid item xs={12} sm={6} md={3}>
+                                            <Paper elevation={0} sx={{ p: 2, borderRadius: 2, bgcolor: '#ffffff', border: '1px solid #fed7aa' }}>
+                                                <Typography variant="caption" sx={{ color: '#c2410c', fontWeight: 800 }}>
+                                                    當前封鎖黑名單 IP
+                                                </Typography>
+                                                <Typography variant="h5" sx={{ fontWeight: 900, color: '#9a3412', my: 0.5 }}>
+                                                    {antiCrawlerStats.metrics?.activeBlacklistCount || 0} 個
+                                                </Typography>
+                                                <Typography variant="caption" sx={{ color: '#78716c' }}>
+                                                    自動封鎖中，到期自動解封
+                                                </Typography>
+                                            </Paper>
+                                        </Grid>
+
+                                        <Grid item xs={12} sm={6} md={3}>
+                                            <Paper elevation={0} sx={{ p: 2, borderRadius: 2, bgcolor: '#ffffff', border: '1px solid #e9d5ff' }}>
+                                                <Typography variant="caption" sx={{ color: '#7e22ce', fontWeight: 800 }}>
+                                                    🍯 蜜罐陷阱捕獲次數
+                                                </Typography>
+                                                <Typography variant="h5" sx={{ fontWeight: 900, color: '#6b21a8', my: 0.5 }}>
+                                                    {antiCrawlerStats.metrics?.honeypotTriggers || 0} 次
+                                                </Typography>
+                                                <Typography variant="caption" sx={{ color: '#78716c' }}>
+                                                    隱藏誘餌引導爬蟲自動暴露
+                                                </Typography>
+                                            </Paper>
+                                        </Grid>
+
+                                        <Grid item xs={12} sm={6} md={3}>
+                                            <Paper elevation={0} sx={{ p: 2, borderRadius: 2, bgcolor: '#ffffff', border: '1px solid #bbf7d0' }}>
+                                                <Typography variant="caption" sx={{ color: '#15803d', fontWeight: 800 }}>
+                                                    合法正常存取放行
+                                                </Typography>
+                                                <Typography variant="h5" sx={{ fontWeight: 900, color: '#166534', my: 0.5 }}>
+                                                    {(antiCrawlerStats.metrics?.legitimate || 0).toLocaleString()} 次
+                                                </Typography>
+                                                <Typography variant="caption" sx={{ color: '#78716c' }}>
+                                                    真實訪客與搜尋引擎正常存取
+                                                </Typography>
+                                            </Paper>
+                                        </Grid>
+                                    </Grid>
+                                )}
+
+                                {/* 防護策略即時設定表單 */}
+                                <Paper elevation={0} sx={{ p: 2.5, mb: 3, borderRadius: 2, bgcolor: '#ffffff', border: '1px solid #fee2e2' }}>
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#2b2520', mb: 2 }}>
+                                        ⚙️ 防爬蟲動態策略配置 (即時生效)
+                                    </Typography>
+                                    <Grid container spacing={2.5} alignItems="center">
+                                        <Grid item xs={12} sm={6} md={3}>
+                                            <FormControlLabel
+                                                control={
+                                                    <Switch
+                                                        checked={antiCrawlerConfig.enabled}
+                                                        onChange={(e) => setAntiCrawlerConfig({ ...antiCrawlerConfig, enabled: e.target.checked })}
+                                                        color="error"
+                                                    />
+                                                }
+                                                label="智慧防爬蟲總開關"
+                                                sx={{ '& .MuiTypography-root': { fontWeight: 700, fontSize: '0.9rem' } }}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12} sm={6} md={3}>
+                                            <FormControlLabel
+                                                control={
+                                                    <Switch
+                                                        checked={antiCrawlerConfig.strictMode}
+                                                        onChange={(e) => setAntiCrawlerConfig({ ...antiCrawlerConfig, strictMode: e.target.checked })}
+                                                        color="warning"
+                                                    />
+                                                }
+                                                label="嚴格防護模式 (禁止非瀏覽器工具)"
+                                                sx={{ '& .MuiTypography-root': { fontWeight: 700, fontSize: '0.85rem' } }}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12} sm={6} md={3}>
+                                            <FormControlLabel
+                                                control={
+                                                    <Switch
+                                                        checked={antiCrawlerConfig.honeypotEnabled}
+                                                        onChange={(e) => setAntiCrawlerConfig({ ...antiCrawlerConfig, honeypotEnabled: e.target.checked })}
+                                                        color="secondary"
+                                                    />
+                                                }
+                                                label="🍯 蜜罐誘餌陷阱防護"
+                                                sx={{ '& .MuiTypography-root': { fontWeight: 700, fontSize: '0.9rem' } }}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12} sm={6} md={3}>
+                                            <FormControlLabel
+                                                control={
+                                                    <Switch
+                                                        checked={antiCrawlerConfig.blockEmptyUserAgent}
+                                                        onChange={(e) => setAntiCrawlerConfig({ ...antiCrawlerConfig, blockEmptyUserAgent: e.target.checked })}
+                                                        color="primary"
+                                                    />
+                                                }
+                                                label="攔截空白 User-Agent"
+                                                sx={{ '& .MuiTypography-root': { fontWeight: 700, fontSize: '0.9rem' } }}
+                                            />
+                                        </Grid>
+
+                                        <Grid item xs={12} sm={6} md={4}>
+                                            <FormControl fullWidth size="small">
+                                                <InputLabel>每分鐘頻率上限 (Rate Limit)</InputLabel>
+                                                <Select
+                                                    value={antiCrawlerConfig.rateLimitPerMin}
+                                                    label="每分鐘頻率上限 (Rate Limit)"
+                                                    onChange={(e) => setAntiCrawlerConfig({ ...antiCrawlerConfig, rateLimitPerMin: Number(e.target.value) })}
+                                                >
+                                                    <MenuItem value={60}>60 次 / 分鐘 (嚴格)</MenuItem>
+                                                    <MenuItem value={90}>90 次 / 分鐘 (推薦標準)</MenuItem>
+                                                    <MenuItem value={120}>120 次 / 分鐘 (寬鬆)</MenuItem>
+                                                    <MenuItem value={300}>300 次 / 分鐘 (高流量)</MenuItem>
+                                                </Select>
+                                            </FormControl>
+                                        </Grid>
+
+                                        <Grid item xs={12} sm={6} md={4}>
+                                            <FormControl fullWidth size="small">
+                                                <InputLabel>違規自動封鎖時長</InputLabel>
+                                                <Select
+                                                    value={antiCrawlerConfig.blockDurationMinutes}
+                                                    label="違規自動封鎖時長"
+                                                    onChange={(e) => setAntiCrawlerConfig({ ...antiCrawlerConfig, blockDurationMinutes: Number(e.target.value) })}
+                                                >
+                                                    <MenuItem value={15}>15 分鐘</MenuItem>
+                                                    <MenuItem value={30}>30 分鐘 (標準)</MenuItem>
+                                                    <MenuItem value={60}>1 小時</MenuItem>
+                                                    <MenuItem value={1440}>24 小時 (嚴厲)</MenuItem>
+                                                </Select>
+                                            </FormControl>
+                                        </Grid>
+
+                                        <Grid item xs={12} md={4}>
+                                            <Button
+                                                variant="contained"
+                                                startIcon={<CheckCircleIcon />}
+                                                onClick={handleSaveAntiCrawlerConfig}
+                                                fullWidth
+                                                sx={{ bgcolor: '#b91c1c', fontWeight: 800, '&:hover': { bgcolor: '#991b1b' } }}
+                                            >
+                                                儲存防爬蟲防禦策略
+                                            </Button>
+                                        </Grid>
+                                    </Grid>
+                                </Paper>
+
+                                {/* 手動封鎖與黑白名單管理 */}
+                                <Paper elevation={0} sx={{ p: 2.5, mb: 3, borderRadius: 2, bgcolor: '#ffffff', border: '1px solid #fee2e2' }}>
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#2b2520', mb: 2 }}>
+                                        🚫 IP 黑名單手動管理與信任白名單
+                                    </Typography>
+
+                                    <Grid container spacing={2} sx={{ mb: 2.5 }}>
+                                        <Grid item xs={12} sm={3}>
+                                            <TextField
+                                                fullWidth
+                                                size="small"
+                                                label="要封鎖的惡意 IP 位址"
+                                                placeholder="例：203.0.113.195"
+                                                value={newBlockIp}
+                                                onChange={(e) => setNewBlockIp(e.target.value)}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12} sm={4}>
+                                            <TextField
+                                                fullWidth
+                                                size="small"
+                                                label="封鎖原因備註"
+                                                value={newBlockReason}
+                                                onChange={(e) => setNewBlockReason(e.target.value)}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12} sm={2}>
+                                            <FormControl fullWidth size="small">
+                                                <InputLabel>封鎖時長</InputLabel>
+                                                <Select
+                                                    value={newBlockDuration}
+                                                    label="封鎖時長"
+                                                    onChange={(e) => setNewBlockDuration(Number(e.target.value))}
+                                                >
+                                                    <MenuItem value={15}>15 分鐘</MenuItem>
+                                                    <MenuItem value={60}>1 小時</MenuItem>
+                                                    <MenuItem value={360}>6 小時</MenuItem>
+                                                    <MenuItem value={1440}>24 小時</MenuItem>
+                                                </Select>
+                                            </FormControl>
+                                        </Grid>
+                                        <Grid item xs={12} sm={3}>
+                                            <Button
+                                                variant="contained"
+                                                startIcon={<BlockIcon />}
+                                                onClick={handleManualBlockIp}
+                                                fullWidth
+                                                sx={{ bgcolor: '#dc2626', fontWeight: 800, height: 40, '&:hover': { bgcolor: '#b91c1c' } }}
+                                            >
+                                                手動封鎖此 IP
+                                            </Button>
+                                        </Grid>
+                                    </Grid>
+
+                                    {/* 當前黑名單表格 */}
+                                    <Typography variant="caption" sx={{ fontWeight: 800, color: '#78716c', mb: 1, display: 'block' }}>
+                                        目前被封鎖的 IP 清單 ({antiCrawlerStats?.blacklist?.length || 0} 個)：
+                                    </Typography>
+                                    {(!antiCrawlerStats?.blacklist || antiCrawlerStats.blacklist.length === 0) ? (
+                                        <Typography variant="body2" sx={{ color: '#a8a29e', py: 1.5, textAlign: 'center', bgcolor: '#fafaf9', borderRadius: 1.5 }}>
+                                            目前沒有被封鎖的 IP，系統連線狀態健康良好。
+                                        </Typography>
+                                    ) : (
+                                        <TableContainer sx={{ border: '1px solid #fee2e2', borderRadius: 1.5, maxHeight: 200, mb: 2 }}>
+                                            <Table size="small">
+                                                <TableHead sx={{ bgcolor: '#fff1f2' }}>
+                                                    <TableRow>
+                                                        <TableCell sx={{ fontWeight: 800 }}>封鎖 IP</TableCell>
+                                                        <TableCell sx={{ fontWeight: 800 }}>封鎖原因</TableCell>
+                                                        <TableCell sx={{ fontWeight: 800 }}>封鎖時間</TableCell>
+                                                        <TableCell sx={{ fontWeight: 800 }}>剩餘時間</TableCell>
+                                                        <TableCell sx={{ fontWeight: 800 }} align="right">操作</TableCell>
+                                                    </TableRow>
+                                                </TableHead>
+                                                <TableBody>
+                                                    {antiCrawlerStats.blacklist.map((item, idx) => (
+                                                        <TableRow key={idx} hover>
+                                                            <TableCell sx={{ fontWeight: 700, color: '#b91c1c', fontFamily: 'monospace' }}>
+                                                                {item.ip}
+                                                            </TableCell>
+                                                            <TableCell sx={{ fontSize: '0.85rem' }}>{item.reason}</TableCell>
+                                                            <TableCell sx={{ fontSize: '0.8rem', color: '#78716c' }}>
+                                                                {dayjs(item.blockedAt).format('YYYY-MM-DD HH:mm:ss')}
+                                                            </TableCell>
+                                                            <TableCell sx={{ fontSize: '0.85rem', fontWeight: 700, color: '#dc2626' }}>
+                                                                {item.remainingMinutes} 分鐘
+                                                            </TableCell>
+                                                            <TableCell align="right">
+                                                                <Button
+                                                                    size="small"
+                                                                    color="primary"
+                                                                    onClick={() => handleManualUnblockIp(item.ip)}
+                                                                    sx={{ fontWeight: 700 }}
+                                                                >
+                                                                    解除封鎖
+                                                                </Button>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))}
+                                                </TableBody>
+                                            </Table>
+                                        </TableContainer>
+                                    )}
+
+                                    {/* 信任白名單 */}
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap', mt: 1 }}>
+                                        <Typography variant="caption" sx={{ fontWeight: 800, color: '#166534' }}>
+                                            信任白名單 IP：
+                                        </Typography>
+                                        {(antiCrawlerStats?.whitelist || []).map((wIp, wIdx) => (
+                                            <Chip key={wIdx} label={wIp} size="small" color="success" variant="outlined" sx={{ fontWeight: 700 }} />
+                                        ))}
+                                        <TextField
+                                            size="small"
+                                            placeholder="新增白名單 IP"
+                                            value={newWhitelistIp}
+                                            onChange={(e) => setNewWhitelistIp(e.target.value)}
+                                            sx={{ width: 160, '& .MuiInputBase-input': { py: 0.5, fontSize: '0.85rem' } }}
+                                        />
+                                        <Button size="small" variant="outlined" color="success" onClick={handleAddWhitelistIp} sx={{ fontWeight: 700 }}>
+                                            加入白名單
+                                        </Button>
+                                    </Box>
+                                </Paper>
+
+                                {/* 最近攔截惡意爬蟲日誌 */}
+                                {antiCrawlerStats?.recentLogs && antiCrawlerStats.recentLogs.length > 0 && (
+                                    <Box sx={{ bgcolor: '#ffffff', p: 2, borderRadius: 2, border: '1px solid #fee2e2' }}>
+                                        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#991b1b', mb: 1.5 }}>
+                                            📋 最近惡意爬蟲攔截事件紀錄 (Latest Intercepted Bot Events)
+                                        </Typography>
+                                        <TableContainer sx={{ maxHeight: 220 }}>
+                                            <Table size="small">
+                                                <TableHead sx={{ bgcolor: '#fef2f2' }}>
+                                                    <TableRow>
+                                                        <TableCell sx={{ fontWeight: 800 }}>時間</TableCell>
+                                                        <TableCell sx={{ fontWeight: 800 }}>來源 IP</TableCell>
+                                                        <TableCell sx={{ fontWeight: 800 }}>探測/造訪路徑</TableCell>
+                                                        <TableCell sx={{ fontWeight: 800 }}>攔截原因</TableCell>
+                                                        <TableCell sx={{ fontWeight: 800 }}>客戶端 User-Agent</TableCell>
+                                                    </TableRow>
+                                                </TableHead>
+                                                <TableBody>
+                                                    {antiCrawlerStats.recentLogs.slice(0, 15).map((log) => (
+                                                        <TableRow key={log.id} hover>
+                                                            <TableCell sx={{ fontSize: '0.8rem', color: '#78716c' }}>
+                                                                {dayjs(log.timestamp).format('HH:mm:ss')}
+                                                            </TableCell>
+                                                            <TableCell sx={{ fontWeight: 700, color: '#b91c1c', fontFamily: 'monospace' }}>
+                                                                {log.ip}
+                                                            </TableCell>
+                                                            <TableCell sx={{ fontSize: '0.85rem', fontFamily: 'monospace', color: '#1e293b' }}>
+                                                                {log.path}
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <Chip
+                                                                    label={log.reason}
+                                                                    size="small"
+                                                                    color={log.reason.includes('HONEYPOT') ? 'secondary' : (log.reason.includes('RATE') ? 'warning' : 'error')}
+                                                                    sx={{ fontWeight: 800, fontSize: '0.75rem' }}
+                                                                />
+                                                            </TableCell>
+                                                            <TableCell sx={{ fontSize: '0.75rem', color: '#64748b', maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                                {log.userAgent}
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))}
+                                                </TableBody>
+                                            </Table>
+                                        </TableContainer>
+                                    </Box>
+                                )}
                             </Paper>
 
                             {/* 4. 容器終端即時日誌檢視器 */}

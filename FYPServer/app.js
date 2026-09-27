@@ -69,6 +69,10 @@ app.use((req, res, next) => {
   next();
 });
 
+// 啟用智慧防爬蟲與惡意請求防禦中介軟體 (Anti-Crawler & Bot Shield)
+const { antiCrawlerMiddleware } = require('./helper/antiCrawler');
+app.use(antiCrawlerMiddleware);
+
 const rateLimit = require('express-rate-limit');
 
 // Rate limiter: 1000 requests per 15 minutes per IP

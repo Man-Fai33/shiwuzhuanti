@@ -1,3 +1,29 @@
-# https://www.robotstxt.org/robotstxt.html
+# ==============================================================
+# 台灣夜市美食數位導覽系統 - 搜尋引擎爬蟲協議 (robots.txt)
+# ==============================================================
+
+# 允許主要搜尋引擎檢索公開旅遊與夜市美食頁面
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 2
+
+User-agent: Baiduspider
+Allow: /
+Crawl-delay: 2
+
+# 禁止所有自動化網路爬蟲抓取管理後台、API 端點與蜜罐陷阱
 User-agent: *
-Disallow:
+Disallow: /datamanagement
+Disallow: /datamanagement/
+Disallow: /system/
+Disallow: /users/
+Disallow: /upload/
+Disallow: /feedback/
+Disallow: /system/anticrawler/trap
+
+# 限制一般爬蟲訪問頻率
+Crawl-delay: 5
