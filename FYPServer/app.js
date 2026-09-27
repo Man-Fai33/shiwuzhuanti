@@ -60,6 +60,13 @@ mongoose.connect(mongoURI)
 const compression = require('compression');
 
 //allow other device access
+const helmet = require('helmet');
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  contentSecurityPolicy: false
+}));
+app.disable('x-powered-by');
+
 app.use(cors())
 app.use(compression());
 app.use((req, res, next) => {
@@ -99,6 +106,11 @@ app.use(apiLimiter);
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true, parameterLimit: 50000 }));
 app.use(bodyParser.json({ limit: '50mb' }));
+// 啟用全站 NoSQL Injection 與 XSS 安全清洗中介軟體 (Security Shield)
+const { noSqlSanitizerMiddleware, xssSanitizerMiddleware } = require('./helper/securityShield');
+app.use(noSqlSanitizerMiddleware);
+app.use(xssSanitizerMiddleware);
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 

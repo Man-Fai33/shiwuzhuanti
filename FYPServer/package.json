@@ -19,6 +19,7 @@
     "express-fileupload": "^1.4.0",
     "express-form-data": "^2.0.19",
     "express-rate-limit": "^8.7.0",
+    "helmet": "^8.3.0",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
     "mongodb": "^4.12.1",
