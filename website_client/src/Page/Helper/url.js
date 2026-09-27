@@ -1,7 +1,6 @@
-export const HOST = 'http://localhost:3000'
-// export const HOST = 'https://calorist.ddns.net'
+import { EXPRESS_SERVER_URL } from '../../config';
 
-
+export const HOST = EXPRESS_SERVER_URL || 'http://localhost:7788';
 
 export const Url = {
     CheckLogin: (HOST + "/users/user/emailPass"),
@@ -13,11 +12,8 @@ export const Url = {
     FeedBack: (HOST + "/feedback/"),
     Bulletin: (HOST + "/bulletin/"),
     Comment: (HOST + "/comment/")
-
-}
-
-
+};
 
 export default {
     Url
-}
+};
