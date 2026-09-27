@@ -27,6 +27,7 @@ import TranslateIcon from '@mui/icons-material/Translate';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 
+import AdBanner from '../../Compnonet/AdBanner';
 import helper from '../Helper/helper';
 import { useLanguage } from '../../Context/LanguageContext';
 
@@ -504,6 +505,19 @@ export default function Index() {
                 </Grid>
             </Paper>
 
+            {/* 商業贊助與品牌聯名旗艦廣告位 (Homepage Leaderboard Ad Slot) */}
+            <AdBanner
+                slotId="homepage-middle-leaderboard"
+                variant="leaderboard"
+                title={isEn ? 'Official Tourism & Brand Partnership Opportunity' : '🏮 台灣在地品牌推廣與商務廣告席位'}
+                description={isEn
+                    ? 'Connect with over 50,000+ food lovers and international travelers visiting Taiwan night markets monthly. Ideal for beverages, souvenirs & travel packages.'
+                    : '月觸及數萬名台灣熱情老饕與海外自由行遊客！適合觀光交通、特色手搖茶飲、在地伴手禮與旅宿品牌聯名合作。'}
+                ctaText={isEn ? 'Inquire for Placement →' : '廣告刊登與商務洽詢 →'}
+                sponsorName={isEn ? 'Official Partner' : '官方合作夥伴'}
+                linkUrl="/feedback"
+            />
+
             {/* 4. 精選熱門夜市展示 (動態讀取) */}
             <Box sx={{ mb: 7 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 2, mb: 3.5, borderBottom: '1px solid #EAE5DD', pb: 2 }}>
@@ -825,6 +839,15 @@ export default function Index() {
                     </Box>
                 </Box>
             )}
+
+            {/* 通欄輕量宣傳贊助條 (Strip Ad Slot for Stall Partners) */}
+            <AdBanner
+                slotId="homepage-bottom-strip"
+                variant="strip"
+                title={isEn ? '📢 Night Market Vendor Hub: Register your stall in 30 seconds for free!' : '📢 全台夜市攤商夥伴招募：30 秒極速刊登您的排隊招牌與中英雙語菜單！'}
+                ctaText={isEn ? 'Join as Stall Vendor →' : '攤商極速進駐 →'}
+                linkUrl="/account"
+            />
 
             {/* 6. 台灣夜市精神文化頁尾小語 */}
             <Box

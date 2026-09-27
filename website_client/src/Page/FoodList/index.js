@@ -23,6 +23,7 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import helper from '../Helper/helper';
 import { useLanguage } from '../../Context/LanguageContext';
 import { useWishlist } from '../../Context/WishlistContext';
+import AdBanner from '../../Compnonet/AdBanner';
 
 export default function FoodList() {
     const { lang, t } = useLanguage();
@@ -185,6 +186,15 @@ export default function FoodList() {
                     {lang === 'en' ? 'Ordering Phrases →' : '常用點餐小抄 →'}
                 </Button>
             </Paper>
+
+            {/* 特色手搖與在地品牌贊助席位 (Food & Drink Pairing Promo) */}
+            <AdBanner
+                slotId="foodlist-beverage-strip"
+                variant="strip"
+                title={lang === 'en' ? '🧋 Foodie Drink Pairing: Chilled Taiwanese fruit tea & alpine oolong pairing tips' : '🧋 在地好味解膩推薦：吃雞排串燒的最佳拍檔！精選高山冷泡烏龍與鮮榨冬瓜檸檬'}
+                ctaText={lang === 'en' ? 'Sponsor Picks →' : '合作品牌推薦 →'}
+                linkUrl="/feedback"
+            />
 
             {/* 篩選與搜尋工具列 */}
             <Paper

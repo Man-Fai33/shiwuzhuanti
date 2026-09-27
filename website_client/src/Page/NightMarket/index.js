@@ -23,6 +23,7 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
 import helper from '../Helper/helper';
 import { useLanguage } from '../../Context/LanguageContext';
+import AdBanner from '../../Compnonet/AdBanner';
 
 export default function NightMarket() {
     const { lang, t } = useLanguage();
@@ -208,6 +209,15 @@ export default function NightMarket() {
                     {lang === 'en' ? 'Open Travel Guide →' : '查看完整秘笈 →'}
                 </Button>
             </Paper>
+
+            {/* 觀光交通與在地夥伴贊助推廣席位 (Transit & Partnership Promo) */}
+            <AdBanner
+                slotId="nightmarket-top-strip"
+                variant="strip"
+                title={lang === 'en' ? '🚕 Taiwan Transit Partner: Easy night market transfers & High Speed Rail discounts' : '🚕 觀光交通贊助夥伴：高鐵夜市接駁、市區計程車與包車旅遊專屬乘車優惠'}
+                ctaText={lang === 'en' ? 'Check Deals →' : '了解優惠 →'}
+                linkUrl="/feedback"
+            />
 
             {/* 篩選與搜尋列 */}
             <Paper
