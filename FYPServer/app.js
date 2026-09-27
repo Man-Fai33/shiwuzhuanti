@@ -33,7 +33,9 @@ var commentRouter = require('./routes/chat');
 var ImageRouter = require('./routes/images');
 var MarketRouter = require('./routes/market')
 var FeedBackRouter = require('./routes/feedback')
-var BulletinRouter =require('./routes/bulletin')
+var BulletinRouter = require('./routes/bulletin')
+var syncRouter = require('./routes/sync')
+const { initScheduledSync } = require('./helper/scheduler');
 var app = express();
 
 // app.use(formData.parse())
@@ -100,10 +102,10 @@ app.use('/images', ImageRouter);
 app.use('/market', MarketRouter)
 app.use('/feedback', FeedBackRouter)
 app.use('/bulletin', BulletinRouter)
+app.use('/sync', syncRouter)
 
-
-
-
+// 初始化 Google Maps 店家與美食定期排程同步
+initScheduledSync();
 
 mongoose.Promise = global.Promise;
 

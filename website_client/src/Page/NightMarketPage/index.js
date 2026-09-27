@@ -707,6 +707,20 @@ export default function NightMarketPage() {
 
     const details = getMarketDetails(market.name, lang);
 
+    const marketShops = shops.filter(s => {
+        if (!market.name) return true;
+        const baseName = market.name.replace('觀光夜市', '').replace('夜市', '');
+        return s.shopYeShi && (s.shopYeShi.includes(baseName) || market.name.includes(s.shopYeShi.replace('觀光夜市', '').replace('夜市', '')));
+    });
+
+    const marketFoodNames = new Set(marketShops.flatMap(s => (s.food || []).map(f => f.foodName || f.name)));
+    const marketFoods = foods.filter(f => {
+        if (marketFoodNames.size > 0) {
+            return marketFoodNames.has(f.foodName);
+        }
+        return true;
+    });
+
     return (
         <Box sx={{ pb: 6 }}>
             {/* 返回夜市列表 */}
@@ -1203,8 +1217,8 @@ export default function NightMarketPage() {
             {/* Tab 0: 美食列表 */}
             {activeTab === 0 && (
                 <Grid container spacing={3}>
-                    {foods.length > 0 ? (
-                        foods.map((fItem, fIdx) => (
+                    {marketFoods.length > 0 ? (
+                        marketFoods.map((fItem, fIdx) => (
                             <Grid item xs={12} sm={6} md={4} key={fItem._id || fIdx}>
                                 <Card className="tw-card" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                                     <CardMedia
@@ -1217,7 +1231,7 @@ export default function NightMarketPage() {
                                     <CardContent sx={{ flexGrow: 1, p: 2 }}>
                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                                             <Typography variant="h6" sx={{ fontWeight: 800, color: '#2C2622' }}>
-                                                {fItem.foodName}
+                                                {lang === 'en' && fItem.foodNameEN ? fItem.foodNameEN : fItem.foodName}
                                             </Typography>
                                             <Chip label={`NT$ ${fItem.foodPrice || 60}`} size="small" sx={{ backgroundColor: '#FFEBEE', color: '#C62828', fontWeight: 800 }} />
                                         </Box>
@@ -1250,8 +1264,8 @@ export default function NightMarketPage() {
             {/* Tab 1: 店家列表 */}
             {activeTab === 1 && (
                 <Grid container spacing={3}>
-                    {shops.length > 0 ? (
-                        shops.map((sItem, sIdx) => (
+                    {marketShops.length > 0 ? (
+                        marketShops.map((sItem, sIdx) => (
                             <Grid item xs={12} sm={6} md={4} key={sItem._id || sIdx}>
                                 <Card className="tw-card" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                                     <CardMedia
@@ -1264,18 +1278,32 @@ export default function NightMarketPage() {
                                     <CardContent sx={{ flexGrow: 1, p: 2 }}>
                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                                             <Typography variant="h6" sx={{ fontWeight: 800, color: '#2C2622' }}>
-                                                {sItem.shopName}
+                                                {lang === 'en' && sItem.shopNameEN ? sItem.shopNameEN : sItem.shopName}
                                             </Typography>
                                             <Chip label={sItem.shopNumber || (lang === 'en' ? 'Stall' : '攤位')} size="small" sx={{ backgroundColor: '#F0EAE1', fontWeight: 800 }} />
                                         </Box>
-                                        <Typography variant="body2" sx={{ color: '#E65100', fontWeight: 700, mb: 1 }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, flexWrap: 'wrap', mb: 1 }}>
+                                            <Chip
+                                                label={sItem.shopType || (lang === 'en' ? 'Street Food' : '人氣美食')}
+                                                size="small"
+                                                sx={{ backgroundColor: '#FEF2F2', color: '#B91C1C', fontWeight: 700, fontSize: '0.75rem' }}
+                                            />
+                                            {(sItem.googleRating > 0 || sItem.rating > 0) && (
+                                                <Chip
+                                                    label={`⭐ ${sItem.googleRating || sItem.rating} (${sItem.googleReviewCount || sItem.rank || 1000}+ ${lang === 'en' ? 'Google Reviews' : '則 Google 評論'})`}
+                                                    size="small"
+                                                    sx={{ backgroundColor: '#FEF3C7', color: '#92400E', fontWeight: 700, fontSize: '0.75rem' }}
+                                                />
+                                            )}
+                                        </Box>
+                                        <Typography variant="body2" sx={{ color: '#E65100', fontWeight: 700, mb: 1, fontSize: '0.85rem' }}>
                                             📍 {sItem.shopLocation || (lang === 'en' ? 'Main Street' : '夜市主街區')}
                                         </Typography>
                                         <Typography variant="body2" sx={{ color: '#666', lineHeight: 1.6, minHeight: '44px' }}>
                                             {sItem.shopShortIntroduction || sItem.shopIntroduction}
                                         </Typography>
                                     </CardContent>
-                                    <CardActions sx={{ p: 2, pt: 0 }}>
+                                    <CardActions sx={{ p: 2, pt: 0, gap: 1 }}>
                                         <Button
                                             fullWidth
                                             className="tw-btn-primary"
@@ -1283,6 +1311,23 @@ export default function NightMarketPage() {
                                         >
                                             {lang === 'en' ? 'View Stall Menu' : '查看攤位菜單'}
                                         </Button>
+                                        {sItem.googlePlaceUrl && (
+                                            <Button
+                                                variant="outlined"
+                                                href={sItem.googlePlaceUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                sx={{
+                                                    minWidth: '40px',
+                                                    borderColor: '#EAE5DD',
+                                                    color: '#B91C1C',
+                                                    '&:hover': { borderColor: '#B91C1C', backgroundColor: 'rgba(185, 28, 28, 0.04)' }
+                                                }}
+                                                title={lang === 'en' ? 'Open in Google Maps' : '在 Google 地圖查看'}
+                                            >
+                                                <OpenInNewIcon fontSize="small" />
+                                            </Button>
+                                        )}
                                     </CardActions>
                                 </Card>
                             </Grid>

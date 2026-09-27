@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+
 const Market = new mongoose.Schema({
     name: { type: String, required: true },
     nameen: { type: String, required: true },
@@ -7,9 +8,9 @@ const Market = new mongoose.Schema({
     positionGuidelines: { type: String, require: true },
     brief: { type: String, require: true },
     introduction: { type: String, require: true },
-    foodList: { Array: [] },
-    shopList: { Array: [] },
-    rating: { type: Number, default: "" },
+    foodList: { type: Array, default: [] },
+    shopList: { type: Array, default: [] },
+    rating: { type: Number, default: 4.8 },
     lat: { type: Number },
     lng: { type: Number },
 })
