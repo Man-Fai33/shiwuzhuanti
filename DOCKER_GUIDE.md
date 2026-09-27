@@ -73,7 +73,24 @@ docker compose up -d
 
 ---
 
-## 🛠️ 3. 常用 Docker 指令備忘
+---
+
+## 🖼️ 6. 圖片存儲與持久化機制 (Image Storage Persistence)
+
+- **圖片實體存放路徑**：
+  在 `docker-compose.yml` 中已設定將本機目錄 `./FYPServer/public/images` 直接掛載至容器內的 `/app/public/images`：
+  ```yaml
+  volumes:
+    - ./FYPServer/public/images:/app/public/images
+  ```
+- **優勢**：
+  1. **現有圖片零遺失**：目前本機資料庫累積的夜市與美食照片，在容器啟動後可立即正常讀取與呈現。
+  2. **新上傳即時落盤**：管理者或店家在網頁後台新上傳的圖片，會直接寫入宿主機的 `FYPServer/public/images/`，即使重構或銷毀 Docker 容器，圖片也不會遺失。
+  3. **備份簡便**：只需備份 `FYPServer/public/images` 資料夾或配合後台下載的 JSON 備份檔，即可達成 100% 完整系統遷移。
+
+---
+
+## 🛠️ 7. 常用 Docker 指令備忘
 
 ```bash
 # 檢視運行中的容器狀態
@@ -82,9 +99,9 @@ docker compose ps
 # 檢視伺服器即時日誌 (終端機視角)
 docker compose logs -f fypserver
 
-# 停止並保留資料磁碟卷
+# 停止並保留資料磁碟卷與圖片
 docker compose down
 
-# 停止並連同磁碟卷全部重置
+# 停止並連同 MongoDB 磁碟卷全部重置
 docker compose down -v
 ```
