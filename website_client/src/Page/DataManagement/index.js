@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     Container,
     Paper,
@@ -28,7 +28,10 @@ import {
     FormControl,
     InputLabel,
     IconButton,
-    Tooltip
+    Tooltip,
+    Switch,
+    FormControlLabel,
+    Card
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 
@@ -47,6 +50,11 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import EditIcon from '@mui/icons-material/Edit';
 import SyncIcon from '@mui/icons-material/Sync';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import StorageIcon from '@mui/icons-material/Storage';
+import TerminalIcon from '@mui/icons-material/Terminal';
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
 import dayjs from 'dayjs';
 import helper from '../Helper/helper';
@@ -103,6 +111,14 @@ export default function DataManagement() {
     const [loading, setLoading] = useState(false);
     const [syncLoading, setSyncLoading] = useState(false);
 
+    // DevOps 系統運維與 Docker 排程管理狀態
+    const [systemStatus, setSystemStatus] = useState(null);
+    const [schedulers, setSchedulers] = useState([]);
+    const [systemLogs, setSystemLogs] = useState([]);
+    const [logsAutoRefresh, setLogsAutoRefresh] = useState(false);
+    const [devopsActionLoading, setDevopsActionLoading] = useState(false);
+    const importFileRef = useRef(null);
+
     useEffect(() => {
         try {
             const rawUser = localStorage.getItem('user');
@@ -113,8 +129,47 @@ export default function DataManagement() {
         } catch (e) { }
 
         loadAllData();
+        loadSystemDevopsData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    // 日誌自動滾動更新 (當管理員停留在 Tab 7 且開啟自動刷新時)
+    useEffect(() => {
+        let timer = null;
+        if (tabVal === 7 && logsAutoRefresh) {
+            timer = setInterval(() => {
+                helper.helper.AsyncSystemLogs(100).then(res => {
+                    if (res && res.status === 'success' && Array.isArray(res.logs)) {
+                        setSystemLogs(res.logs);
+                    }
+                });
+            }, 3000);
+        }
+        return () => {
+            if (timer) clearInterval(timer);
+        };
+    }, [tabVal, logsAutoRefresh]);
+
+    const loadSystemDevopsData = async () => {
+        try {
+            const [statusRes, schedRes, logsRes] = await Promise.all([
+                helper.helper.AsyncSystemStatus(),
+                helper.helper.AsyncSystemSchedulers(),
+                helper.helper.AsyncSystemLogs(100)
+            ]);
+            if (statusRes && statusRes.status === 'success') {
+                setSystemStatus(statusRes.data);
+            }
+            if (schedRes && schedRes.status === 'success' && schedRes.data?.jobs) {
+                setSchedulers(schedRes.data.jobs);
+            }
+            if (logsRes && logsRes.status === 'success' && Array.isArray(logsRes.logs)) {
+                setSystemLogs(logsRes.logs);
+            }
+        } catch (e) {
+            console.error('Failed to load devops data:', e);
+        }
+    };
 
     const loadAllData = async () => {
         setLoading(true);
@@ -447,6 +502,155 @@ export default function DataManagement() {
         }
     };
 
+    // ==========================================
+    // 8. 系統運維、Docker 容器與動態排程控制
+    // ==========================================
+    const handleToggleScheduler = async (jobId, jobName) => {
+        try {
+            const res = await helper.helper.AsyncSchedulerToggle(jobId);
+            if (res && res.status === 'success') {
+                setStatusMsg({ type: 'success', text: res.message || `已切換排程「${jobName}」狀態` });
+                loadSystemDevopsData();
+            } else {
+                setStatusMsg({ type: 'error', text: res?.message || '切換排程失敗' });
+            }
+        } catch (err) {
+            setStatusMsg({ type: 'error', text: '操作失敗: ' + err.message });
+        }
+    };
+
+    const handleUpdateSchedulerCron = async (jobId, newCron) => {
+        try {
+            const res = await helper.helper.AsyncSchedulerUpdate(jobId, { cronExpression: newCron });
+            if (res && res.status === 'success') {
+                setStatusMsg({ type: 'success', text: `已將排程頻率更新為：${newCron}` });
+                loadSystemDevopsData();
+            }
+        } catch (err) {
+            setStatusMsg({ type: 'error', text: '更新頻率失敗: ' + err.message });
+        }
+    };
+
+    const handleTriggerScheduler = async (jobId, jobName) => {
+        setDevopsActionLoading(true);
+        setStatusMsg({ type: 'info', text: `⚡ 正在手動執行排程「${jobName}」，請稍候...` });
+        try {
+            const res = await helper.helper.AsyncSchedulerTrigger(jobId);
+            if (res && res.status === 'success') {
+                setStatusMsg({
+                    type: 'success',
+                    text: `🎉 排程「${jobName}」手動執行完畢！(耗時: ${res.data?.duration || 0}ms)`
+                });
+                loadAllData();
+                loadSystemDevopsData();
+            } else {
+                setStatusMsg({ type: 'error', text: res?.message || '執行排程失敗' });
+            }
+        } catch (err) {
+            setStatusMsg({ type: 'error', text: '執行排程發生異常: ' + err.message });
+        } finally {
+            setDevopsActionLoading(false);
+        }
+    };
+
+    const handleClearLogs = async () => {
+        try {
+            const res = await helper.helper.AsyncSystemLogsClear();
+            if (res && res.status === 'success') {
+                setSystemLogs([]);
+                setStatusMsg({ type: 'success', text: '日誌緩衝區已清空' });
+            }
+        } catch (err) {
+            setStatusMsg({ type: 'error', text: '清空日誌失敗' });
+        }
+    };
+
+    const handleExportBackup = async () => {
+        setStatusMsg({ type: 'info', text: '📦 正在產生全資料庫備份檔案，請稍候...' });
+        try {
+            const downloadUrl = helper.helper.AsyncSystemBackupExportUrl();
+            const res = await fetch(downloadUrl);
+            const blob = await res.blob();
+            const blobUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = `nightmarket_backup_${dayjs().format('YYYYMMDD_HHmmss')}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(blobUrl);
+            setStatusMsg({ type: 'success', text: '🎉 全資料庫 JSON 備份檔已成功下載至您的電腦！' });
+        } catch (err) {
+            setStatusMsg({ type: 'error', text: '下載備份失敗: ' + err.message });
+        }
+    };
+
+    const handleImportFileChange = async (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async (evt) => {
+            try {
+                const parsed = JSON.parse(evt.target.result);
+                if (!parsed.data) {
+                    setStatusMsg({ type: 'error', text: '無效的備份 JSON 結構 (缺少 data 節點)' });
+                    return;
+                }
+
+                if (!window.confirm('⚠️ 警告：確定要將此備份檔還原匯入資料庫嗎？現有同名夜市/店家與美食資料將自動覆蓋更新。')) {
+                    if (importFileRef.current) importFileRef.current.value = '';
+                    return;
+                }
+
+                setDevopsActionLoading(true);
+                const res = await helper.helper.AsyncSystemBackupImport(parsed);
+                if (res && res.status === 'success') {
+                    setStatusMsg({
+                        type: 'success',
+                        text: `🎉 資料庫還原成功！匯入：${res.stats.importedMarkets} 夜市、${res.stats.importedShops} 店家、${res.stats.importedFoods} 美食。`
+                    });
+                    loadAllData();
+                    loadSystemDevopsData();
+                } else {
+                    setStatusMsg({ type: 'error', text: res?.message || '還原失敗' });
+                }
+            } catch (err) {
+                setStatusMsg({ type: 'error', text: '解析或上傳備份 JSON 檔案失敗: ' + err.message });
+            } finally {
+                setDevopsActionLoading(false);
+                if (importFileRef.current) importFileRef.current.value = '';
+            }
+        };
+        reader.readAsText(file);
+    };
+
+    const handleSeedDatabase = async () => {
+        if (!window.confirm('🌱 確定要初始化全台夜市標準數據庫嗎？此操作適合 Docker 剛啟動上線時快速載入全台指標夜市與 Google Maps 推薦名店。')) {
+            return;
+        }
+
+        setDevopsActionLoading(true);
+        setStatusMsg({ type: 'info', text: '🌱 正在初始化全台標準夜市與名店資料，請稍候...' });
+        try {
+            const res = await helper.helper.AsyncSystemDatabaseSeed();
+            if (res && res.status === 'success') {
+                setStatusMsg({
+                    type: 'success',
+                    text: `🎉 全台標準數據庫初始化完成！當前總計：${res.summary.totalMarkets} 處夜市、${res.summary.totalShops} 間名店、${res.summary.totalFoods} 道美食！`
+                });
+                loadAllData();
+                loadSystemDevopsData();
+            } else {
+                setStatusMsg({ type: 'error', text: res?.message || '初始化失敗' });
+            }
+        } catch (err) {
+            setStatusMsg({ type: 'error', text: '初始化過程發生異常: ' + err.message });
+        } finally {
+            setDevopsActionLoading(false);
+        }
+    };
+
     // 篩選店家清單
     const filteredShops = shops.filter(s => {
         const matchMarket = shopFilterMarket === 'ALL' || s.shopYeShi === shopFilterMarket;
@@ -554,7 +758,8 @@ export default function DataManagement() {
                     <Tab icon={<PeopleIcon />} iconPosition="start" label={`會員帳號 (${usersList.length})`} />
                     <Tab icon={<CampaignIcon />} iconPosition="start" label={`活動公告 (${bulletins.length})`} />
                     <Tab icon={<FeedbackIcon />} iconPosition="start" label={`饕客回饋 (${feedbacks.length})`} />
-                    <Tab icon={<InsightsIcon />} iconPosition="start" label="每日流量與同步" />
+                    <Tab icon={<InsightsIcon />} iconPosition="start" label="每日流量統計" />
+                    <Tab icon={<StorageIcon />} iconPosition="start" label="系統運維與容器排程" />
                 </Tabs>
 
                 <Box sx={{ p: { xs: 2, md: 3.5 } }}>
@@ -1218,6 +1423,387 @@ export default function DataManagement() {
                                     )}
                                 </>
                             )}
+                        </Box>
+                    )}
+
+                    {/* ============================================================== */}
+                    {/* Tab 7: 系統運維、Docker 容器與動態排程控制台                     */}
+                    {/* ============================================================== */}
+                    {tabVal === 7 && (
+                        <Box>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
+                                <Box>
+                                    <Typography variant="h6" sx={{ fontWeight: 800, color: '#b7282e' }}>
+                                        🎛️ Docker 容器運維、自動定期排程與全庫控制中心
+                                    </Typography>
+                                    <Typography variant="body2" sx={{ color: '#6d655e', mt: 0.5 }}>
+                                        全站資料庫作業、Google Maps 同步週期、備份還原與容器終端日誌均可於網頁直接操作，不需登入伺服器。
+                                    </Typography>
+                                </Box>
+                                <Stack direction="row" spacing={1.5}>
+                                    <Button
+                                        variant="outlined"
+                                        startIcon={<RefreshIcon />}
+                                        onClick={loadSystemDevopsData}
+                                        disabled={devopsActionLoading}
+                                        sx={{ borderColor: '#b7282e', color: '#b7282e', fontWeight: 700 }}
+                                    >
+                                        重新整理系統狀態
+                                    </Button>
+                                    <Button
+                                        variant="contained"
+                                        startIcon={<PlayArrowIcon />}
+                                        onClick={handleSeedDatabase}
+                                        disabled={devopsActionLoading}
+                                        sx={{ bgcolor: '#b7282e', fontWeight: 800, '&:hover': { bgcolor: '#941e24' } }}
+                                    >
+                                        🌱 初始化全台夜市標準數據
+                                    </Button>
+                                </Stack>
+                            </Box>
+
+                            {/* 1. 系統資源與容器狀態 KPI 卡片 */}
+                            {systemStatus && (
+                                <Grid container spacing={2.5} sx={{ mb: 4 }}>
+                                    <Grid item xs={12} sm={6} md={3}>
+                                        <Paper elevation={0} sx={{ p: 2.5, borderRadius: 3, border: '1px solid #dbeafe', bgcolor: '#eff6ff' }}>
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                                                <Typography variant="caption" sx={{ color: '#1e40af', fontWeight: 800 }}>
+                                                    運行環境與服務狀態
+                                                </Typography>
+                                                <Chip
+                                                    label={systemStatus.server?.isDocker ? '🐳 Docker 容器' : '💻 主機服務'}
+                                                    size="small"
+                                                    color={systemStatus.server?.isDocker ? 'primary' : 'default'}
+                                                    sx={{ fontWeight: 800 }}
+                                                />
+                                            </Box>
+                                            <Typography variant="h5" sx={{ fontWeight: 900, color: '#1e3a8a', my: 0.5 }}>
+                                                {systemStatus.server?.uptimeFormatted || '0 秒'}
+                                            </Typography>
+                                            <Typography variant="caption" sx={{ color: '#64748b' }}>
+                                                Node: {systemStatus.server?.nodeVersion} ｜ 平台: {systemStatus.server?.platform} ({systemStatus.server?.arch})
+                                            </Typography>
+                                        </Paper>
+                                    </Grid>
+
+                                    <Grid item xs={12} sm={6} md={3}>
+                                        <Paper elevation={0} sx={{ p: 2.5, borderRadius: 3, border: '1px solid #fef3c7', bgcolor: '#fffbeb' }}>
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                                                <Typography variant="caption" sx={{ color: '#92400e', fontWeight: 800 }}>
+                                                    記憶體負載 (Node.js)
+                                                </Typography>
+                                                <Chip label={`RAM: ${systemStatus.memory?.memUsagePercent || 0}%`} size="small" sx={{ fontWeight: 800, bgcolor: '#fde68a' }} />
+                                            </Box>
+                                            <Typography variant="h5" sx={{ fontWeight: 900, color: '#78350f', my: 0.5 }}>
+                                                {systemStatus.memory?.heapUsedMb || 0} MB
+                                            </Typography>
+                                            <Typography variant="caption" sx={{ color: '#78716c' }}>
+                                                Heap: {systemStatus.memory?.heapTotalMb}MB ｜ RSS: {systemStatus.memory?.rssMb}MB
+                                            </Typography>
+                                        </Paper>
+                                    </Grid>
+
+                                    <Grid item xs={12} sm={6} md={3}>
+                                        <Paper elevation={0} sx={{ p: 2.5, borderRadius: 3, border: '1px solid #dcfce7', bgcolor: '#f0fdf4' }}>
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                                                <Typography variant="caption" sx={{ color: '#166534', fontWeight: 800 }}>
+                                                    MongoDB 資料庫狀態
+                                                </Typography>
+                                                <Chip label="已連線正常" size="small" color="success" sx={{ fontWeight: 800 }} />
+                                            </Box>
+                                            <Typography variant="h5" sx={{ fontWeight: 900, color: '#14532d', my: 0.5 }}>
+                                                {systemStatus.database?.dbName || 'fyp'}
+                                            </Typography>
+                                            <Typography variant="caption" sx={{ color: '#15803d' }}>
+                                                夜市: {systemStatus.database?.collections?.markets || 0} ｜ 店家: {systemStatus.database?.collections?.shops || 0} ｜ 美食: {systemStatus.database?.collections?.foods || 0}
+                                            </Typography>
+                                        </Paper>
+                                    </Grid>
+
+                                    <Grid item xs={12} sm={6} md={3}>
+                                        <Paper elevation={0} sx={{ p: 2.5, borderRadius: 3, border: '1px solid #fae8ff', bgcolor: '#fdf4ff' }}>
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                                                <Typography variant="caption" sx={{ color: '#86198f', fontWeight: 800 }}>
+                                                    自動排程監護任務
+                                                </Typography>
+                                                <Chip label={`${schedulers.filter(j => j.enabled).length} 項啟用中`} size="small" color="secondary" sx={{ fontWeight: 800 }} />
+                                            </Box>
+                                            <Typography variant="h5" sx={{ fontWeight: 900, color: '#701a75', my: 0.5 }}>
+                                                {schedulers.length} 個排程
+                                            </Typography>
+                                            <Typography variant="caption" sx={{ color: '#a21caf' }}>
+                                                全自動執行 Google Maps 採集與流量歸檔
+                                            </Typography>
+                                        </Paper>
+                                    </Grid>
+                                </Grid>
+                            )}
+
+                            {/* 2. 動態定期排程控制中心 */}
+                            <Paper elevation={0} sx={{ p: 3, mb: 4, borderRadius: 3, border: '1px solid #eae5dd', bgcolor: '#faf8f5' }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2.5, flexWrap: 'wrap', gap: 2 }}>
+                                    <Box>
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#2b2520' }}>
+                                            ⏰ 後台全自動定期排程管理 (Cron Schedulers)
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ color: '#78716c' }}>
+                                            可在網頁直接暫停/重啟排程工作或變更執行週期，設定立即套用且不需重啟容器服務。
+                                        </Typography>
+                                    </Box>
+                                </Box>
+
+                                <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid #eae5dd', borderRadius: 2 }}>
+                                    <Table>
+                                        <TableHead sx={{ bgcolor: '#f5f0ea' }}>
+                                            <TableRow>
+                                                <TableCell sx={{ fontWeight: 800 }}>排程名稱與描述</TableCell>
+                                                <TableCell sx={{ fontWeight: 800 }}>排程開關</TableCell>
+                                                <TableCell sx={{ fontWeight: 800 }}>執行頻率 (Cron)</TableCell>
+                                                <TableCell sx={{ fontWeight: 800 }}>上次執行狀態</TableCell>
+                                                <TableCell sx={{ fontWeight: 800 }}>上次執行時間 / 耗時</TableCell>
+                                                <TableCell sx={{ fontWeight: 800 }} align="right">手動觸發</TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {schedulers.map((job) => (
+                                                <TableRow key={job.id} hover>
+                                                    <TableCell>
+                                                        <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#2b2520' }}>
+                                                            {job.name}
+                                                        </Typography>
+                                                        <Typography variant="caption" sx={{ color: '#78716c' }}>
+                                                            {job.description}
+                                                        </Typography>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <FormControlLabel
+                                                            control={
+                                                                <Switch
+                                                                    checked={job.enabled}
+                                                                    onChange={() => handleToggleScheduler(job.id, job.name)}
+                                                                    color="success"
+                                                                />
+                                                            }
+                                                            label={job.enabled ? "運行中" : "已暫停"}
+                                                            sx={{ '& .MuiTypography-root': { fontWeight: 700, fontSize: '0.85rem' } }}
+                                                        />
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <FormControl size="small" sx={{ minWidth: 160 }}>
+                                                            <Select
+                                                                value={job.cronExpression}
+                                                                onChange={(e) => handleUpdateSchedulerCron(job.id, e.target.value)}
+                                                                sx={{ fontSize: '0.85rem', fontWeight: 700 }}
+                                                            >
+                                                                <MenuItem value="0 4 * * *">每日凌晨 04:00 (0 4 * * *)</MenuItem>
+                                                                <MenuItem value="5 0 * * *">每日凌晨 00:05 (5 0 * * *)</MenuItem>
+                                                                <MenuItem value="0 */6 * * *">每 6 小時一次 (0 */6 * * *)</MenuItem>
+                                                                <MenuItem value="0 */12 * * *">每 12 小時一次 (0 */12 * * *)</MenuItem>
+                                                                <MenuItem value="0 * * * *">每小時整點 (0 * * * *)</MenuItem>
+                                                                <MenuItem value="*/30 * * * *">每 30 分鐘 (*/30 * * * *)</MenuItem>
+                                                            </Select>
+                                                        </FormControl>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {job.lastStatus === 'success' && <Chip label="執行成功" size="small" color="success" sx={{ fontWeight: 800 }} />}
+                                                        {job.lastStatus === 'running' && <Chip label="執行中..." size="small" color="warning" sx={{ fontWeight: 800 }} />}
+                                                        {job.lastStatus === 'failed' && <Chip label="失敗" size="small" color="error" sx={{ fontWeight: 800 }} />}
+                                                        {job.lastStatus === 'idle' && <Chip label="等待排程中" size="small" sx={{ fontWeight: 700, bgcolor: '#e5e7eb' }} />}
+                                                    </TableCell>
+                                                    <TableCell sx={{ fontSize: '0.85rem', color: '#57534e' }}>
+                                                        {job.lastRun ? dayjs(job.lastRun).format('YYYY-MM-DD HH:mm:ss') : '尚未執行'}
+                                                        {job.lastDuration ? ` (${job.lastDuration}ms)` : ''}
+                                                    </TableCell>
+                                                    <TableCell align="right">
+                                                        <Button
+                                                            variant="contained"
+                                                            size="small"
+                                                            startIcon={<PlayArrowIcon />}
+                                                            onClick={() => handleTriggerScheduler(job.id, job.name)}
+                                                            disabled={devopsActionLoading || job.lastStatus === 'running'}
+                                                            sx={{ bgcolor: '#b7282e', fontWeight: 800, '&:hover': { bgcolor: '#941e24' } }}
+                                                        >
+                                                            立即執行
+                                                        </Button>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            </Paper>
+
+                            {/* 3. 資料庫全庫操作：備份、還原與種子數據 */}
+                            <Paper elevation={0} sx={{ p: 3, mb: 4, borderRadius: 3, border: '1px solid #eae5dd', bgcolor: '#faf8f5' }}>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#2b2520', mb: 2 }}>
+                                    📦 全端資料庫備份、還原與種子資料管理
+                                </Typography>
+                                <Grid container spacing={3}>
+                                    <Grid item xs={12} md={4}>
+                                        <Card elevation={0} sx={{ p: 2.5, height: '100%', borderRadius: 2.5, border: '1px solid #e2e8f0', bgcolor: '#ffffff', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                                            <Box>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                                                    <CloudDownloadIcon sx={{ color: '#2563eb' }} />
+                                                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#1e293b' }}>
+                                                        一鍵匯出全站 JSON 備份
+                                                    </Typography>
+                                                </Box>
+                                                <Typography variant="body2" sx={{ color: '#64748b', mb: 2.5 }}>
+                                                    將夜市聚落、攤位店家、招牌美食、會員帳號、公告與每日統計數據打包為單一 JSON 備份檔下載。
+                                                </Typography>
+                                            </Box>
+                                            <Button
+                                                variant="outlined"
+                                                startIcon={<CloudDownloadIcon />}
+                                                onClick={handleExportBackup}
+                                                fullWidth
+                                                sx={{ borderColor: '#2563eb', color: '#2563eb', fontWeight: 800 }}
+                                            >
+                                                下載全資料庫備份檔
+                                            </Button>
+                                        </Card>
+                                    </Grid>
+
+                                    <Grid item xs={12} md={4}>
+                                        <Card elevation={0} sx={{ p: 2.5, height: '100%', borderRadius: 2.5, border: '1px solid #e2e8f0', bgcolor: '#ffffff', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                                            <Box>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                                                    <CloudUploadIcon sx={{ color: '#059669' }} />
+                                                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#1e293b' }}>
+                                                        匯入 JSON 備份檔案還原
+                                                    </Typography>
+                                                </Box>
+                                                <Typography variant="body2" sx={{ color: '#64748b', mb: 2.5 }}>
+                                                    上傳既有的備份 JSON 檔案，系統將自動比對資料並進行 Upsert 匯入還原，維護資料完整性。
+                                                </Typography>
+                                            </Box>
+                                            <input
+                                                type="file"
+                                                ref={importFileRef}
+                                                accept=".json"
+                                                style={{ display: 'none' }}
+                                                onChange={handleImportFileChange}
+                                            />
+                                            <Button
+                                                variant="outlined"
+                                                startIcon={<CloudUploadIcon />}
+                                                onClick={() => importFileRef.current && importFileRef.current.click()}
+                                                fullWidth
+                                                disabled={devopsActionLoading}
+                                                sx={{ borderColor: '#059669', color: '#059669', fontWeight: 800 }}
+                                            >
+                                                選擇 JSON 檔案還原
+                                            </Button>
+                                        </Card>
+                                    </Grid>
+
+                                    <Grid item xs={12} md={4}>
+                                        <Card elevation={0} sx={{ p: 2.5, height: '100%', borderRadius: 2.5, border: '1px solid #e2e8f0', bgcolor: '#ffffff', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                                            <Box>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                                                    <PlayArrowIcon sx={{ color: '#b7282e' }} />
+                                                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#1e293b' }}>
+                                                        初始化標準夜市數據庫
+                                                    </Typography>
+                                                </Box>
+                                                <Typography variant="body2" sx={{ color: '#64748b', mb: 2.5 }}>
+                                                    適合全新啟動的 Docker 容器！一鍵快速注入全台 8 大夜市、50+ 排隊名店與 100+ 經典美食資料。
+                                                </Typography>
+                                            </Box>
+                                            <Button
+                                                variant="contained"
+                                                startIcon={<PlayArrowIcon />}
+                                                onClick={handleSeedDatabase}
+                                                fullWidth
+                                                disabled={devopsActionLoading}
+                                                sx={{ bgcolor: '#b7282e', fontWeight: 800, '&:hover': { bgcolor: '#941e24' } }}
+                                            >
+                                                一鍵初始化夜市資料庫
+                                            </Button>
+                                        </Card>
+                                    </Grid>
+                                </Grid>
+                            </Paper>
+
+                            {/* 4. 容器終端即時日誌檢視器 */}
+                            <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid #27272a', bgcolor: '#09090b', color: '#fafafa' }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 2 }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                        <TerminalIcon sx={{ color: '#4ade80' }} />
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#4ade80', fontFamily: 'monospace' }}>
+                                            Docker 容器即時控制台日誌 (Live Container Logs)
+                                        </Typography>
+                                    </Box>
+                                    <Stack direction="row" spacing={2} alignItems="center">
+                                        <FormControlLabel
+                                            control={
+                                                <Switch
+                                                    checked={logsAutoRefresh}
+                                                    onChange={(e) => setLogsAutoRefresh(e.target.checked)}
+                                                    color="success"
+                                                    size="small"
+                                                />
+                                            }
+                                            label="每 3 秒自動刷新"
+                                            sx={{ color: '#a1a1aa', '& .MuiTypography-root': { fontSize: '0.85rem' } }}
+                                        />
+                                        <Button
+                                            variant="outlined"
+                                            size="small"
+                                            startIcon={<RefreshIcon />}
+                                            onClick={() => helper.helper.AsyncSystemLogs(100).then(r => r.logs && setSystemLogs(r.logs))}
+                                            sx={{ borderColor: '#52525b', color: '#e4e4e7', fontSize: '0.8rem' }}
+                                        >
+                                            刷新日誌
+                                        </Button>
+                                        <Button
+                                            variant="outlined"
+                                            size="small"
+                                            onClick={handleClearLogs}
+                                            sx={{ borderColor: '#52525b', color: '#f87171', fontSize: '0.8rem' }}
+                                        >
+                                            清空日誌緩衝
+                                        </Button>
+                                    </Stack>
+                                </Box>
+
+                                <Box
+                                    sx={{
+                                        bgcolor: '#18181b',
+                                        p: 2,
+                                        borderRadius: 2,
+                                        fontFamily: 'Consolas, "Fira Code", monospace',
+                                        fontSize: '0.85rem',
+                                        height: 380,
+                                        overflowY: 'auto',
+                                        border: '1px solid #27272a',
+                                        lineHeight: 1.6
+                                    }}
+                                >
+                                    {systemLogs.length === 0 ? (
+                                        <Typography sx={{ color: '#71717a', fontStyle: 'italic', fontFamily: 'monospace' }}>
+                                            目前尚無日誌記錄...
+                                        </Typography>
+                                    ) : (
+                                        systemLogs.map((log) => {
+                                            let levelColor = '#38bdf8'; // INFO
+                                            if (log.level === 'CRON') levelColor = '#c084fc';
+                                            else if (log.level === 'SYNC') levelColor = '#34d399';
+                                            else if (log.level === 'WARN') levelColor = '#fbbf24';
+                                            else if (log.level === 'ERROR') levelColor = '#f87171';
+
+                                            return (
+                                                <Box key={log.id} sx={{ mb: 0.5, wordBreak: 'break-all', display: 'flex', gap: 1 }}>
+                                                    <span style={{ color: '#71717a' }}>[{dayjs(log.timestamp).format('HH:mm:ss')}]</span>
+                                                    <span style={{ color: levelColor, fontWeight: 700, minWidth: 60 }}>[{log.level}]</span>
+                                                    <span style={{ color: '#e4e4e7' }}>{log.message}</span>
+                                                </Box>
+                                            );
+                                        })
+                                    )}
+                                </Box>
+                            </Paper>
                         </Box>
                     )}
 

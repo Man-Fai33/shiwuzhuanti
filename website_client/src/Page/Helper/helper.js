@@ -561,6 +561,110 @@ export const helper = {
         } catch (e) {
             return { status: 'fail', message: e.message };
         }
+    },
+
+    // ==========================================
+    // 系統運維、Docker 容器與動態排程 API
+    // ==========================================
+    AsyncSystemStatus: async () => {
+        try {
+            const res = await fetch(URL.Url.System + '/status');
+            return await res.json();
+        } catch (e) {
+            return { status: 'fail', message: e.message };
+        }
+    },
+
+    AsyncSystemSchedulers: async () => {
+        try {
+            const res = await fetch(URL.Url.System + '/schedulers');
+            return await res.json();
+        } catch (e) {
+            return { status: 'fail', message: e.message };
+        }
+    },
+
+    AsyncSchedulerToggle: async (jobId) => {
+        try {
+            const res = await fetch(`${URL.Url.System}/schedulers/${jobId}/toggle`, {
+                method: 'POST'
+            });
+            return await res.json();
+        } catch (e) {
+            return { status: 'fail', message: e.message };
+        }
+    },
+
+    AsyncSchedulerUpdate: async (jobId, data) => {
+        try {
+            const res = await fetch(`${URL.Url.System}/schedulers/${jobId}/update`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            return await res.json();
+        } catch (e) {
+            return { status: 'fail', message: e.message };
+        }
+    },
+
+    AsyncSchedulerTrigger: async (jobId) => {
+        try {
+            const res = await fetch(`${URL.Url.System}/schedulers/${jobId}/trigger`, {
+                method: 'POST'
+            });
+            return await res.json();
+        } catch (e) {
+            return { status: 'fail', message: e.message };
+        }
+    },
+
+    AsyncSystemLogs: async (limit = 100) => {
+        try {
+            const res = await fetch(`${URL.Url.System}/logs?limit=${limit}`);
+            return await res.json();
+        } catch (e) {
+            return { status: 'fail', message: e.message };
+        }
+    },
+
+    AsyncSystemLogsClear: async () => {
+        try {
+            const res = await fetch(`${URL.Url.System}/logs/clear`, {
+                method: 'POST'
+            });
+            return await res.json();
+        } catch (e) {
+            return { status: 'fail', message: e.message };
+        }
+    },
+
+    AsyncSystemBackupExportUrl: () => {
+        return `${URL.Url.System}/backup/export`;
+    },
+
+    AsyncSystemBackupImport: async (backupData) => {
+        try {
+            const res = await fetch(`${URL.Url.System}/backup/import`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(backupData)
+            });
+            return await res.json();
+        } catch (e) {
+            return { status: 'fail', message: e.message };
+        }
+    },
+
+    AsyncSystemDatabaseSeed: async () => {
+        try {
+            const res = await fetch(`${URL.Url.System}/database/seed`, {
+                method: 'POST'
+            });
+            return await res.json();
+        } catch (e) {
+            return { status: 'fail', message: e.message };
+        }
     }
 
 }

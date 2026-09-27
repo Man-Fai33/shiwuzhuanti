@@ -36,7 +36,9 @@ var FeedBackRouter = require('./routes/feedback')
 var BulletinRouter = require('./routes/bulletin')
 var syncRouter = require('./routes/sync')
 var analyticsRouter = require('./routes/analytics')
-const { initScheduledSync } = require('./helper/scheduler');
+var systemRouter = require('./routes/system');
+require('./helper/loggerBuffer'); // 啟用滾動日誌緩衝
+const { initAllSchedulers } = require('./helper/scheduler');
 var app = express();
 
 // app.use(formData.parse())
@@ -105,9 +107,10 @@ app.use('/feedback', FeedBackRouter)
 app.use('/bulletin', BulletinRouter)
 app.use('/sync', syncRouter)
 app.use('/analytics', analyticsRouter)
+app.use('/system', systemRouter)
 
-// 初始化 Google Maps 店家與美食定期排程同步
-initScheduledSync();
+// 初始化全系統自動定期排程 (Google Maps 同步、每日流量歸檔、健康維護)
+initAllSchedulers();
 
 mongoose.Promise = global.Promise;
 

@@ -1,6 +1,6 @@
 import { EXPRESS_SERVER_URL } from '../../config';
 
-export const HOST = EXPRESS_SERVER_URL || 'http://localhost:7788';
+export const HOST = EXPRESS_SERVER_URL !== undefined ? EXPRESS_SERVER_URL : 'http://localhost:7788';
 
 export const Url = {
     CheckLogin: (HOST + "/users/user/emailPass"),
@@ -13,9 +13,13 @@ export const Url = {
     Bulletin: (HOST + "/bulletin/"),
     Comment: (HOST + "/comment/"),
     Analytics: (HOST + "/analytics"),
-    Sync: (HOST + "/sync")
+    Sync: (HOST + "/sync"),
+    System: (HOST + "/system")
 };
 
-export default {
-    Url
+const urlExport = {
+    Url,
+    HOST
 };
+
+export default urlExport;

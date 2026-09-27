@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  # 1. MongoDB 資料庫服務
+  mongodb:
+    image: mongo:6.0
+    container_name: nightmarket-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: fyp
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - nightmarket-net
+
+  # 2. FYPServer 後端 API 服務 (Express + node-cron + Mongoose)
+  fypserver:
+    build:
+      context: ./FYPServer
+      dockerfile: Dockerfile
+    container_name: nightmarket-server
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+    environment:
+      - PORT=7788
+      - NODE_ENV=production
+      - IS_DOCKER=true
+      - MONGODB_URI=mongodb://mongodb:27017/fyp
+      - SYNC_CRON_SCHEDULE=0 4 * * *
+    ports:
+      - "7788:7788"
+    volumes:
+      - uploads_data:/app/public/images
+    networks:
+      - nightmarket-net
+
+  # 3. 前端網頁服務 (React Production Build + Nginx Reverse Proxy)
+  website_client:
+    build:
+      context: ./website_client
+      dockerfile: Dockerfile
+    container_name: nightmarket-client
+    restart: unless-stopped
+    depends_on:
+      - fypserver
+    ports:
+      - "3000:80"
+    networks:
+      - nightmarket-net
+
+volumes:
+  mongo_data:
+    driver: local
+  uploads_data:
+    driver: local
+
+networks:
+  nightmarket-net:
+    driver: bridge
