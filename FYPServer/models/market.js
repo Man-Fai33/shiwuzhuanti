@@ -13,6 +13,9 @@ const Market = new mongoose.Schema({
     rating: { type: Number, default: 4.8 },
     lat: { type: Number },
     lng: { type: Number },
-})
+});
+
+Market.index({ name: 1 });
+Market.index({ nameen: 1 });
 
 module.exports = mongoose.model('market', Market);

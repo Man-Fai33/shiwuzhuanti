@@ -21,6 +21,11 @@ const Shop = new mongoose.Schema({
     googleRating: { type: Number, default: 0 },
     googleReviewCount: { type: Number, default: 0 },
     lastSyncAt: { type: Date, default: Date.now }
-})
+});
+
+Shop.index({ shopYeShi: 1 });
+Shop.index({ shopName: 1 });
+Shop.index({ rank: -1 });
+Shop.index({ shopManagerID: 1 });
 
 module.exports = mongoose.model('Shop', Shop);

@@ -744,6 +744,8 @@ export const functions = {
 
 
 
-export default {
+const exportedHelper = {
     helper, functions
-}
+};
+
+export default exportedHelper;

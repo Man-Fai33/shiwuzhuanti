@@ -5,5 +5,8 @@ const Comment = module.exports = new mongoose.Schema({
     shop: { type: String, required: true },
     comment: { type: String, required: true },
     date: { type: Date, required: true }
-})
-module.exports = mongoose.model('comment', Comment)
+});
+
+Comment.index({ shop: 1, date: -1 });
+
+module.exports = mongoose.model('comment', Comment);

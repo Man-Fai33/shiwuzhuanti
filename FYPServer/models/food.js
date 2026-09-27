@@ -10,6 +10,10 @@ const Food = new mongoose.Schema({
     rank: { type: Number, default: 0 },
     rating: { type: Number, default: 0 },
     isLike: { type: Array }
-})
-// Food.add({ food: [Food] })
-module.exports = mongoose.model('food', Food)
+});
+
+Food.index({ foodName: 1 });
+Food.index({ rank: -1 });
+Food.index({ rating: -1 });
+
+module.exports = mongoose.model('food', Food);
