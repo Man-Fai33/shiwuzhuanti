@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <!-- 首頁 Home Page -->
+  <url>
+    <loc>https://nightmarket.taiwan.travel/</loc>
+    <lastmod>2026-09-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://nightmarket.taiwan.travel/?lang=zh" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://nightmarket.taiwan.travel/?lang=en" />
+  </url>
+
+  <!-- 夜市總覽與地圖導航 Night Markets Directory -->
+  <url>
+    <loc>https://nightmarket.taiwan.travel/nightmarket</loc>
+    <lastmod>2026-09-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://nightmarket.taiwan.travel/nightmarket?lang=zh" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://nightmarket.taiwan.travel/nightmarket?lang=en" />
+  </url>
+
+  <!-- 全台夜市特色美食料理清單 Food Directory -->
+  <url>
+    <loc>https://nightmarket.taiwan.travel/foodlist</loc>
+    <lastmod>2026-09-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://nightmarket.taiwan.travel/foodlist?lang=zh" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://nightmarket.taiwan.travel/foodlist?lang=en" />
+  </url>
+
+  <!-- 深度夜市美食散策行程指南 Travel Itinerary Guide -->
+  <url>
+    <loc>https://nightmarket.taiwan.travel/travelguide</loc>
+    <lastmod>2026-09-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-TW" href="https://nightmarket.taiwan.travel/travelguide?lang=zh" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://nightmarket.taiwan.travel/travelguide?lang=en" />
+  </url>
+
+  <!-- 攤商極簡進駐與登記專區 Merchant Onboarding Portal -->
+  <url>
+    <loc>https://nightmarket.taiwan.travel/account</loc>
+    <lastmod>2026-09-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- 夜市快訊與活動公告 Bulletin Board -->
+  <url>
+    <loc>https://nightmarket.taiwan.travel/bulletin</loc>
+    <lastmod>2026-09-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- 食客反饋與攤位推薦 Feedback -->
+  <url>
+    <loc>https://nightmarket.taiwan.travel/feedback</loc>
+    <lastmod>2026-09-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+</urlset>

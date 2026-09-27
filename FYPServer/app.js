@@ -102,6 +102,58 @@ app.use(bodyParser.json({ limit: '50mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 
+// 動態產生全站 XML Sitemap 供搜尋引擎 Googlebot 檢索
+const MarketModel = require('./models/market');
+const ShopModel = require('./models/shop');
+const FoodModel = require('./models/food');
+
+app.get('/sitemap.xml', async (req, res) => {
+  try {
+    const markets = await MarketModel.find({}, '_id name').lean();
+    const shops = await ShopModel.find({ isSale: true }, '_id shopName shopYeShi').lean();
+    const foods = await FoodModel.find({ isSale: true }, '_id foodName').lean();
+
+    const baseUrl = process.env.BASE_URL || 'https://nightmarket.taiwan.travel';
+    const today = new Date().toISOString().split('T')[0];
+
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+    xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n`;
+
+    const staticPages = [
+      { loc: '/', priority: '1.0', changefreq: 'daily' },
+      { loc: '/nightmarket', priority: '0.9', changefreq: 'daily' },
+      { loc: '/foodlist', priority: '0.9', changefreq: 'daily' },
+      { loc: '/travelguide', priority: '0.8', changefreq: 'weekly' },
+      { loc: '/account', priority: '0.8', changefreq: 'monthly' },
+      { loc: '/bulletin', priority: '0.7', changefreq: 'weekly' },
+    ];
+
+    staticPages.forEach(p => {
+      xml += `  <url>\n    <loc>${baseUrl}${p.loc}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>${p.changefreq}</changefreq>\n    <priority>${p.priority}</priority>\n  </url>\n`;
+    });
+
+    markets.forEach(m => {
+      xml += `  <url>\n    <loc>${baseUrl}/nightmarketpage?id=${m._id}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.85</priority>\n  </url>\n`;
+    });
+
+    shops.forEach(s => {
+      xml += `  <url>\n    <loc>${baseUrl}/shop?id=${s._id}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.75</priority>\n  </url>\n`;
+    });
+
+    foods.forEach(f => {
+      xml += `  <url>\n    <loc>${baseUrl}/foodinfo?id=${f._id}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.75</priority>\n  </url>\n`;
+    });
+
+    xml += `</urlset>`;
+
+    res.header('Content-Type', 'application/xml');
+    res.send(xml);
+  } catch (err) {
+    console.error('Failed to generate dynamic sitemap:', err);
+    res.status(500).send('Error generating sitemap');
+  }
+});
+
 app.use('/users', usersRouter);
 // app.use('/auth', auth);
 app.use('/upload', uploadRouter)

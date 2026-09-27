@@ -21,11 +21,13 @@ import { LanguageProvider } from './Context/LanguageContext';
 import { WishlistProvider } from './Context/WishlistContext';
 import ShopPage from './Page/Shop/shop';
 import helper from './Page/Helper/helper';
+import { updatePageSEO } from './Page/Helper/seoHelper';
 
 function PageTracker() {
   const location = useLocation();
   useEffect(() => {
     helper.helper.AsyncTrackVisit(location.pathname);
+    updatePageSEO(location.pathname);
   }, [location.pathname]);
   return null;
 }

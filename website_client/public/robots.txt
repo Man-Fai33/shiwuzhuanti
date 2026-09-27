@@ -27,3 +27,6 @@ Disallow: /system/anticrawler/trap
 
 # 限制一般爬蟲訪問頻率
 Crawl-delay: 5
+
+# 搜尋引擎索引 Sitemap 路徑宣告
+Sitemap: https://nightmarket.taiwan.travel/sitemap.xml

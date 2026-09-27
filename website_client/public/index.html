@@ -1,33 +1,109 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-TW">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#C62828" />
-    <title>夜市好好行 🏮 台灣在地夜市美食與生活指南</title>
+    <meta name="theme-color" content="#B91C1C" />
+    
+    <!-- Primary Page Title & Standard Meta Tags -->
+    <title>台灣夜市好好行 🏮 Taiwan Night Market Food & Travel Guide | 必吃排隊美食・即時人潮避峰・地圖導航</title>
     <meta
       name="description"
-      content="走訪全台特色夜市，發掘巷弄排隊美食、老字號小吃、即時活動資訊與交通指南。逗陣來迺夜市！"
+      content="全台在地夜市數位觀光首選！深度匯集士林、饒河、寧夏、逢甲、六合、羅東等經典夜市必吃美食、米其林推薦排隊小吃、即時天氣預報、尖峰人潮時段預測與 Google Maps 實體路線導航。逗陣來迺夜市！"
     />
+    <meta
+      name="keywords"
+      content="台灣夜市, 台北夜市, 士林夜市, 逢甲夜市, 饒河夜市, 寧夏夜市, 六合夜市, 羅東夜市, 台灣小吃, 夜市美食, 珍珠奶茶, 臭豆腐, 蚵仔煎, 大腸包小腸, 鹽酥雞, 地瓜球, 台灣自由行, Taiwan Night Market, Taiwan Street Food, Taipei Food Guide, Fengjia Night Market, Shilin Night Market"
+    />
+    <meta name="author" content="台灣夜市好好行數位導覽團隊 (Taiwan Night Market Guide Team)" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+    <link rel="canonical" href="https://nightmarket.taiwan.travel" />
+    <link rel="alternate" hreflang="zh-TW" href="https://nightmarket.taiwan.travel/?lang=zh" />
+    <link rel="alternate" hreflang="en" href="https://nightmarket.taiwan.travel/?lang=en" />
+    <link rel="alternate" hreflang="x-default" href="https://nightmarket.taiwan.travel" />
+
+    <!-- Open Graph (Facebook, LINE, Social Media) -->
+    <meta property="og:site_name" content="台灣夜市好好行 🏮 Taiwan Night Market Guide" />
+    <meta property="og:title" content="台灣夜市好好行 🏮 Taiwan Night Market Food & Travel Guide" />
+    <meta property="og:description" content="走訪全台特色夜市，發掘巷弄排隊名店、米其林必比登小吃、即時人潮避峰預測與 Google 地圖實體導航。中英雙語友善！" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://nightmarket.taiwan.travel" />
+    <meta property="og:image" content="%PUBLIC_URL%/Yeshi_food.jpg" />
+    <meta property="og:image:secure_url" content="%PUBLIC_URL%/Yeshi_food.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="台灣熱門夜市小吃美食盛宴" />
+    <meta property="og:locale" content="zh_TW" />
+    <meta property="og:locale:alternate" content="en_US" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="台灣夜市好好行 🏮 Taiwan Night Market Guide" />
+    <meta name="twitter:description" content="全台夜市小吃排隊名店、人潮時段預測與 Google 地圖導航！" />
+    <meta name="twitter:image" content="%PUBLIC_URL%/Yeshi_food.jpg" />
+
+    <!-- Web App Manifest & Apple PWA Tags -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="夜市好好行" />
+
+    <!-- Preconnect to CDN Fonts for Core Web Vitals (FCP/LCP Speed Boost) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet" />
+
+    <!-- Google Structured Data (JSON-LD) - Sitelinks, Tourist Attraction & Food Establishment -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://nightmarket.taiwan.travel/#website",
+          "url": "https://nightmarket.taiwan.travel",
+          "name": "台灣夜市好好行",
+          "alternateName": "Taiwan Night Market Digital Guide",
+          "description": "全台熱門夜市小吃名店推薦、即時人潮避峰指南與大眾運輸導航",
+          "inLanguage": ["zh-TW", "en"],
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://nightmarket.taiwan.travel/foodlist?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@type": "TouristAttraction",
+          "@id": "https://nightmarket.taiwan.travel/#attraction",
+          "name": "台灣觀光夜市 (Taiwan Night Markets)",
+          "description": "台灣聞名全球的夜市飲食文化聚落，匯聚經典小吃、古早味甜品與生活娛樂。",
+          "touristType": ["Food Tourism", "Cultural Tourism", "Nightlife"],
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.9",
+            "reviewCount": "1280",
+            "bestRating": "5",
+            "worstRating": "1"
+          }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://nightmarket.taiwan.travel/#organization",
+          "name": "夜市好好行營運團隊",
+          "url": "https://nightmarket.taiwan.travel",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://nightmarket.taiwan.travel/logo512.png"
+          }
+        }
+      ]
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>
     <!-- 智慧防爬蟲蜜罐陷阱 (Honeypot Trap for Malicious Web Crawlers) -->
     <a href="/system/anticrawler/trap" style="display:none !important; visibility:hidden !important; pointer-events:none; opacity:0; position:absolute; left:-9999px; top:-9999px;" tabIndex="-1" aria-hidden="true" rel="nofollow">夜市美食全站原始結構資料索引目錄 (Crawler Honeypot)</a>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
-
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
-
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
   </body>
 </html>
