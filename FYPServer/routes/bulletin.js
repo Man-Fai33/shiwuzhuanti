@@ -39,4 +39,14 @@ router.get('/', async (req, res) => {
         res.json({ status: "fail", message: err })
     })
 })
+
+router.delete('/:id', async (req, res) => {
+    let id = req.params.id;
+    Bulletin.findByIdAndDelete(id).exec().then(result => {
+        res.json({ status: "success", bulletin: result });
+    }).catch(err => {
+        res.json({ status: "fail", message: err });
+    });
+});
+
 module.exports = router

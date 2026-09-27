@@ -12,7 +12,8 @@ export const Url = {
     FeedBack: (HOST + "/feedback/"),
     Bulletin: (HOST + "/bulletin/"),
     Comment: (HOST + "/comment/"),
-    Analytics: (HOST + "/analytics")
+    Analytics: (HOST + "/analytics"),
+    Sync: (HOST + "/sync")
 };
 
 export default {

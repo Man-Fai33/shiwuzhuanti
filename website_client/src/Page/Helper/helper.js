@@ -449,6 +449,118 @@ export const helper = {
         } catch (e) {
             return { status: 'fail' };
         }
+    },
+
+    // 完整的後台全端管理 CRUD 支援
+    AsyncMarketUpdate: async (id, marketData) => {
+        try {
+            const res = await fetch(`${URL.Url.Market}${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ market: marketData })
+            });
+            return await res.json();
+        } catch (e) {
+            return { status: 'fail', message: e.message };
+        }
+    },
+
+    AsyncMarketDelete: async (id) => {
+        try {
+            const res = await fetch(`${URL.Url.Market}${id}`, { method: 'DELETE' });
+            return await res.json();
+        } catch (e) {
+            return { status: 'fail', message: e.message };
+        }
+    },
+
+    AsyncShopUpdate: async (id, shopData) => {
+        try {
+            const res = await fetch(`${URL.Url.Shop}/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ shop: shopData })
+            });
+            return await res.json();
+        } catch (e) {
+            return { status: 'fail', message: e.message };
+        }
+    },
+
+    AsyncShopDelete: async (id) => {
+        try {
+            const res = await fetch(`${URL.Url.Shop}/${id}`, { method: 'DELETE' });
+            return await res.json();
+        } catch (e) {
+            return { status: 'fail', message: e.message };
+        }
+    },
+
+    AsyncFoodUpdate: async (id, foodData) => {
+        try {
+            const res = await fetch(`${URL.Url.Food}${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ food: foodData })
+            });
+            return await res.json();
+        } catch (e) {
+            return { status: 'fail', message: e.message };
+        }
+    },
+
+    AsyncFoodDelete: async (id) => {
+        try {
+            const res = await fetch(`${URL.Url.Food}${id}`, { method: 'DELETE' });
+            return await res.json();
+        } catch (e) {
+            return { status: 'fail', message: e.message };
+        }
+    },
+
+    AsyncUserAll: async () => {
+        try {
+            const res = await fetch(URL.Url.User);
+            return await res.json();
+        } catch (e) {
+            return { status: 'fail', message: e.message };
+        }
+    },
+
+    AsyncUserDelete: async (id) => {
+        try {
+            const res = await fetch(`${URL.Url.User}/${id}`, { method: 'DELETE' });
+            return await res.json();
+        } catch (e) {
+            return { status: 'fail', message: e.message };
+        }
+    },
+
+    AsyncBulletinDelete: async (id) => {
+        try {
+            const res = await fetch(`${URL.Url.Bulletin}${id}`, { method: 'DELETE' });
+            return await res.json();
+        } catch (e) {
+            return { status: 'fail', message: e.message };
+        }
+    },
+
+    AsyncSyncTrigger: async () => {
+        try {
+            const res = await fetch(URL.Url.Sync + '/trigger', { method: 'POST' });
+            return await res.json();
+        } catch (e) {
+            return { status: 'fail', message: e.message };
+        }
+    },
+
+    AsyncSyncStatus: async () => {
+        try {
+            const res = await fetch(URL.Url.Sync + '/status');
+            return await res.json();
+        } catch (e) {
+            return { status: 'fail', message: e.message };
+        }
     }
 
 }

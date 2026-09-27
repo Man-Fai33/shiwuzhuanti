@@ -88,4 +88,14 @@ router.put('/:id', async (req, res) => {
         res.json({ status: "fail", message: err })
     })
 })
+
+router.delete('/:id', (req, res) => {
+    let id = req.params.id;
+    Shop.findByIdAndDelete(id).exec().then(result => {
+        res.json({ status: "success", shop: result });
+    }).catch(err => {
+        res.json({ status: "fail", message: err });
+    });
+});
+
 module.exports = router;

@@ -49,7 +49,13 @@ router.put('/:id', async (req, res) => {
     })
 })
 
-
-
+router.delete('/:id', (req, res) => {
+    let id = req.params.id;
+    Food.findByIdAndDelete(id).exec().then(result => {
+        res.json({ status: "success", food: result });
+    }).catch(err => {
+        res.json({ status: "fail", message: err });
+    });
+});
 
 module.exports = router;

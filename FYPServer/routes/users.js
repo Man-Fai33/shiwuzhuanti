@@ -121,11 +121,15 @@ router.put('/user', async (req, res) => {
   }).catch(err => {
     res.json({ status: "fail", message: err })
   })
- 
 })
 
-
-
-
+router.delete('/user/:id', (req, res) => {
+  let id = req.params.id;
+  User.findByIdAndDelete(id).exec().then(result => {
+    res.json({ status: "success", user: result });
+  }).catch(err => {
+    res.json({ status: "fail", message: err });
+  });
+});
 
 module.exports = router;

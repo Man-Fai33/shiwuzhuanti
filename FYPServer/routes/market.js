@@ -80,6 +80,16 @@ router.post('/:id', (req, res) => {
 
 
 
+router.put('/:id', (req, res) => {
+    let targetid = req.params.id;
+    let data = req.body.market || req.body;
+    Market.findByIdAndUpdate(targetid, data, { new: true }).exec().then(result => {
+        res.json({ status: "success", market: result });
+    }).catch(err => {
+        res.json({ status: "fail", message: err });
+    });
+});
+
 router.delete('/:id', (req, res) => {
     let targetid = req.params.id;
     Market.findByIdAndDelete(targetid).exec().then(result => {
