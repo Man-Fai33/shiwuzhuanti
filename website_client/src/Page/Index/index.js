@@ -36,6 +36,7 @@ export default function Index() {
     const user = rawUser ? JSON.parse(rawUser) : null;
     const [markets, setMarkets] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [analytics, setAnalytics] = useState(null);
 
     useEffect(() => {
         async function fetchMarkets() {
@@ -48,7 +49,18 @@ export default function Index() {
                 console.error('Failed to load markets:', err);
             }
         }
+        async function fetchAnalytics() {
+            try {
+                const aRes = await helper.helper.AsyncGetAnalyticsStats();
+                if (aRes && aRes.status === 'success') {
+                    setAnalytics(aRes.data);
+                }
+            } catch (err) {
+                // optional
+            }
+        }
         fetchMarkets();
+        fetchAnalytics();
     }, []);
 
     const handleSearch = (e) => {
@@ -589,6 +601,58 @@ export default function Index() {
                         {t('nav_admin')}
                     </Button>
                 </Paper>
+            )}
+
+            {/* 每日瀏覽人數與全站流量統計徽章 */}
+            {analytics && (
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: { xs: 1.5, sm: 3 },
+                        flexWrap: 'wrap',
+                        mt: 4,
+                        mb: 2,
+                        p: 2,
+                        borderRadius: '16px',
+                        backgroundColor: '#FAF8F5',
+                        border: '1px solid #EAE5DD',
+                        maxWidth: '780px',
+                        mx: 'auto'
+                    }}
+                >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography variant="body2" sx={{ color: '#78716C', fontWeight: 700 }}>
+                            {lang === 'en' ? '👥 Today\'s Visitors:' : '👥 今日造訪人數：'}
+                        </Typography>
+                        <Chip
+                            label={`${(analytics.today?.uv || 0).toLocaleString()} ${lang === 'en' ? 'visitors' : '人'}`}
+                            size="small"
+                            sx={{ backgroundColor: '#FEF2F2', color: '#B91C1C', fontWeight: 800 }}
+                        />
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography variant="body2" sx={{ color: '#78716C', fontWeight: 700 }}>
+                            {lang === 'en' ? '📈 Today\'s Views:' : '📈 今日總瀏覽量：'}
+                        </Typography>
+                        <Chip
+                            label={`${(analytics.today?.pv || 0).toLocaleString()} ${lang === 'en' ? 'views' : '次'}`}
+                            size="small"
+                            sx={{ backgroundColor: '#FFFBEB', color: '#B45309', fontWeight: 800 }}
+                        />
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography variant="body2" sx={{ color: '#78716C', fontWeight: 700 }}>
+                            {lang === 'en' ? '🌐 Total Views:' : '🌐 累積總瀏覽量：'}
+                        </Typography>
+                        <Chip
+                            label={`${(analytics.totalPv || 0).toLocaleString()} ${lang === 'en' ? 'views' : '次'}`}
+                            size="small"
+                            sx={{ backgroundColor: '#ECFDF5', color: '#047857', fontWeight: 800 }}
+                        />
+                    </Box>
+                </Box>
             )}
 
             {/* 5. 台灣夜市精神文化頁尾小語 */}

@@ -11,7 +11,15 @@ import {
     Button,
     Alert,
     CircularProgress,
-    Stack
+    Stack,
+    Chip,
+    LinearProgress,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import AddBusinessIcon from '@mui/icons-material/AddBusiness';
@@ -19,6 +27,9 @@ import CampaignIcon from '@mui/icons-material/Campaign';
 import FeedbackIcon from '@mui/icons-material/Feedback';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import InsightsIcon from '@mui/icons-material/Insights';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import dayjs from 'dayjs';
 import helper from '../Helper/helper';
 
@@ -50,6 +61,8 @@ export default function DataManagement() {
 
     const [statusMsg, setStatusMsg] = useState({ type: '', text: '' });
     const [loading, setLoading] = useState(false);
+    const [analytics, setAnalytics] = useState(null);
+    const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
     useEffect(() => {
         try {
@@ -61,7 +74,22 @@ export default function DataManagement() {
         } catch (e) { }
 
         loadData();
+        loadAnalytics();
     }, []);
+
+    const loadAnalytics = async () => {
+        setAnalyticsLoading(true);
+        try {
+            const aRes = await helper.helper.AsyncGetAnalyticsStats();
+            if (aRes && aRes.status === 'success') {
+                setAnalytics(aRes.data);
+            }
+        } catch (e) {
+            console.error('Failed to load analytics:', e);
+        } finally {
+            setAnalyticsLoading(false);
+        }
+    };
 
     const loadData = async () => {
         try {
@@ -254,6 +282,7 @@ export default function DataManagement() {
                     <Tab icon={<AddBusinessIcon />} iconPosition="start" label="增添夜市聚落" />
                     <Tab icon={<FeedbackIcon />} iconPosition="start" label={`饕客回饋審查 (${feedbacks.length})`} />
                     <Tab icon={<CampaignIcon />} iconPosition="start" label="發布夜市最新公告" />
+                    <Tab icon={<InsightsIcon />} iconPosition="start" label="每日瀏覽人數與流量" />
                 </Tabs>
 
                 <Box sx={{ p: { xs: 2.5, md: 4 } }}>
@@ -492,6 +521,179 @@ export default function DataManagement() {
                                     {loading ? <CircularProgress size={24} color="inherit" /> : '立即公告張貼 🏮'}
                                 </Button>
                             </Box>
+                        </Box>
+                    )}
+
+                    {/* Tab 3: 每日瀏覽人數與流量分析 */}
+                    {tabVal === 3 && (
+                        <Box>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
+                                <Box>
+                                    <Typography variant="h6" sx={{ fontWeight: 800, color: '#b7282e' }}>
+                                        📊 全站每日瀏覽人數與流量分析
+                                    </Typography>
+                                    <Typography variant="body2" sx={{ color: '#6d655e', mt: 0.5 }}>
+                                        即時追蹤訪客進入次數 (PV) 與獨立不重複訪客數 (UV)，掌握台灣夜市好好行平台的宣傳成效。
+                                    </Typography>
+                                </Box>
+                                <Button
+                                    variant="outlined"
+                                    startIcon={<RefreshIcon />}
+                                    onClick={loadAnalytics}
+                                    disabled={analyticsLoading}
+                                    sx={{ borderColor: '#b7282e', color: '#b7282e', fontWeight: 700 }}
+                                >
+                                    {analyticsLoading ? '同步中...' : '重新整理數據'}
+                                </Button>
+                            </Box>
+
+                            {analytics ? (
+                                <>
+                                    {/* 4 大核心 KPI 指標卡 */}
+                                    <Grid container spacing={2.5} sx={{ mb: 4 }}>
+                                        <Grid item xs={12} sm={6} md={3}>
+                                            <Paper elevation={0} sx={{ p: 2.5, borderRadius: 3, border: '1px solid #fee2e2', bgcolor: '#fff5f5' }}>
+                                                <Typography variant="caption" sx={{ color: '#b91c1c', fontWeight: 800, textTransform: 'uppercase' }}>
+                                                    今日瀏覽總人次 (PV)
+                                                </Typography>
+                                                <Typography variant="h4" sx={{ fontWeight: 900, color: '#991b1b', my: 1 }}>
+                                                    {(analytics.today?.pv || 0).toLocaleString()}
+                                                </Typography>
+                                                <Typography variant="caption" sx={{ color: '#78716c' }}>
+                                                    統計日期：{analytics.today?.date || '今日'}
+                                                </Typography>
+                                            </Paper>
+                                        </Grid>
+                                        <Grid item xs={12} sm={6} md={3}>
+                                            <Paper elevation={0} sx={{ p: 2.5, borderRadius: 3, border: '1px solid #fef3c7', bgcolor: '#fffbeb' }}>
+                                                <Typography variant="caption" sx={{ color: '#b45309', fontWeight: 800, textTransform: 'uppercase' }}>
+                                                    今日獨立訪客 (UV)
+                                                </Typography>
+                                                <Typography variant="h4" sx={{ fontWeight: 900, color: '#92400e', my: 1 }}>
+                                                    {(analytics.today?.uv || 0).toLocaleString()}
+                                                </Typography>
+                                                <Typography variant="caption" sx={{ color: '#78716c' }}>
+                                                    不重複 IP / 裝置造訪人數
+                                                </Typography>
+                                            </Paper>
+                                        </Grid>
+                                        <Grid item xs={12} sm={6} md={3}>
+                                            <Paper elevation={0} sx={{ p: 2.5, borderRadius: 3, border: '1px solid #dbeafe', bgcolor: '#eff6ff' }}>
+                                                <Typography variant="caption" sx={{ color: '#1d4ed8', fontWeight: 800, textTransform: 'uppercase' }}>
+                                                    昨日全天造訪人次
+                                                </Typography>
+                                                <Typography variant="h4" sx={{ fontWeight: 900, color: '#1e40af', my: 1 }}>
+                                                    {(analytics.yesterday?.pv || 0).toLocaleString()}
+                                                </Typography>
+                                                <Typography variant="caption" sx={{ color: '#78716c' }}>
+                                                    昨日獨立訪客：{(analytics.yesterday?.uv || 0).toLocaleString()} 人
+                                                </Typography>
+                                            </Paper>
+                                        </Grid>
+                                        <Grid item xs={12} sm={6} md={3}>
+                                            <Paper elevation={0} sx={{ p: 2.5, borderRadius: 3, border: '1px solid #d1fae5', bgcolor: '#ecfdf5' }}>
+                                                <Typography variant="caption" sx={{ color: '#047857', fontWeight: 800, textTransform: 'uppercase' }}>
+                                                    累積歷史總瀏覽量
+                                                </Typography>
+                                                <Typography variant="h4" sx={{ fontWeight: 900, color: '#065f46', my: 1 }}>
+                                                    {(analytics.totalPv || 0).toLocaleString()}
+                                                </Typography>
+                                                <Typography variant="caption" sx={{ color: '#78716c' }}>
+                                                    累積總獨立訪客：{(analytics.totalUv || 0).toLocaleString()} 人
+                                                </Typography>
+                                            </Paper>
+                                        </Grid>
+                                    </Grid>
+
+                                    {/* 過去 7 ~ 14 天每日造訪人數趨勢表格 */}
+                                    <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid #f2e2d0', bgcolor: '#ffffff', mb: 4 }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                                            <TrendingUpIcon sx={{ color: '#b7282e' }} />
+                                            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#2b2520' }}>
+                                                近期每日瀏覽人數與訪客趨勢報表
+                                            </Typography>
+                                        </Box>
+                                        <TableContainer>
+                                            <Table size="small">
+                                                <TableHead>
+                                                    <TableRow sx={{ bgcolor: '#faf8f5' }}>
+                                                        <TableCell sx={{ fontWeight: 800 }}>日期 (Date)</TableCell>
+                                                        <TableCell sx={{ fontWeight: 800 }}>獨立訪客 (UV / 人數)</TableCell>
+                                                        <TableCell sx={{ fontWeight: 800 }}>總瀏覽次數 (PV / 次數)</TableCell>
+                                                        <TableCell sx={{ fontWeight: 800 }}>裝置比例 (行動 / 桌機)</TableCell>
+                                                    </TableRow>
+                                                </TableHead>
+                                                <TableBody>
+                                                    {(analytics.history || []).map((row, rIdx) => {
+                                                        const maxPv = Math.max(...(analytics.history || []).map(h => h.pv), 1);
+                                                        const pct = Math.round((row.pv / maxPv) * 100);
+                                                        return (
+                                                            <TableRow key={rIdx} hover>
+                                                                <TableCell sx={{ fontWeight: 700, color: '#2b2520' }}>
+                                                                    {row.date} {row.date === analytics.today?.date && <Chip label="今日" size="small" sx={{ ml: 1, height: 20, bgcolor: '#fee2e2', color: '#b91c1c', fontWeight: 800 }} />}
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    <Typography variant="body2" sx={{ fontWeight: 800, color: '#b45309' }}>
+                                                                        {row.uv.toLocaleString()} 人
+                                                                    </Typography>
+                                                                </TableCell>
+                                                                <TableCell sx={{ minWidth: 160 }}>
+                                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                                        <Typography variant="body2" sx={{ fontWeight: 800, color: '#b91c1c', minWidth: 50 }}>
+                                                                            {row.pv.toLocaleString()}
+                                                                        </Typography>
+                                                                        <Box sx={{ width: '100%', mr: 1 }}>
+                                                                            <LinearProgress variant="determinate" value={pct} sx={{ height: 8, borderRadius: 4, bgcolor: '#fee2e2', '& .MuiLinearProgress-bar': { bgcolor: '#b91c1c' } }} />
+                                                                        </Box>
+                                                                    </Box>
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    <Typography variant="caption" sx={{ color: '#78716c' }}>
+                                                                        📱 {row.mobile || 0} ｜ 💻 {row.desktop || 0}
+                                                                    </Typography>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        );
+                                                    })}
+                                                </TableBody>
+                                            </Table>
+                                        </TableContainer>
+                                    </Paper>
+
+                                    {/* 熱門頁面瀏覽排行 */}
+                                    {analytics.topPages && analytics.topPages.length > 0 && (
+                                        <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid #f2e2d0', bgcolor: '#ffffff' }}>
+                                            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#2b2520', mb: 2 }}>
+                                                🔥 熱門瀏覽路徑與景點排行 (Top Visited Pages)
+                                            </Typography>
+                                            <Grid container spacing={2}>
+                                                {analytics.topPages.map((page, pIdx) => (
+                                                    <Grid item xs={12} sm={6} md={4} key={pIdx}>
+                                                        <Box sx={{ p: 2, borderRadius: 2, border: '1px solid #eae5dd', bgcolor: '#faf8f5', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                            <Box>
+                                                                <Typography variant="caption" sx={{ color: '#78716c', fontWeight: 700 }}>
+                                                                    Rank #{pIdx + 1}
+                                                                </Typography>
+                                                                <Typography variant="body2" sx={{ fontWeight: 800, color: '#2b2520' }}>
+                                                                    {page.path === '/' ? '首頁 (Home)' : page.path}
+                                                                </Typography>
+                                                            </Box>
+                                                            <Chip label={`${page.count.toLocaleString()} 次`} size="small" sx={{ bgcolor: '#fff', border: '1px solid #ddd', fontWeight: 800, color: '#b7282e' }} />
+                                                        </Box>
+                                                    </Grid>
+                                                ))}
+                                            </Grid>
+                                        </Paper>
+                                    )}
+                                </>
+                            ) : (
+                                <Box sx={{ textAlign: 'center', py: 5 }}>
+                                    <CircularProgress sx={{ color: '#b7282e' }} />
+                                    <Typography variant="body2" sx={{ color: '#78716c', mt: 2 }}>
+                                        正在載入即時每日瀏覽數據...
+                                    </Typography>
+                                </Box>
+                            )}
                         </Box>
                     )}
                 </Box>

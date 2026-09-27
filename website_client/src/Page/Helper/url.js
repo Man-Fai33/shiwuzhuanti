@@ -11,7 +11,8 @@ export const Url = {
     Market: (HOST + "/market/"),
     FeedBack: (HOST + "/feedback/"),
     Bulletin: (HOST + "/bulletin/"),
-    Comment: (HOST + "/comment/")
+    Comment: (HOST + "/comment/"),
+    Analytics: (HOST + "/analytics")
 };
 
 export default {

@@ -35,6 +35,7 @@ var MarketRouter = require('./routes/market')
 var FeedBackRouter = require('./routes/feedback')
 var BulletinRouter = require('./routes/bulletin')
 var syncRouter = require('./routes/sync')
+var analyticsRouter = require('./routes/analytics')
 const { initScheduledSync } = require('./helper/scheduler');
 var app = express();
 
@@ -103,6 +104,7 @@ app.use('/market', MarketRouter)
 app.use('/feedback', FeedBackRouter)
 app.use('/bulletin', BulletinRouter)
 app.use('/sync', syncRouter)
+app.use('/analytics', analyticsRouter)
 
 // 初始化 Google Maps 店家與美食定期排程同步
 initScheduledSync();

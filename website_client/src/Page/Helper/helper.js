@@ -421,6 +421,34 @@ export const helper = {
             return msg;
         }
 
+    },
+
+    AsyncTrackVisit: async (path = window.location.pathname) => {
+        try {
+            let visitorId = localStorage.getItem('visitor_id');
+            if (!visitorId) {
+                visitorId = 'v_' + Math.random().toString(36).substring(2, 11) + '_' + Date.now();
+                localStorage.setItem('visitor_id', visitorId);
+            }
+            const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+            const res = await fetch(URL.Url.Analytics + '/track', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ visitorId, path, isMobile })
+            });
+            return await res.json();
+        } catch (e) {
+            return { status: 'fail' };
+        }
+    },
+
+    AsyncGetAnalyticsStats: async () => {
+        try {
+            const res = await fetch(URL.Url.Analytics + '/stats');
+            return await res.json();
+        } catch (e) {
+            return { status: 'fail' };
+        }
     }
 
 }

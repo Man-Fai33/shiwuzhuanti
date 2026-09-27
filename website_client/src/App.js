@@ -1,5 +1,6 @@
+import React, { useEffect } from 'react';
 import './App.css';
-import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Outlet, useLocation } from 'react-router-dom';
 import AnimeIndex from './Page/AnimeIndex';
 import Index from './Page/Index';
 import SignUp from './Page/SignUp';
@@ -19,6 +20,15 @@ import UserContext from './Context/context';
 import { LanguageProvider } from './Context/LanguageContext';
 import { WishlistProvider } from './Context/WishlistContext';
 import ShopPage from './Page/Shop/shop';
+import helper from './Page/Helper/helper';
+
+function PageTracker() {
+  const location = useLocation();
+  useEffect(() => {
+    helper.helper.AsyncTrackVisit(location.pathname);
+  }, [location.pathname]);
+  return null;
+}
 
 function App() {
   return (
@@ -27,6 +37,7 @@ function App() {
         <div className="App">
           <UserContext.Provider value={UserContext}>
           <BrowserRouter>
+            <PageTracker />
             <DrawerBar />
           <Routes>
             {/* 首頁預設直接進入精美主頁 */}
