@@ -11,6 +11,10 @@ import CardMedia from '@mui/material/CardMedia';
 import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
 import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
+import Alert from '@mui/material/Alert';
+import CircularProgress from '@mui/material/CircularProgress';
+import Divider from '@mui/material/Divider';
 
 // Icons
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -20,6 +24,13 @@ import StorefrontIcon from '@mui/icons-material/Storefront';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import PaymentsIcon from '@mui/icons-material/Payments';
 import VerifiedIcon from '@mui/icons-material/Verified';
+import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
+import RestaurantIcon from '@mui/icons-material/Restaurant';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import SendIcon from '@mui/icons-material/Send';
+import RateReviewIcon from '@mui/icons-material/RateReview';
 
 import helper from '../Helper/helper';
 import { useLanguage } from '../../Context/LanguageContext';
@@ -38,6 +49,16 @@ export default function FoodInfo() {
     const [shops, setShops] = useState([]);
     const [userRating, setUserRating] = useState(4.8);
 
+    // 聯網增強狀態
+    const [enriching, setEnriching] = useState(false);
+    const [enrichMsg, setEnrichMsg] = useState('');
+
+    // 美食即時評論狀態
+    const [comments, setComments] = useState([]);
+    const [newComment, setNewComment] = useState('');
+    const [commentScore, setCommentScore] = useState(5);
+    const [submittingComment, setSubmittingComment] = useState(false);
+
     useEffect(() => {
         async function loadFoodData() {
             if (!foodId) return;
@@ -52,12 +73,37 @@ export default function FoodInfo() {
                 if (sRes && sRes.shop) {
                     setShops(sRes.shop);
                 }
+
+                // 讀取該美食之即時評價
+                const cRes = await helper.helper.AsyncCommentGet();
+                if (cRes && cRes.comment) {
+                    setComments(cRes.comment);
+                }
             } catch (err) {
                 console.error('Failed to load food:', err);
             }
         }
         loadFoodData();
     }, [foodId]);
+
+    // 觸發網路大數據深度補全
+    const handleEnrichOnline = async () => {
+        if (!food._id) return;
+        setEnriching(true);
+        setEnrichMsg('');
+        try {
+            const res = await helper.helper.AsyncFoodEnrich(food._id);
+            if (res && res.status === 'success' && res.food) {
+                setFood(res.food);
+                setEnrichMsg(isEn ? '✨ Successfully enriched gourmet details from the web!' : '✨ 成功從網路大數據撈取並補全深度美食資訊！');
+                setTimeout(() => setEnrichMsg(''), 4500);
+            }
+        } catch (e) {
+            console.error('Enrich failed:', e);
+        } finally {
+            setEnriching(false);
+        }
+    };
 
     const handleRatingChange = async (newVal) => {
         setUserRating(newVal);
@@ -76,7 +122,34 @@ export default function FoodInfo() {
         window.location.href = '/shop';
     };
 
-    // 辨識飲食偏好標籤 (針對外國旅客與特殊飲食需求)
+    // 提交饕客心得點評
+    const handleAddReview = async (e) => {
+        e.preventDefault();
+        if (!newComment.trim()) return;
+        setSubmittingComment(true);
+
+        const commentPayload = {
+            ownerId: user?._id || 'guest_' + Date.now(),
+            ownerName: user?.username || (isEn ? 'Foodie Traveler' : '熱心饕客'),
+            shop: food.foodName || '夜市美食',
+            comment: `【評分: ${commentScore}★】${newComment.trim()}`,
+            date: new Date()
+        };
+
+        try {
+            const res = await helper.helper.AsyncCommentCreate(commentPayload);
+            if (res && res.status === 'success') {
+                setComments([res.comment, ...comments]);
+                setNewComment('');
+            }
+        } catch (err) {
+            console.error('Failed to submit comment:', err);
+        } finally {
+            setSubmittingComment(false);
+        }
+    };
+
+    // 辨識飲食偏好標籤
     const getDietaryTag = (item) => {
         const name = (item.foodName || '').toLowerCase();
         if (name.includes('地瓜球') || name.includes('豆花') || name.includes('果汁') || name.includes('奶茶') || name.includes('黑糖') || name.includes('雪花冰') || name.includes('杏仁')) {
@@ -106,11 +179,12 @@ export default function FoodInfo() {
     });
 
     const displayShops = matchingShops.length > 0 ? matchingShops : shops.slice(0, 3);
+    const foodComments = comments.filter(c => c.shop && (c.shop.includes(food.foodName) || (food.foodName && food.foodName.includes(c.shop))));
 
     return (
-        <Box sx={{ pb: 6, maxWidth: 1200, mx: 'auto', px: { xs: 2, sm: 3 } }}>
+        <Box sx={{ pb: 8, maxWidth: 1200, mx: 'auto', px: { xs: 2, sm: 3 } }}>
             {/* 頂部導航按鈕列 */}
-            <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1.5 }}>
                 <Button
                     href="/Food"
                     startIcon={<ArrowBackIcon />}
@@ -119,22 +193,50 @@ export default function FoodInfo() {
                     {isEn ? 'Back to Food Directory' : '返回美食探索清單'}
                 </Button>
 
-                <Button
-                    variant={inWishlist ? "contained" : "outlined"}
-                    startIcon={inWishlist ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-                    onClick={() => food._id && toggleWishlist(food)}
-                    sx={{
-                        borderRadius: 3,
-                        fontWeight: 800,
-                        borderColor: '#B91C1C',
-                        color: inWishlist ? '#FFFFFF' : '#B91C1C',
-                        bgcolor: inWishlist ? '#B91C1C' : 'transparent',
-                        '&:hover': { bgcolor: inWishlist ? '#991B1B' : '#FFF5F5', borderColor: '#B91C1C' }
-                    }}
-                >
-                    {inWishlist ? (isEn ? 'Saved in Food Wishlist' : '已收藏至美食清單') : (isEn ? 'Add to Food Wishlist' : '收藏至我的口袋清單')}
-                </Button>
+                <Box sx={{ display: 'flex', gap: 1.5 }}>
+                    {/* 一鍵聯網深度補全按鈕 */}
+                    <Button
+                        variant="outlined"
+                        disabled={enriching}
+                        onClick={handleEnrichOnline}
+                        startIcon={enriching ? <CircularProgress size={16} /> : <AutoAwesomeIcon sx={{ color: '#D97706' }} />}
+                        sx={{
+                            borderRadius: 3,
+                            fontWeight: 700,
+                            borderColor: '#D97706',
+                            color: '#92400E',
+                            bgcolor: '#FFFBEB',
+                            '&:hover': { bgcolor: '#FEF3C7', borderColor: '#B45309' }
+                        }}
+                    >
+                        {enriching
+                            ? (isEn ? 'Fetching online data...' : '聯網擷取數據中...')
+                            : (isEn ? 'Enrich Online Data' : '🌐 聯網獲取深度美食資料')}
+                    </Button>
+
+                    <Button
+                        variant={inWishlist ? "contained" : "outlined"}
+                        startIcon={inWishlist ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+                        onClick={() => food._id && toggleWishlist(food)}
+                        sx={{
+                            borderRadius: 3,
+                            fontWeight: 800,
+                            borderColor: '#B91C1C',
+                            color: inWishlist ? '#FFFFFF' : '#B91C1C',
+                            bgcolor: inWishlist ? '#B91C1C' : 'transparent',
+                            '&:hover': { bgcolor: inWishlist ? '#991B1B' : '#FFF5F5', borderColor: '#B91C1C' }
+                        }}
+                    >
+                        {inWishlist ? (isEn ? 'Saved in Wishlist' : '已收藏') : (isEn ? 'Add to Wishlist' : '收藏口袋清單')}
+                    </Button>
+                </Box>
             </Box>
+
+            {enrichMsg && (
+                <Alert severity="success" sx={{ mb: 3, borderRadius: '12px' }}>
+                    {enrichMsg}
+                </Alert>
+            )}
 
             {/* 美食主卡片 */}
             <Paper
@@ -149,13 +251,13 @@ export default function FoodInfo() {
                 }}
             >
                 <Grid container spacing={4} alignItems="center">
-                    {/* 左側照片 */}
+                    {/* 左側照片與標籤 */}
                     <Grid item xs={12} md={5}>
                         <Box sx={{ position: 'relative', borderRadius: '18px', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.12)' }}>
                             <img
                                 src={food.foodIcon || 'https://images.unsplash.com/photo-1562967914-608f82629710?w=800'}
                                 alt={food.foodName || '美食相片'}
-                                style={{ width: '100%', height: '340px', objectFit: 'cover', display: 'block' }}
+                                style={{ width: '100%', height: '360px', objectFit: 'cover', display: 'block' }}
                             />
                             {/* 價格標籤 */}
                             <Box
@@ -190,17 +292,43 @@ export default function FoodInfo() {
                                     }}
                                 />
                             </Box>
+
+                            {/* 熱量標記 */}
+                            {food.calories && (
+                                <Box sx={{ position: 'absolute', top: 14, right: 14 }}>
+                                    <Chip
+                                        icon={<LocalFireDepartmentIcon sx={{ color: '#DC2626 !important' }} />}
+                                        label={`${food.calories} kcal`}
+                                        sx={{
+                                            bgcolor: 'rgba(255,255,255,0.92)',
+                                            color: '#DC2626',
+                                            fontWeight: 800,
+                                            border: '1px solid #FECACA'
+                                        }}
+                                    />
+                                </Box>
+                            )}
                         </Box>
                     </Grid>
 
                     {/* 右側詳細資訊 */}
                     <Grid item xs={12} md={7}>
-                        <Typography
-                            variant="h4"
-                            sx={{ fontFamily: "'Noto Serif TC', serif", fontWeight: 900, color: '#1C1917', mb: 0.5 }}
-                        >
-                            {food.foodName || (isEn ? 'Signature Street Delicacy' : '必吃夜市美食')}
-                        </Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 0.5 }}>
+                            <Typography
+                                variant="h4"
+                                sx={{ fontFamily: "'Noto Serif TC', serif", fontWeight: 900, color: '#1C1917' }}
+                            >
+                                {food.foodName || (isEn ? 'Signature Street Delicacy' : '必吃夜市美食')}
+                            </Typography>
+                            {food.onlineEnriched && (
+                                <Chip
+                                    size="small"
+                                    icon={<AutoAwesomeIcon sx={{ fontSize: '0.9rem !important' }} />}
+                                    label={isEn ? "Web Enriched" : "大數據認證"}
+                                    sx={{ bgcolor: '#FEF3C7', color: '#92400E', fontWeight: 800 }}
+                                />
+                            )}
+                        </Box>
 
                         {food.foodInfoEN && (
                             <Typography variant="h6" sx={{ color: '#78716C', fontWeight: 600, mb: 2, fontSize: '1.05rem' }}>
@@ -217,15 +345,22 @@ export default function FoodInfo() {
                                     sx={{ backgroundColor: '#FAF8F5', color: '#1C1917', border: '1px solid #EAE5DD', fontWeight: 700, borderRadius: '8px' }}
                                 />
                             ))}
+                            {Array.isArray(food.tags) && food.tags.map((tg, i) => (
+                                <Chip
+                                    key={`tg-${i}`}
+                                    label={`# ${tg}`}
+                                    sx={{ bgcolor: '#FFFBEB', color: '#92400E', fontWeight: 700, border: '1px solid #FDE68A' }}
+                                />
+                            ))}
                             <Chip
                                 icon={<VerifiedIcon sx={{ fontSize: '1rem !important', color: '#D97706' }} />}
                                 label={isEn ? "Night Market Must-Eat" : "夜市必吃人氣王"}
-                                sx={{ bgcolor: '#FFFBEB', color: '#92400E', fontWeight: 800, border: '1px solid #FDE68A' }}
+                                sx={{ bgcolor: '#FEF2F2', color: '#991B1B', fontWeight: 800, border: '1px solid #FECACA' }}
                             />
                         </Box>
 
                         <Typography variant="body1" sx={{ color: '#57534E', lineHeight: 1.8, mb: 3, fontSize: '1rem' }}>
-                            {isEn && food.foodInfoEN ? food.foodInfoEN : (food.foodInfo || '經典台灣道地夜市小吃，傳承獨門配方與現點現做的美味口感。')}
+                            {food.foodInfo || '經典台灣道地夜市小吃，傳承獨門配方與現點現做的美味口感。'}
                         </Typography>
 
                         {/* 評分與支付支援卡片 */}
@@ -287,8 +422,210 @@ export default function FoodInfo() {
                 </Grid>
             </Paper>
 
+            {/* 🌟 深度美食特質維度專區 (Culinary Deep Dive Grid) */}
+            <Grid container spacing={3} sx={{ mb: 5 }}>
+                {/* 1. 在地飲食文化與傳承故事 */}
+                <Grid item xs={12} md={7}>
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            p: 3.5,
+                            borderRadius: '20px',
+                            backgroundColor: '#FAF8F5',
+                            border: '1px solid #EAE5DD',
+                            height: '100%',
+                            position: 'relative'
+                        }}
+                    >
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                            <MenuBookIcon sx={{ color: '#B91C1C' }} />
+                            <Typography variant="h6" sx={{ fontFamily: "'Noto Serif TC', serif", fontWeight: 800, color: '#1C1917' }}>
+                                {isEn ? 'Cultural Story & Heritage' : '在地文化淵源與歷史小故事'}
+                            </Typography>
+                        </Box>
+                        <Typography variant="body2" sx={{ color: '#44403C', lineHeight: 1.9, fontSize: '0.98rem' }}>
+                            {food.culturalStory || `${food.foodName} 為台灣夜市歷久彌新的靈魂代表作，攤商嚴選每日市場直送鮮食，傳承數十年老師傅獨門手藝，不論熱火煎烤或慢火燉煮，都是世代台灣人共同的暖胃記憶。`}
+                        </Typography>
+
+                        {food.cookingMethod && (
+                            <Box sx={{ mt: 3, pt: 2, borderTop: '1px dashed #D6D3D1' }}>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#B91C1C', mb: 0.5, display: 'flex', alignItems: 'center', gap: 0.8 }}>
+                                    <RestaurantIcon sx={{ fontSize: 18 }} /> {isEn ? 'Cooking Craftsmanship' : '料理匠心工法'}
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: '#57534E', lineHeight: 1.7 }}>
+                                    {food.cookingMethod}
+                                </Typography>
+                            </Box>
+                        )}
+                    </Paper>
+                </Grid>
+
+                {/* 2. 熱量與四大營養素指標 */}
+                <Grid item xs={12} md={5}>
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            p: 3.5,
+                            borderRadius: '20px',
+                            backgroundColor: '#FFFFFF',
+                            border: '1px solid #EAE5DD',
+                            height: '100%'
+                        }}
+                    >
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2.5 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <LocalFireDepartmentIcon sx={{ color: '#DC2626' }} />
+                                <Typography variant="h6" sx={{ fontFamily: "'Noto Serif TC', serif", fontWeight: 800, color: '#1C1917' }}>
+                                    {isEn ? 'Nutrition Estimates' : '熱量與營養素估算'}
+                                </Typography>
+                            </Box>
+                            <Chip
+                                label={`約 ${food.calories || 350} kcal`}
+                                sx={{ bgcolor: '#FEF2F2', color: '#DC2626', fontWeight: 800 }}
+                            />
+                        </Box>
+
+                        <Grid container spacing={2} sx={{ mb: 2.5 }}>
+                            <Grid item xs={6}>
+                                <Box sx={{ p: 2, borderRadius: '12px', bgcolor: '#F8FAFC', textAlign: 'center', border: '1px solid #E2E8F0' }}>
+                                    <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 700 }}>
+                                        {isEn ? 'Protein' : '蛋白質'}
+                                    </Typography>
+                                    <Typography variant="h6" sx={{ fontWeight: 800, color: '#0F172A', mt: 0.5 }}>
+                                        {food.nutrition?.protein || '18g'}
+                                    </Typography>
+                                </Box>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <Box sx={{ p: 2, borderRadius: '12px', bgcolor: '#F8FAFC', textAlign: 'center', border: '1px solid #E2E8F0' }}>
+                                    <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 700 }}>
+                                        {isEn ? 'Total Fat' : '脂肪含量'}
+                                    </Typography>
+                                    <Typography variant="h6" sx={{ fontWeight: 800, color: '#0F172A', mt: 0.5 }}>
+                                        {food.nutrition?.fat || '14g'}
+                                    </Typography>
+                                </Box>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <Box sx={{ p: 2, borderRadius: '12px', bgcolor: '#F8FAFC', textAlign: 'center', border: '1px solid #E2E8F0' }}>
+                                    <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 700 }}>
+                                        {isEn ? 'Carbs' : '碳水化合物'}
+                                    </Typography>
+                                    <Typography variant="h6" sx={{ fontWeight: 800, color: '#0F172A', mt: 0.5 }}>
+                                        {food.nutrition?.carbs || '42g'}
+                                    </Typography>
+                                </Box>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <Box sx={{ p: 2, borderRadius: '12px', bgcolor: '#F8FAFC', textAlign: 'center', border: '1px solid #E2E8F0' }}>
+                                    <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 700 }}>
+                                        {isEn ? 'Sodium' : '鈉含量'}
+                                    </Typography>
+                                    <Typography variant="h6" sx={{ fontWeight: 800, color: '#0F172A', mt: 0.5 }}>
+                                        {food.nutrition?.sodium || '480mg'}
+                                    </Typography>
+                                </Box>
+                            </Grid>
+                        </Grid>
+
+                        <Typography variant="caption" sx={{ color: '#78716C', display: 'block', textAlign: 'center' }}>
+                            ℹ️ {isEn ? 'Values estimated from standard Taiwan night market recipes.' : '依夜市標準配方估算，各攤商調味與份量可能略有增減。'}
+                        </Typography>
+                    </Paper>
+                </Grid>
+
+                {/* 3. 口感特色與美味絕配 */}
+                <Grid item xs={12} md={6}>
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            p: 3,
+                            borderRadius: '20px',
+                            backgroundColor: '#FFFFFF',
+                            border: '1px solid #EAE5DD',
+                            height: '100%'
+                        }}
+                    >
+                        <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#1C1917', mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+                            👅 {isEn ? 'Taste & Texture Profile' : '口感風味輪廓'}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#44403C', lineHeight: 1.8, mb: 2 }}>
+                            {food.texture || '外酥內嫩、香氣撲鼻、鹹甜平衡，現點現做散發濃郁火候香氣。'}
+                        </Typography>
+
+                        <Divider sx={{ my: 2 }} />
+
+                        <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#059669', mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                            🍹 {isEn ? 'Best Food & Drink Pairing' : '老饕推薦絕配吃法'}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#57534E', lineHeight: 1.7 }}>
+                            {food.bestPairing || '建議搭配一杯冰涼冬瓜檸檬或四季春無糖青茶，酸甜解膩、爽快加倍！'}
+                        </Typography>
+                    </Paper>
+                </Grid>
+
+                {/* 4. 食材原料與過敏原安全警示 */}
+                <Grid item xs={12} md={6}>
+                    <Paper
+                        elevation={0}
+                        sx={{
+                            p: 3,
+                            borderRadius: '20px',
+                            backgroundColor: '#FFFFFF',
+                            border: '1px solid #EAE5DD',
+                            height: '100%'
+                        }}
+                    >
+                        <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#1C1917', mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+                            🥗 {isEn ? 'Primary Ingredients' : '主要食材與配方'}
+                        </Typography>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2.5 }}>
+                            {Array.isArray(food.ingredients) && food.ingredients.length > 0 ? (
+                                food.ingredients.map((ing, i) => (
+                                    <Chip
+                                        key={`ing-${i}`}
+                                        label={ing}
+                                        sx={{ bgcolor: '#F5F5F4', color: '#292524', fontWeight: 600 }}
+                                    />
+                                ))
+                            ) : (
+                                <Typography variant="body2" sx={{ color: '#78716C' }}>
+                                    產地直送鮮食材、特調香料、純釀醬汁
+                                </Typography>
+                            )}
+                        </Box>
+
+                        <Divider sx={{ my: 2 }} />
+
+                        <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#DC2626', mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <WarningAmberIcon sx={{ fontSize: 20 }} /> {isEn ? 'Allergen Advisory' : '過敏原安全提醒'}
+                        </Typography>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                            {Array.isArray(food.allergens) && food.allergens.length > 0 ? (
+                                food.allergens.map((alg, i) => (
+                                    <Chip
+                                        key={`alg-${i}`}
+                                        label={`⚠️ ${alg}`}
+                                        sx={{ bgcolor: '#FEF2F2', color: '#991B1B', fontWeight: 700, border: '1px solid #FECACA' }}
+                                    />
+                                ))
+                            ) : (
+                                <Chip
+                                    label="無特殊易過敏成分標示"
+                                    sx={{ bgcolor: '#F0FDF4', color: '#166534', fontWeight: 600 }}
+                                />
+                            )}
+                            <Chip
+                                label={`夜市行情: ${food.priceRange || 'NT$ 50 - 90'}`}
+                                sx={{ bgcolor: '#FEF3C7', color: '#92400E', fontWeight: 700 }}
+                            />
+                        </Box>
+                    </Paper>
+                </Grid>
+            </Grid>
+
             {/* 推薦提供此小吃的知名名店與攤位 */}
-            <Box sx={{ mb: 4 }}>
+            <Box sx={{ mb: 6 }}>
                 <Box sx={{ mb: 2.5 }}>
                     <Typography
                         variant="caption"
@@ -362,6 +699,100 @@ export default function FoodInfo() {
                     ))}
                 </Grid>
             </Box>
+
+            {/* 💬 饕客即時真實點評與心得交流專區 (Live Foodie Reviews) */}
+            <Paper
+                elevation={0}
+                sx={{
+                    p: { xs: 3, md: 4 },
+                    borderRadius: '24px',
+                    backgroundColor: '#FAF8F5',
+                    border: '1px solid #EAE5DD'
+                }}
+            >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
+                    <RateReviewIcon sx={{ color: '#B91C1C', fontSize: 28 }} />
+                    <Typography variant="h5" sx={{ fontFamily: "'Noto Serif TC', serif", fontWeight: 800, color: '#1C1917' }}>
+                        {isEn ? 'Foodie Reviews & Comments' : '饕客真實點評與心得'}
+                    </Typography>
+                </Box>
+                <Typography variant="body2" sx={{ color: '#78716C', mb: 3 }}>
+                    {isEn ? 'Have you tasted this street delicacy? Share your flavor impressions with the community!' : '您也品嚐過這道夜市美味嗎？歡迎寫下您的口感評價與推薦攤位！'}
+                </Typography>
+
+                {/* 發表評價輸入框 */}
+                <Box component="form" onSubmit={handleAddReview} sx={{ mb: 4 }}>
+                    <Grid container spacing={2} alignItems="center">
+                        <Grid item xs={12} sm={3}>
+                            <Typography variant="caption" sx={{ fontWeight: 700, color: '#57534E', display: 'block', mb: 0.5 }}>
+                                {isEn ? 'Your Rating' : '給予星級評分'}
+                            </Typography>
+                            <Rating
+                                value={commentScore}
+                                onChange={(e, val) => setCommentScore(val || 5)}
+                                sx={{ color: '#FBBF24' }}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={7}>
+                            <TextField
+                                fullWidth
+                                size="small"
+                                placeholder={isEn ? 'Write your flavor review (e.g. Crispy, flavorful sauce...)' : '分享您的品嚐心得 (例如：外皮超級酥脆、醬汁很開胃...)'}
+                                value={newComment}
+                                onChange={(e) => setNewComment(e.target.value)}
+                                sx={{ bgcolor: '#FFFFFF', borderRadius: '10px' }}
+                            />
+                        </Grid>
+                        <Grid item xs={12} sm={2}>
+                            <Button
+                                fullWidth
+                                type="submit"
+                                variant="contained"
+                                disabled={submittingComment || !newComment.trim()}
+                                startIcon={submittingComment ? <CircularProgress size={16} /> : <SendIcon />}
+                                sx={{ bgcolor: '#B91C1C', fontWeight: 800, py: 1, '&:hover': { bgcolor: '#991B1B' } }}
+                            >
+                                {isEn ? 'Post' : '發表評論'}
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </Box>
+
+                {/* 評論列表 */}
+                <Stack spacing={2}>
+                    {foodComments.length > 0 ? (
+                        foodComments.slice(0, 5).map((cmt, idx) => (
+                            <Box
+                                key={cmt._id || idx}
+                                sx={{
+                                    p: 2.5,
+                                    borderRadius: '16px',
+                                    bgcolor: '#FFFFFF',
+                                    border: '1px solid #EAE5DD'
+                                }}
+                            >
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#1C1917' }}>
+                                        👤 {cmt.ownerName || '匿名饕客'}
+                                    </Typography>
+                                    <Typography variant="caption" sx={{ color: '#A8A29E' }}>
+                                        {cmt.date ? new Date(cmt.date).toLocaleDateString() : '近期發表'}
+                                    </Typography>
+                                </Box>
+                                <Typography variant="body2" sx={{ color: '#44403C', lineHeight: 1.6 }}>
+                                    {cmt.comment}
+                                </Typography>
+                            </Box>
+                        ))
+                    ) : (
+                        <Box sx={{ p: 4, textAlign: 'center', bgcolor: '#FFFFFF', borderRadius: '16px', border: '1px dashed #D6D3D1' }}>
+                            <Typography variant="body2" sx={{ color: '#78716C' }}>
+                                🏮 {isEn ? 'No foodie comments yet. Be the first to review!' : '目前尚無點評，快成為第一個分享心得的夜市探險家吧！'}
+                            </Typography>
+                        </Box>
+                    )}
+                </Stack>
+            </Paper>
         </Box>
     );
 }

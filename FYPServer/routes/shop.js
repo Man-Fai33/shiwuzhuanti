@@ -68,6 +68,27 @@ router.get('/', (req, res) => {
         res.json({ status: "fail", message: err })
     })
 })
+const { searchShopOnline } = require('../helper/webScraperEngine');
+
+/**
+ * GET /shops/search-web
+ * 網上智能檢索店家資料（支援店家註冊時一鍵從網路撈取資料自動填表）
+ */
+router.get('/search-web', (req, res) => {
+    try {
+        const query = req.query.query || req.query.name || '';
+        const market = req.query.market || '士林觀光夜市';
+        const data = searchShopOnline(query, market);
+        res.json({
+            status: 'success',
+            data: data
+        });
+    } catch (err) {
+        console.error('[Shop:SearchWeb] Error:', err);
+        res.status(500).json({ status: 'fail', message: '聯網檢索失敗: ' + err.message });
+    }
+});
+
 router.get('/:id', (req, res) => {
     let id = req.params.id
     Shop.findById(id).exec().then(result => {

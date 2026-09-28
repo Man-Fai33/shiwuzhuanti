@@ -26,6 +26,8 @@ import FastfoodIcon from '@mui/icons-material/Fastfood';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import SearchIcon from '@mui/icons-material/Search';
 import helper from '../Helper/helper';
 
 const steps = ['攤位基本資料', '招牌美食與菜單', '確認申請資料'];
@@ -37,6 +39,11 @@ export default function Account() {
     const [loading, setLoading] = useState(false);
     const [statusMsg, setStatusMsg] = useState({ type: '', text: '' });
 
+    // 聯網自動補全狀態 (Web Scraper Auto-Fill)
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchingWeb, setSearchingWeb] = useState(false);
+    const [searchSuccess, setSearchSuccess] = useState('');
+
     // Step 0: Shop details
     const [nm, setNm] = useState('');
     const [shopName, setShopName] = useState('');
@@ -44,6 +51,8 @@ export default function Account() {
     const [shopType, setShopType] = useState('snack');
     const [shopLocal, setShopLocal] = useState('');
     const [shopOwnerId, setShopOwnerId] = useState('');
+    const [phone, setPhone] = useState('0912-345-678');
+    const [businessHours, setBusinessHours] = useState('週二至週日 17:00 - 00:00 (週一固定公休)');
     const [shortIntro, setShortIntro] = useState('');
     const [intro, setIntro] = useState('');
     const [shopIcon, setShopIcon] = useState(null);
@@ -134,6 +143,44 @@ export default function Account() {
         setFoodIconPreview('');
     };
 
+    const handleAutoFillFromWeb = async () => {
+        const q = searchQuery.trim() || shopName.trim();
+        if (!q) {
+            setStatusMsg({ type: 'error', text: '請先輸入欲搜尋的攤位名稱或關鍵字 (例如：豪大大雞排、阿宗麵線)' });
+            return;
+        }
+        setSearchingWeb(true);
+        setSearchSuccess('');
+        setStatusMsg({ type: '', text: '' });
+
+        try {
+            const res = await helper.helper.AsyncShopSearchWeb(q, nm);
+            if (res && res.status === 'success' && res.data) {
+                const d = res.data;
+                if (d.shopName) setShopName(d.shopName);
+                if (d.shopYeShi) setNm(d.shopYeShi);
+                if (d.shopType) setShopType(d.shopType);
+                if (d.shopNumber) setShopNum(d.shopNumber);
+                if (d.shopLocation) setShopLocal(d.shopLocation);
+                if (d.phone) setPhone(d.phone);
+                if (d.businessHours) setBusinessHours(d.businessHours);
+                if (d.shopShortIntroduction) setShortIntro(d.shopShortIntroduction);
+                if (d.shopIntroduction) setIntro(d.shopIntroduction);
+                if (d.shopIcon) setShopIconPreview(d.shopIcon);
+                if (Array.isArray(d.food) && d.food.length > 0) {
+                    setFoodList(d.food);
+                }
+                setSearchSuccess(`🎉 已成功自網路與 Google Maps 檢索到【${d.shopName}】的完整店家資料、營業資訊與招牌菜色，已為您自動填入！`);
+            } else {
+                setStatusMsg({ type: 'error', text: '未搜尋到相符的網路店家資訊，您可以手動填寫。' });
+            }
+        } catch (err) {
+            setStatusMsg({ type: 'error', text: '聯網檢索異常，請稍後再試。' });
+        } finally {
+            setSearchingWeb(false);
+        }
+    };
+
     const handleNext = () => {
         if (activeStep === 0) {
             if (!shopName.trim() || !nm) {
@@ -154,7 +201,7 @@ export default function Account() {
         setStatusMsg({ type: '', text: '' });
 
         try {
-            let shopImgPath = '/img/default_shop.jpg';
+            let shopImgPath = shopIconPreview || '/img/default_shop.jpg';
             if (shopIcon) {
                 const data = new FormData();
                 data.append('Image', shopIcon);
@@ -169,6 +216,8 @@ export default function Account() {
                 shopNumber: shopNum.trim() || 'A01',
                 shopType: shopType,
                 shopLocation: shopLocal.trim() || `${nm} 特色攤位區`,
+                phone: phone.trim() || '0912-345-678',
+                businessHours: businessHours.trim() || '週二至週日 17:00 - 00:00 (週一固定公休)',
                 shopManager: user?._id || '',
                 shopManagerID: shopOwnerId.trim() || 'A123456789',
                 shopIntroduction: intro.trim() || `${shopName} 誠摯歡迎全台饕客蒞臨品嚐！`,
@@ -255,9 +304,65 @@ export default function Account() {
                 {/* 步驟 0: 店鋪基本資料 */}
                 {activeStep === 0 && (
                     <Box>
-                        <Typography variant="h6" sx={{ fontWeight: 800, color: '#b7282e', mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography variant="h6" sx={{ fontWeight: 800, color: '#b7282e', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
                             <StorefrontIcon /> 步驟一：填寫攤位與經營者資料
                         </Typography>
+
+                        {/* 🌟 聯網智能搜尋／自動補全店家資料卡片 */}
+                        <Paper
+                            elevation={0}
+                            sx={{
+                                p: 2.5,
+                                mb: 3.5,
+                                borderRadius: '16px',
+                                backgroundColor: '#FEF2F2',
+                                border: '1.5px dashed #EF4444'
+                            }}
+                        >
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                                <AutoAwesomeIcon sx={{ color: '#DC2626' }} />
+                                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#991B1B' }}>
+                                    快速登記助手：從網路或 Google Maps 自動帶入資料
+                                </Typography>
+                            </Box>
+                            <Typography variant="body2" sx={{ color: '#7F1D1D', mb: 2 }}>
+                                想開店不想慢慢手動打字？輸入店名（例如：豪大大雞排、阿宗麵線、福州世祖胡椒餅或您的招牌料理），系統將自動檢索網路大數據，一秒自動填妥簡介、特色、門面照片與招牌菜單！
+                            </Typography>
+                            <Grid container spacing={1.5} alignItems="center">
+                                <Grid item xs={12} sm={8}>
+                                    <TextField
+                                        fullWidth
+                                        size="small"
+                                        placeholder="輸入店家招牌或料理名稱 (例如：豪大大雞排、明倫蛋餅、胡椒餅)"
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        sx={{ backgroundColor: '#FFFFFF', borderRadius: '8px' }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} sm={4}>
+                                    <Button
+                                        fullWidth
+                                        variant="contained"
+                                        disabled={searchingWeb}
+                                        onClick={handleAutoFillFromWeb}
+                                        startIcon={searchingWeb ? <CircularProgress size={16} color="inherit" /> : <SearchIcon />}
+                                        sx={{
+                                            backgroundColor: '#DC2626',
+                                            fontWeight: 800,
+                                            py: 1,
+                                            '&:hover': { backgroundColor: '#B91C1C' }
+                                        }}
+                                    >
+                                        {searchingWeb ? '聯網撈取中...' : '一鍵從網路撈取'}
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                            {searchSuccess && (
+                                <Alert severity="success" sx={{ mt: 2, borderRadius: '8px' }}>
+                                    {searchSuccess}
+                                </Alert>
+                            )}
+                        </Paper>
 
                         <Grid container spacing={3}>
                             <Grid item xs={12} sm={6}>
@@ -313,6 +418,26 @@ export default function Account() {
                                     placeholder="例如：第 58 號攤位"
                                     value={shopNum}
                                     onChange={(e) => setShopNum(e.target.value)}
+                                />
+                            </Grid>
+
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    fullWidth
+                                    label="聯絡電話 / 訂購專線"
+                                    placeholder="例如：0912-345-678"
+                                    value={phone}
+                                    onChange={(e) => setPhone(e.target.value)}
+                                />
+                            </Grid>
+
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    fullWidth
+                                    label="營業時間與公休日"
+                                    placeholder="例如：週二至週日 17:00 - 00:00 (週一公休)"
+                                    value={businessHours}
+                                    onChange={(e) => setBusinessHours(e.target.value)}
                                 />
                             </Grid>
 

@@ -369,7 +369,7 @@ export default function FoodList() {
                                     </Typography>
 
                                     {/* 分類標籤 & 飲食標記 Chip */}
-                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8, mb: 1.5 }}>
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.8, mb: 1 }}>
                                         {getDietaryTag(item) && (
                                             <Chip
                                                 label={getDietaryTag(item).label}
@@ -399,6 +399,40 @@ export default function FoodList() {
                                             />
                                         ))}
                                     </Box>
+
+                                    {/* 熱量與口感小標籤 */}
+                                    {(item.calories || item.texture) && (
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, mb: 1.2, flexWrap: 'wrap' }}>
+                                            {item.calories && (
+                                                <Chip
+                                                    size="small"
+                                                    label={`🔥 ${item.calories} kcal`}
+                                                    sx={{
+                                                        fontSize: '0.72rem',
+                                                        fontWeight: 700,
+                                                        backgroundColor: '#FEF3C7',
+                                                        color: '#92400E',
+                                                        borderRadius: '6px',
+                                                        height: '22px'
+                                                    }}
+                                                />
+                                            )}
+                                            {item.texture && (
+                                                <Chip
+                                                    size="small"
+                                                    label={`😋 ${item.texture.split('、')[0] || item.texture}`}
+                                                    sx={{
+                                                        fontSize: '0.72rem',
+                                                        fontWeight: 600,
+                                                        backgroundColor: '#EFF6FF',
+                                                        color: '#1E40AF',
+                                                        borderRadius: '6px',
+                                                        height: '22px'
+                                                    }}
+                                                />
+                                            )}
+                                        </Box>
+                                    )}
 
                                     <Typography
                                         variant="body2"

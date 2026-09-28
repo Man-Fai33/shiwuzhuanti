@@ -14,9 +14,11 @@ export const Url = {
     Comment: (HOST + "/comment/"),
     Analytics: (HOST + "/analytics"),
     Sync: (HOST + "/sync"),
-    System: (HOST + "/system"),
     SendVerificationCode: (HOST + "/users/send-verification-code"),
-    VerifyCode: (HOST + "/users/verify-code")
+    VerifyCode: (HOST + "/users/verify-code"),
+    ShopSearchWeb: (HOST + "/shops/search-web"),
+    FoodSearchWeb: (HOST + "/foods/search-web"),
+    FoodEnrich: (HOST + "/foods/enrich")
 };
 
 const urlExport = {

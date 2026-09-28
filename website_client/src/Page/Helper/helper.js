@@ -164,6 +164,26 @@ export const helper = {
             return { status: 'fail', message: '驗證碼核對網路連線異常' };
         }
     },
+    AsyncShopSearchWeb: async (query, market) => {
+        try {
+            let url = `${URL.Url.ShopSearchWeb}?query=${encodeURIComponent(query || '')}&market=${encodeURIComponent(market || '')}`;
+            let response = await fetch(url);
+            return await response.json();
+        } catch (e) {
+            console.error('Shop search web error:', e);
+            return { status: 'fail', message: '搜尋名店聯網異常' };
+        }
+    },
+    AsyncFoodEnrich: async (foodId) => {
+        try {
+            let url = `${URL.Url.FoodEnrich}/${foodId}`;
+            let response = await fetch(url, { method: 'POST' });
+            return await response.json();
+        } catch (e) {
+            console.error('Food enrich error:', e);
+            return { status: 'fail', message: '美食聯網補全異常' };
+        }
+    },
     AsyncFeedbackCreate: async (feedback) => {
         try {
             let jsonBody = JSON.stringify({
