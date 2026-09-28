@@ -1,0 +1,143 @@
+name: 🚀 CI - Build & Test Pipeline
+
+on:
+  push:
+    branches: [ "main", "master", "develop" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ==============================================================
+  # 1. 後端 Node.js / Express 語法檢驗與資料庫連線煙霧測試
+  # ==============================================================
+  backend-test:
+    name: 🛡️ Backend Quality & DB Test
+    runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: FYPServer/package.json
+
+      - name: 📦 Install Backend Dependencies
+        working-directory: ./FYPServer
+        run: npm install
+
+      - name: 🔍 Node.js Code Syntax Check
+        working-directory: ./FYPServer
+        run: |
+          node --check app.js
+          node --check bin/www
+          node --check helper/securityShield.js
+          node --check helper/antiCrawler.js
+          node --check helper/scheduler.js
+          echo "✅ All backend core files passed syntax validation."
+
+      - name: 🧪 MongoDB Connection & Security Shield Smoke Test
+        working-directory: ./FYPServer
+        env:
+          MONGODB_URI: mongodb://localhost:27017/fyp_ci
+          PORT: 7789
+        run: |
+          npm test
+          echo "✅ Smoke tests passed with MongoDB service."
+
+  # ==============================================================
+  # 2. 前端 React 應用程式編譯與資產構建
+  # ==============================================================
+  frontend-build:
+    name: ⚛️ Frontend Build & Optimization
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: website_client/package.json
+
+      - name: 📦 Install Frontend Dependencies
+        working-directory: ./website_client
+        run: npm install
+
+      - name: 🏗️ Compile React Production Build
+        working-directory: ./website_client
+        env:
+          CI: false # 防止 CRA Linter 警告中斷構建
+        run: |
+          npm run build
+          if [ ! -f "build/index.html" ]; then
+            echo "❌ Build failed: build/index.html not found!"
+            exit 1
+          fi
+          echo "✅ React production build successfully compiled."
+
+      - name: 📤 Archive Production Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: react-build-dist
+          path: website_client/build
+          retention-days: 7
+
+  # ==============================================================
+  # 3. Docker Compose 容器配置驗證與鏡像建置
+  # ==============================================================
+  docker-validation:
+    name: 🐳 Docker Multi-Container Build
+    needs: [backend-test, frontend-build]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🛠️ Setup Docker Buildx
+        uses: actions/setup-buildx-action@v3
+
+      - name: 📝 Validate Docker Compose Specification
+        run: |
+          mkdir -p FYPServer/public/images
+          docker compose config
+          echo "✅ docker-compose.yml configuration is valid."
+
+      - name: 🔨 Build FYPServer Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./FYPServer
+          file: ./FYPServer/Dockerfile
+          push: false
+          tags: nightmarket-server:test
+
+      - name: 🔨 Build Website Client Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./website_client
+          file: ./website_client/Dockerfile
+          push: false
+          tags: nightmarket-client:test

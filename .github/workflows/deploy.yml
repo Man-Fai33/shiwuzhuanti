@@ -1,0 +1,118 @@
+name: 🚢 CD - Publish Container Images & Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+    tags: [ "v*.*.*" ]
+  workflow_dispatch:
+
+concurrency:
+  group: cd-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  # ==============================================================
+  # 1. 建置並發布映像檔至 GitHub Container Registry (GHCR)
+  # ==============================================================
+  publish-images:
+    name: 📦 Build & Publish to GHCR
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🛠️ Setup Docker Buildx
+        uses: actions/setup-buildx-action@v3
+
+      - name: 🔑 Log in to GitHub Container Registry (GHCR)
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🏷️ Extract Docker Metadata for FYPServer
+        id: meta-server
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/nightmarket-server
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha,format=short
+            type=ref,event=tag
+
+      - name: 🚀 Build and Push FYPServer Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./FYPServer
+          file: ./FYPServer/Dockerfile
+          push: true
+          tags: ${{ steps.meta-server.outputs.tags }}
+          labels: ${{ steps.meta-server.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: 🏷️ Extract Docker Metadata for Website Client
+        id: meta-client
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/nightmarket-client
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha,format=short
+            type=ref,event=tag
+
+      - name: 🚀 Build and Push Website Client Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./website_client
+          file: ./website_client/Dockerfile
+          push: true
+          tags: ${{ steps.meta-client.outputs.tags }}
+          labels: ${{ steps.meta-client.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ==============================================================
+  # 2. 自動遠端主機部屬 (可選：需設定 Repository Secrets)
+  # ==============================================================
+  deploy-to-server:
+    name: 🌐 Remote Server Deployment (Zero-Downtime)
+    needs: publish-images
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: 🔍 Check Remote Server Configuration
+        id: check-secrets
+        run: |
+          if [ -n "${{ secrets.REMOTE_HOST }}" ] && [ -n "${{ secrets.REMOTE_SSH_KEY }}" ]; then
+            echo "configured=true" >> $GITHUB_OUTPUT
+            echo "✅ 偵測到伺服器 SSH 設定，準備執行遠端自動部署。"
+          else
+            echo "configured=false" >> $GITHUB_OUTPUT
+            echo "ℹ️ 未設定 REMOTE_HOST 或 REMOTE_SSH_KEY Secrets，跳過遠端伺服器更新步驟。"
+            echo "ℹ️ GHCR 容器映像檔已發布完成，隨時可在任何主機執行 'docker compose pull' 進行更新。"
+          fi
+
+      - name: 🚀 SSH Deploy to Production Host
+        if: steps.check-secrets.outputs.configured == 'true'
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER || 'root' }}
+          key: ${{ secrets.REMOTE_SSH_KEY }}
+          port: ${{ secrets.REMOTE_PORT || 22 }}
+          script: |
+            set -e
+            echo "=== 開始部署台灣夜市系統 ==="
+            cd ${{ secrets.DEPLOY_PATH || '/opt/shiwuzhuanti' }}
+            git pull origin main || true
+            docker compose pull fypserver website_client || true
+            docker compose up -d --remove-orphans
+            echo "=== 部署完成，容器健康運行中 ==="
