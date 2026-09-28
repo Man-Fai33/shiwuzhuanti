@@ -2,7 +2,85 @@ const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
 const User = require('../models/user');
+const VerificationCode = require('../models/verificationCode');
 const { authRateLimiter, toSafeString, cleanNoSql } = require('../helper/securityShield');
+const { generateOtp, sendVerificationEmail } = require('../helper/emailService');
+
+/**
+ * POST /users/send-verification-code
+ * 發送 6 位數電子信箱驗證碼 (支援 SMTP 真實寄信與開發模式降級)
+ */
+router.post('/send-verification-code', authRateLimiter, async (req, res) => {
+  try {
+    const rawEmail = req.body.email;
+    const type = req.body.type || 'signup';
+    const email = toSafeString(rawEmail, 120).toLowerCase();
+
+    if (!email || !email.includes('@') || !email.includes('.')) {
+      return res.status(400).json({ status: "fail", message: "請輸入有效的電子郵件地址" });
+    }
+
+    // 若為註冊驗證，檢查信箱是否已存在
+    if (type === 'signup') {
+      const existing = await User.findOne({ email }).lean().exec();
+      if (existing) {
+        return res.status(409).json({ status: "fail", message: "此電子信箱已被註冊使用" });
+      }
+    }
+
+    // 產生 6 位數安全隨機驗證碼
+    const code = generateOtp(6);
+
+    // 儲存或更新驗證碼紀錄 (MongoDB TTL 10分鐘自動清理)
+    await VerificationCode.findOneAndUpdate(
+      { email, type },
+      { code, createdAt: new Date() },
+      { upsert: true, new: true }
+    );
+
+    // 發送驗證信函
+    const emailResult = await sendVerificationEmail(email, code, type);
+
+    res.json({
+      status: "success",
+      message: "驗證碼已成功發送至您的電子信箱，請於 10 分鐘內完成驗證",
+      mode: emailResult.mode,
+      devCode: emailResult.devCode || undefined
+    });
+  } catch (err) {
+    console.error('[EmailVerification] Send code error:', err.message);
+    res.status(500).json({ status: "fail", message: "發送驗證碼失敗，請稍後再試" });
+  }
+});
+
+/**
+ * POST /users/verify-code
+ * 驗證輸入之 6 位數信箱驗證碼
+ */
+router.post('/verify-code', authRateLimiter, async (req, res) => {
+  try {
+    const email = toSafeString(req.body.email, 120).toLowerCase();
+    const code = toSafeString(req.body.code, 10).trim();
+    const type = req.body.type || 'signup';
+
+    if (!email || !code) {
+      return res.status(400).json({ status: "fail", message: "請輸入電子信箱與驗證碼" });
+    }
+
+    const record = await VerificationCode.findOne({ email, code, type }).exec();
+    if (!record) {
+      return res.status(400).json({ status: "fail", message: "驗證碼不正確或已過期，請重新獲取" });
+    }
+
+    res.json({
+      status: "success",
+      message: "電子信箱驗證成功！"
+    });
+  } catch (err) {
+    console.error('[EmailVerification] Verify error:', err.message);
+    res.status(500).json({ status: "fail", message: "驗證過程發生異常" });
+  }
+});
 
 /**
  * GET /users/user
@@ -20,11 +98,13 @@ router.get('/user', async (req, res) => {
 
 /**
  * POST /users/user
- * 註冊新會員 (附帶暴力註冊頻率限制與資料型別校驗)
+ * 註冊新會員 (附帶信箱驗證碼校驗、暴力註冊頻率限制與資料型別校驗)
  */
 router.post('/user', authRateLimiter, async (req, res) => {
   try {
     let target = req.body.user;
+    const verificationCode = toSafeString(req.body.verificationCode, 10).trim();
+
     if (!target || typeof target !== 'object') {
       return res.status(400).json({ status: "fail", message: "無效的註冊資料" });
     }
@@ -50,6 +130,19 @@ router.post('/user', authRateLimiter, async (req, res) => {
       return res.status(409).json({ status: "fail", message: "此電子信箱已被註冊使用" });
     }
 
+    // 若有提供 verificationCode，進行嚴格核對並標註 isVerified
+    if (verificationCode) {
+      const codeRecord = await VerificationCode.findOne({ email, code: verificationCode, type: 'signup' }).exec();
+      if (!codeRecord) {
+        return res.status(400).json({ status: "fail", message: "電子信箱驗證碼錯誤或已過期，請重新確認" });
+      }
+      target.isVerified = true;
+      // 成功後銷毀已使用之驗證碼
+      await VerificationCode.deleteOne({ _id: codeRecord._id }).catch(() => {});
+    } else {
+      target.isVerified = false;
+    }
+
     const newUser = new User(target);
     const savedUser = await newUser.save();
     
@@ -59,7 +152,7 @@ router.post('/user', authRateLimiter, async (req, res) => {
 
     res.json({
       status: "success",
-      message: "帳號註冊成功",
+      message: target.isVerified ? "帳號註冊且信箱驗證成功！" : "帳號註冊成功",
       user: safeUser
     });
   } catch (err) {

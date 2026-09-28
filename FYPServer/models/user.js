@@ -19,6 +19,7 @@ const User = new mongoose.Schema({
     gender: Boolean,
     date: Date,
     shop: { type: Array, default: [] },
-    iconUrl: { type: String, default: "" }
+    iconUrl: { type: String, default: "" },
+    isVerified: { type: Boolean, default: false }
 });
 module.exports = mongoose.model('User', User);

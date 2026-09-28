@@ -126,6 +126,44 @@ export const helper = {
             return msg;
         }
     },
+    AsyncSendVerificationCode: async (email, type = 'signup') => {
+        try {
+            let jsonBody = JSON.stringify({ email, type });
+            let url = URL.Url.SendVerificationCode;
+            let response = await fetch(url, {
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                method: "post",
+                body: jsonBody
+            });
+            let respJson = await response.json();
+            return respJson;
+        } catch (e) {
+            console.error('Send verification code error:', e);
+            return { status: 'fail', message: '發送驗證碼網路連線異常' };
+        }
+    },
+    AsyncVerifyCode: async (email, code, type = 'signup') => {
+        try {
+            let jsonBody = JSON.stringify({ email, code, type });
+            let url = URL.Url.VerifyCode;
+            let response = await fetch(url, {
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                method: "post",
+                body: jsonBody
+            });
+            let respJson = await response.json();
+            return respJson;
+        } catch (e) {
+            console.error('Verify code error:', e);
+            return { status: 'fail', message: '驗證碼核對網路連線異常' };
+        }
+    },
     AsyncFeedbackCreate: async (feedback) => {
         try {
             let jsonBody = JSON.stringify({

@@ -49,15 +49,28 @@ async function runTests() {
   }
   console.log('  ✅ Type Safety passed all assertions.');
 
-  // 4. 資料庫連線測試 (若提供 MONGODB_URI)
+  // 4. 信箱驗證服務模組測試
+  console.log('▶ [Test 4] Email Verification & OTP Generator Test');
+  const { generateOtp, renderEmailTemplate } = require('../helper/emailService');
+  const testOtp = generateOtp(6);
+  if (!testOtp || testOtp.length !== 6 || isNaN(Number(testOtp))) {
+    throw new Error('❌ Test Failed: Invalid OTP generated!');
+  }
+  const emailHtml = renderEmailTemplate(testOtp, 'signup');
+  if (!emailHtml.includes(testOtp)) {
+    throw new Error('❌ Test Failed: OTP missing in rendered email HTML template!');
+  }
+  console.log(`  ✅ OTP generation & template rendering passed (Generated: ${testOtp}).`);
+
+  // 5. 資料庫連線測試 (若提供 MONGODB_URI)
   const mongoUri = process.env.MONGODB_URI;
   if (mongoUri) {
-    console.log(`▶ [Test 4] Database Connectivity to ${mongoUri.replace(/\/\/.*@/, '//***@')}`);
+    console.log(`▶ [Test 5] Database Connectivity to ${mongoUri.replace(/\/\/.*@/, '//***@')}`);
     await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 5000 });
     console.log('  ✅ MongoDB connection succeeded.');
     await mongoose.disconnect();
   } else {
-    console.log('▶ [Test 4] Skipped (No MONGODB_URI provided in this environment).');
+    console.log('▶ [Test 5] Skipped (No MONGODB_URI provided in this environment).');
   }
 
   console.log('🎉 All CI/CD Smoke Tests Passed Successfully!\n');

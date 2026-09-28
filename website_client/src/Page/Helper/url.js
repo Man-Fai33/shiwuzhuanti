@@ -14,7 +14,9 @@ export const Url = {
     Comment: (HOST + "/comment/"),
     Analytics: (HOST + "/analytics"),
     Sync: (HOST + "/sync"),
-    System: (HOST + "/system")
+    System: (HOST + "/system"),
+    SendVerificationCode: (HOST + "/users/send-verification-code"),
+    VerifyCode: (HOST + "/users/verify-code")
 };
 
 const urlExport = {

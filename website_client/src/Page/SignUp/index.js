@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Container,
     Box,
@@ -14,9 +14,14 @@ import {
     Radio,
     FormControl,
     FormLabel,
-    CircularProgress
+    CircularProgress,
+    Chip,
+    InputAdornment
 } from '@mui/material';
 import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
+import MarkEmailReadIcon from '@mui/icons-material/MarkEmailRead';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import SendIcon from '@mui/icons-material/Send';
 import helper from '../Helper/helper';
 import { useLanguage } from '../../Context/LanguageContext';
 
@@ -33,6 +38,77 @@ export default function SignUp() {
     const [loading, setLoading] = useState(false);
     const [successMsg, setSuccessMsg] = useState("");
 
+    // 信箱安全驗證狀態 (Email Verification States)
+    const [verificationCode, setVerificationCode] = useState("");
+    const [isCodeSent, setIsCodeSent] = useState(false);
+    const [isEmailVerified, setIsEmailVerified] = useState(false);
+    const [sendingCode, setSendingCode] = useState(false);
+    const [verifyingCode, setVerifyingCode] = useState(false);
+    const [countdown, setCountdown] = useState(0);
+    const [devOtpHint, setDevOtpHint] = useState("");
+
+    // 60 秒冷卻倒數計時器
+    useEffect(() => {
+        if (countdown > 0) {
+            const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [countdown]);
+
+    // 發送 6 位數信箱驗證碼
+    const handleSendCode = async () => {
+        if (!email.trim() || !email.includes('@') || !email.includes('.')) {
+            setError(lang === 'en' ? 'Please enter a valid email address before sending code' : '請先輸入有效的電子郵件信箱');
+            return;
+        }
+        setError("");
+        setSuccessMsg("");
+        setSendingCode(true);
+
+        try {
+            const res = await helper.helper.AsyncSendVerificationCode(email.trim(), 'signup');
+            if (res && res.status === "success") {
+                setIsCodeSent(true);
+                setCountdown(60);
+                setSuccessMsg(res.message || (lang === 'en' ? 'Verification code sent to your email!' : '驗證碼已發送至您的電子信箱！'));
+                if (res.devCode) {
+                    setDevOtpHint(res.devCode);
+                    setVerificationCode(res.devCode); // 開發環境自動填入加速體驗
+                }
+            } else {
+                setError(res?.message || (lang === 'en' ? 'Failed to send verification code. Email might already be registered.' : '發送驗證碼失敗，此信箱可能已被註冊'));
+            }
+        } catch (err) {
+            setError(lang === 'en' ? 'Network error while sending verification code' : '發送驗證碼網路連線異常，請確認後端伺服器運行');
+        } finally {
+            setSendingCode(false);
+        }
+    };
+
+    // 單獨核對信箱驗證碼
+    const handleVerifyCode = async () => {
+        if (!verificationCode.trim()) {
+            setError(lang === 'en' ? 'Please enter the 6-digit verification code' : '請輸入 6 位數驗證碼');
+            return;
+        }
+        setError("");
+        setVerifyingCode(true);
+
+        try {
+            const res = await helper.helper.AsyncVerifyCode(email.trim(), verificationCode.trim(), 'signup');
+            if (res && res.status === "success") {
+                setIsEmailVerified(true);
+                setSuccessMsg(lang === 'en' ? 'Email verified successfully! You can now finish registration.' : '電子信箱驗證成功！請繼續填寫資料完成註冊。');
+            } else {
+                setError(res?.message || (lang === 'en' ? 'Verification code invalid or expired' : '驗證碼不正確或已過期'));
+            }
+        } catch (err) {
+            setError(lang === 'en' ? 'Network error while verifying code' : '驗證碼核對網路連線異常');
+        } finally {
+            setVerifyingCode(false);
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
@@ -46,6 +122,10 @@ export default function SignUp() {
             setError(lang === 'en' ? 'Please enter a valid email address' : '請輸入有效的電子郵件信箱');
             return;
         }
+        if (!isEmailVerified && !verificationCode.trim()) {
+            setError(lang === 'en' ? 'Please request and enter your email verification code' : '請先點擊「發送驗證碼」並填寫 6 位數信箱驗證碼');
+            return;
+        }
         if (!upassword || upassword.length < 4) {
             setError(lang === 'en' ? 'Password must be at least 4 characters long' : '密碼長度至少需要 4 個字元');
             return;
@@ -57,6 +137,7 @@ export default function SignUp() {
 
         setLoading(true);
         const user = {
+            verificationCode: verificationCode.trim(),
             user: {
                 username: uname.trim(),
                 email: email.trim(),
@@ -72,7 +153,7 @@ export default function SignUp() {
         try {
             const res = await helper.helper.AsyncUserCreate(user);
             if (res && res.status === "success") {
-                setSuccessMsg(lang === 'en' ? 'Account created successfully! Redirecting to sign in...' : '註冊成功！即將為您前往登入頁面...');
+                setSuccessMsg(lang === 'en' ? 'Account created & verified! Redirecting to sign in...' : '帳號註冊且信箱驗證成功！即將前往登入頁面...');
                 setTimeout(() => {
                     window.location.href = "/signin";
                 }, 1200);
@@ -98,14 +179,13 @@ export default function SignUp() {
                     boxShadow: '0 8px 30px rgba(28, 25, 23, 0.06)'
                 }}
             >
-                {/* 標題與意象 */}
-                <Box sx={{ textAlign: 'center', mb: 3 }}>
+                <Box sx={{ textAlign: 'center', mb: 4 }}>
                     <Box
                         sx={{
-                            width: 52,
-                            height: 52,
+                            width: 56,
+                            height: 56,
                             borderRadius: '16px',
-                            bgcolor: '#FEF2F2',
+                            backgroundColor: 'rgba(185, 28, 28, 0.08)',
                             color: 'var(--tw-terracotta, #B91C1C)',
                             display: 'inline-flex',
                             alignItems: 'center',
@@ -150,6 +230,7 @@ export default function SignUp() {
                             />
                         </Grid>
 
+                        {/* 電子郵件輸入框 */}
                         <Grid item xs={12}>
                             <TextField
                                 required
@@ -158,8 +239,100 @@ export default function SignUp() {
                                 label={lang === 'en' ? 'Email Address' : '電子郵件 (帳號)'}
                                 placeholder="name@example.com"
                                 value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                disabled={isEmailVerified}
+                                onChange={(e) => {
+                                    setEmail(e.target.value);
+                                    setIsEmailVerified(false);
+                                    setIsCodeSent(false);
+                                }}
+                                InputProps={{
+                                    endAdornment: isEmailVerified ? (
+                                        <InputAdornment position="end">
+                                            <Chip
+                                                icon={<CheckCircleOutlineIcon style={{ color: '#059669' }} />}
+                                                label={lang === 'en' ? 'Verified' : '信箱已驗證'}
+                                                size="small"
+                                                sx={{ backgroundColor: '#ECFDF5', color: '#059669', fontWeight: 700 }}
+                                            />
+                                        </InputAdornment>
+                                    ) : null
+                                }}
                             />
+                        </Grid>
+
+                        {/* 信箱 6 位數安全驗證碼輸入與發送區塊 */}
+                        <Grid item xs={12}>
+                            <Box sx={{ p: 2, borderRadius: '14px', backgroundColor: 'var(--tw-surface-warm, #FAF8F5)', border: '1px solid var(--tw-border-subtle, #EAE5DD)' }}>
+                                <Typography variant="caption" sx={{ fontWeight: 700, color: 'var(--tw-deep-charcoal, #1C1917)', display: 'block', mb: 1.5 }}>
+                                    🛡️ {lang === 'en' ? 'Email Security Verification' : '信箱安全身份驗證'}
+                                </Typography>
+
+                                <Grid container spacing={1.5} alignItems="center">
+                                    <Grid item xs={12} sm={7}>
+                                        <TextField
+                                            required
+                                            fullWidth
+                                            size="small"
+                                            label={lang === 'en' ? '6-Digit Code' : '6 位數信箱驗證碼'}
+                                            placeholder="123456"
+                                            value={verificationCode}
+                                            disabled={isEmailVerified}
+                                            onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                            inputProps={{ maxLength: 6, style: { letterSpacing: '4px', fontWeight: 700 } }}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={6} sm={5}>
+                                        <Button
+                                            fullWidth
+                                            size="medium"
+                                            variant="outlined"
+                                            disabled={sendingCode || countdown > 0 || isEmailVerified}
+                                            onClick={handleSendCode}
+                                            startIcon={sendingCode ? <CircularProgress size={16} /> : <SendIcon sx={{ fontSize: 16 }} />}
+                                            sx={{
+                                                borderColor: 'var(--tw-terracotta, #B91C1C)',
+                                                color: 'var(--tw-terracotta, #B91C1C)',
+                                                fontWeight: 700,
+                                                '&:hover': {
+                                                    borderColor: '#991B1B',
+                                                    backgroundColor: 'rgba(185, 28, 28, 0.04)'
+                                                }
+                                            }}
+                                        >
+                                            {countdown > 0
+                                                ? `${countdown}s ${lang === 'en' ? 'Resend' : '後可重發'}`
+                                                : isCodeSent
+                                                    ? (lang === 'en' ? 'Resend Code' : '重新發送')
+                                                    : (lang === 'en' ? 'Send Code' : '發送驗證碼')}
+                                        </Button>
+                                    </Grid>
+                                </Grid>
+
+                                {devOtpHint && (
+                                    <Box sx={{ mt: 1.5, p: 1, borderRadius: '8px', backgroundColor: '#FEF3C7', color: '#92400E', fontSize: '0.8rem' }}>
+                                        💡 <strong>開發測試提示：</strong> 未設定 SMTP 伺服器，驗證碼已自動模擬填入：<strong>{devOtpHint}</strong>
+                                    </Box>
+                                )}
+
+                                {!isEmailVerified && isCodeSent && (
+                                    <Box sx={{ mt: 1.5, display: 'flex', justifyContent: 'flex-end' }}>
+                                        <Button
+                                            size="small"
+                                            variant="contained"
+                                            disabled={verifyingCode || !verificationCode}
+                                            onClick={handleVerifyCode}
+                                            startIcon={verifyingCode ? <CircularProgress size={14} color="inherit" /> : <MarkEmailReadIcon sx={{ fontSize: 16 }} />}
+                                            sx={{
+                                                backgroundColor: 'var(--tw-terracotta, #B91C1C)',
+                                                fontWeight: 700,
+                                                '&:hover': { backgroundColor: '#991B1B' }
+                                            }}
+                                        >
+                                            {lang === 'en' ? 'Verify Code Now' : '立即核對驗證碼'}
+                                        </Button>
+                                    </Box>
+                                )}
+                            </Box>
                         </Grid>
 
                         <Grid item xs={12} sm={6}>
@@ -228,22 +401,42 @@ export default function SignUp() {
                         fullWidth
                         variant="contained"
                         disabled={loading}
-                        className="tw-btn-primary"
                         sx={{
-                            mt: 3.5,
-                            mb: 2,
-                            py: 1.4,
-                            fontSize: '1rem',
+                            mt: 4,
+                            mb: 2.5,
+                            py: 1.5,
+                            borderRadius: '12px',
+                            backgroundColor: 'var(--tw-terracotta, #B91C1C)',
+                            fontWeight: 700,
+                            fontSize: '1.05rem',
+                            letterSpacing: '0.5px',
+                            boxShadow: '0 4px 14px rgba(185, 28, 28, 0.25)',
+                            '&:hover': {
+                                backgroundColor: '#991B1B',
+                                boxShadow: '0 6px 20px rgba(185, 28, 28, 0.35)'
+                            }
                         }}
                     >
-                        {loading ? <CircularProgress size={24} color="inherit" /> : (lang === 'en' ? 'Create Account' : '立即註冊會員')}
+                        {loading ? (
+                            <CircularProgress size={24} color="inherit" />
+                        ) : (
+                            lang === 'en' ? 'Complete Registration' : '完成註冊並綁定信箱'
+                        )}
                     </Button>
 
-                    <Box sx={{ textAlign: 'center', mt: 1 }}>
+                    <Box sx={{ textAlign: 'center', mt: 2 }}>
                         <Typography variant="body2" sx={{ color: 'var(--tw-text-muted, #78716C)' }}>
-                            {lang === 'en' ? 'Already have an account? ' : '已經擁有會員帳號？ '}
-                            <Link href="/signin" underline="hover" sx={{ color: 'var(--tw-terracotta, #B91C1C)', fontWeight: 700 }}>
-                                {lang === 'en' ? 'Sign In →' : '立即登入 →'}
+                            {lang === 'en' ? 'Already have an account?' : '已經有台灣夜市通帳號？'}{' '}
+                            <Link
+                                href="/signin"
+                                underline="hover"
+                                sx={{
+                                    color: 'var(--tw-terracotta, #B91C1C)',
+                                    fontWeight: 700,
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                {lang === 'en' ? 'Sign in directly' : '立即登入'}
                             </Link>
                         </Typography>
                     </Box>
