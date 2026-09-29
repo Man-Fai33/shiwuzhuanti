@@ -11,6 +11,10 @@ const Market = new mongoose.Schema({
     foodList: { type: Array, default: [] },
     shopList: { type: Array, default: [] },
     rating: { type: Number, default: 4.8 },
+    city: { type: String },
+    cityEn: { type: String },
+    region: { type: String }, // 'north', 'central', 'south', 'east'
+    openDays: { type: String },
     lat: { type: Number },
     lng: { type: Number },
 });

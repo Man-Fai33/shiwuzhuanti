@@ -2,7 +2,25 @@ const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
 const Food = require('../models/food');
-const { enrichFoodData } = require('../helper/webScraperEngine');
+const { enrichFoodData, searchFoodImagesOnline, getBestFoodImage } = require('../helper/webScraperEngine');
+
+/**
+ * GET /foods/search-images
+ * 網上搜尋特定美食之高清照片候選清單（供使用者/攤商一鍵選擇或自動配圖）
+ */
+router.get('/search-images', async (req, res) => {
+    try {
+        const query = req.query.query || req.query.name || '';
+        const images = await searchFoodImagesOnline(query);
+        res.json({
+            status: 'success',
+            images
+        });
+    } catch (err) {
+        console.error('[Food:SearchImages] Error:', err);
+        res.status(500).json({ status: 'fail', message: '搜尋美食照片失敗: ' + err.message });
+    }
+});
 
 /**
  * GET /foods/search-web
@@ -27,7 +45,7 @@ router.get('/search-web', (req, res) => {
 
 /**
  * POST /foods/enrich/:id
- * 針對特定美食觸發網路大數據深度補全 (補全熱量、故事、食材、過敏原、口感)
+ * 針對特定美食觸發網路大數據深度補全 (補全熱量、故事、食材、過敏原、口感與照片)
  */
 router.post('/enrich/:id', async (req, res) => {
     try {
@@ -46,7 +64,7 @@ router.post('/enrich/:id', async (req, res) => {
 
         res.json({
             status: 'success',
-            message: '🎉 成功自網路擷取並補全該美食之深度資料！',
+            message: '🎉 成功自網路擷取並補全該美食之深度資料與高清照片！',
             food: updatedFood
         });
     } catch (err) {
@@ -65,8 +83,8 @@ router.post('/enrich-all', async (req, res) => {
         let updatedCount = 0;
 
         for (const f of allFoods) {
-            // 若尚無文化故事或尚未標註 onlineEnriched，執行智慧補全
-            if (!f.culturalStory || !f.onlineEnriched || !f.calories) {
+            // 若尚無文化故事、熱量或美食照片，執行智慧補全
+            if (!f.culturalStory || !f.onlineEnriched || !f.calories || !f.foodIcon || f.foodIcon.trim() === '') {
                 const enriched = enrichFoodData(f.foodName, f.toObject());
                 Object.assign(f, enriched);
                 f.onlineEnriched = true;
@@ -77,7 +95,7 @@ router.post('/enrich-all', async (req, res) => {
 
         res.json({
             status: 'success',
-            message: `🎉 全站美食深度資料批次聯網補全完成！共更新 ${updatedCount} 道特色小吃。`,
+            message: `🎉 全站美食深度資料與照片批次聯網補全完成！共更新 ${updatedCount} 道特色小吃。`,
             total: allFoods.length,
             updatedCount
         });
@@ -115,8 +133,8 @@ router.get('/:id', async (req, res) => {
             return res.status(404).json({ status: "fail", message: "找不到該美食" });
         }
 
-        // 若尚無文化故事或熱量，即時進行聯網大數據深度補充並異步存檔
-        if (!food.culturalStory || !food.texture || !food.onlineEnriched) {
+        // 若尚無文化故事、熱量或美食照片，即時進行聯網大數據深度補充並異步存檔
+        if (!food.culturalStory || !food.texture || !food.onlineEnriched || !food.foodIcon || food.foodIcon.trim() === '') {
             const enriched = enrichFoodData(food.foodName, food.toObject());
             Object.assign(food, enriched);
             food.onlineEnriched = true;

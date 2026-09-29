@@ -184,6 +184,26 @@ export const helper = {
             return { status: 'fail', message: '美食聯網補全異常' };
         }
     },
+    AsyncFoodSearchImages: async (query) => {
+        try {
+            let url = `${URL.Url.FoodSearchImages}?query=${encodeURIComponent(query || '')}`;
+            let response = await fetch(url);
+            return await response.json();
+        } catch (e) {
+            console.error('Food search images error:', e);
+            return { status: 'fail', message: '搜尋美食照片異常' };
+        }
+    },
+    AsyncShopSearchImages: async (query, type) => {
+        try {
+            let url = `${URL.Url.ShopSearchImages}?query=${encodeURIComponent(query || '')}&type=${encodeURIComponent(type || '')}`;
+            let response = await fetch(url);
+            return await response.json();
+        } catch (e) {
+            console.error('Shop search images error:', e);
+            return { status: 'fail', message: '搜尋攤位照片異常' };
+        }
+    },
     AsyncFeedbackCreate: async (feedback) => {
         try {
             let jsonBody = JSON.stringify({

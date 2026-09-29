@@ -28,6 +28,7 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import SearchIcon from '@mui/icons-material/Search';
+import ImagePickerDialog from '../../Compnonet/ImagePickerDialog';
 import helper from '../Helper/helper';
 
 const steps = ['攤位基本資料', '招牌美食與菜單', '確認申請資料'];
@@ -43,6 +44,11 @@ export default function Account() {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchingWeb, setSearchingWeb] = useState(false);
     const [searchSuccess, setSearchSuccess] = useState('');
+
+    // 網路圖片挑選彈窗狀態 (Online Image Picker)
+    const [imagePickerOpen, setImagePickerOpen] = useState(false);
+    const [imagePickerType, setImagePickerType] = useState('shop');
+    const [imagePickerQuery, setImagePickerQuery] = useState('');
 
     // Step 0: Shop details
     const [nm, setNm] = useState('');
@@ -111,7 +117,7 @@ export default function Account() {
             return;
         }
 
-        let uploadedPath = '/img/default_food.jpg';
+        let uploadedPath = foodIconPreview || '';
         if (foodIcon) {
             try {
                 const data = new FormData();
@@ -121,6 +127,21 @@ export default function Account() {
             } catch (e) {
                 console.error(e);
             }
+        }
+        
+        // 若完全未上傳或未指定照片，自動即時從網路/維基百科大數據庫撈取相符美食照
+        if (!uploadedPath) {
+            try {
+                const imgRes = await helper.helper.AsyncFoodSearchImages(foodName.trim());
+                if (imgRes && imgRes.status === 'success' && imgRes.images && imgRes.images[0]) {
+                    uploadedPath = imgRes.images[0].url;
+                }
+            } catch (err) {
+                console.error('Auto fetch food img failed:', err);
+            }
+        }
+        if (!uploadedPath) {
+            uploadedPath = 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600';
         }
 
         const newFood = {
@@ -201,12 +222,27 @@ export default function Account() {
         setStatusMsg({ type: '', text: '' });
 
         try {
-            let shopImgPath = shopIconPreview || '/img/default_shop.jpg';
+            let shopImgPath = shopIconPreview || '';
             if (shopIcon) {
                 const data = new FormData();
                 data.append('Image', shopIcon);
                 const res = await helper.helper.AsyncUploadImage(data);
                 if (res && res.path) shopImgPath = res.path;
+            }
+
+            // 若完全未上傳或未指定招牌照，自動即時從網路夜市名店大數據庫撈取
+            if (!shopImgPath) {
+                try {
+                    const imgRes = await helper.helper.AsyncShopSearchImages(shopName.trim(), shopType);
+                    if (imgRes && imgRes.status === 'success' && imgRes.images && imgRes.images[0]) {
+                        shopImgPath = imgRes.images[0].url;
+                    }
+                } catch (err) {
+                    console.error('Auto fetch shop img failed:', err);
+                }
+            }
+            if (!shopImgPath) {
+                shopImgPath = 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800';
             }
 
             const newShop = {
@@ -497,6 +533,18 @@ export default function Account() {
                                         上傳招牌照片
                                         <input hidden type="file" accept="image/*" onChange={handleShopIconChange} />
                                     </Button>
+                                    <Button
+                                        variant="outlined"
+                                        startIcon={<AutoAwesomeIcon />}
+                                        onClick={() => {
+                                            setImagePickerType('shop');
+                                            setImagePickerQuery(shopName || '夜市攤位');
+                                            setImagePickerOpen(true);
+                                        }}
+                                        sx={{ borderColor: '#2563EB', color: '#2563EB', fontWeight: 700 }}
+                                    >
+                                        🌐 網路選店面照
+                                    </Button>
                                     {shopIconPreview && (
                                         <Box
                                             component="img"
@@ -588,6 +636,19 @@ export default function Account() {
                                         >
                                             上傳照片
                                             <input hidden type="file" accept="image/*" onChange={handleFoodIconChange} />
+                                        </Button>
+                                        <Button
+                                            variant="outlined"
+                                            size="small"
+                                            startIcon={<AutoAwesomeIcon />}
+                                            onClick={() => {
+                                                setImagePickerType('food');
+                                                setImagePickerQuery(foodName || '夜市小吃');
+                                                setImagePickerOpen(true);
+                                            }}
+                                            sx={{ color: '#2563EB', borderColor: '#93C5FD', fontWeight: 700 }}
+                                        >
+                                            🌐 網路搜菜色照
                                         </Button>
                                         {foodIconPreview && (
                                             <Box
@@ -705,6 +766,24 @@ export default function Account() {
                     </Box>
                 )}
             </Paper>
+
+            {/* 網路圖片挑選彈窗 */}
+            <ImagePickerDialog
+                open={imagePickerOpen}
+                onClose={() => setImagePickerOpen(false)}
+                type={imagePickerType}
+                initialQuery={imagePickerQuery}
+                title={imagePickerType === 'shop' ? '🌐 挑選網路夜市攤位門面照片' : '🌐 挑選網路特色美食菜色照片'}
+                onSelect={(url) => {
+                    if (imagePickerType === 'shop') {
+                        setShopIconPreview(url);
+                        setShopIcon(null);
+                    } else {
+                        setFoodIconPreview(url);
+                        setFoodIcon(null);
+                    }
+                }}
+            />
         </Container>
     );
 }

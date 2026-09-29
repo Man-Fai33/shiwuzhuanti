@@ -50,6 +50,40 @@ router.post('/', async (req, res) => {
     res.json(resp)
 })
 
+const { ALL_TAIWAN_NIGHT_MARKETS } = require('../helper/taiwanNightMarketsData');
+
+/**
+ * POST /market/seed-all
+ * 批次補全全台灣29大觀光夜市
+ */
+router.post('/seed-all', async (req, res) => {
+    try {
+        let added = 0;
+        let updated = 0;
+        for (const mData of ALL_TAIWAN_NIGHT_MARKETS) {
+            const existing = await Market.findOne({ name: mData.name });
+            if (existing) {
+                Object.assign(existing, mData);
+                await existing.save();
+                updated++;
+            } else {
+                await new Market(mData).save();
+                added++;
+            }
+        }
+        const total = await Market.countDocuments();
+        res.json({
+            status: "success",
+            message: `🎉 全台灣夜市資料庫更新完成！共新增 ${added} 座、更新 ${updated} 座，全台共計 ${total} 座觀光夜市。`,
+            total,
+            added,
+            updated
+        });
+    } catch (e) {
+        res.status(500).json({ status: "fail", message: e.message });
+    }
+});
+
 router.get('/', (req, res) => {
 
     Market.find().exec().then(result => {

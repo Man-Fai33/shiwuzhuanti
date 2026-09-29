@@ -80,6 +80,9 @@ export default function NightMarketPage() {
     }, [nightID]);
 
     const getAuthenticMarketImage = (m) => {
+        if (m?.marketIcon) {
+            return m.marketIcon;
+        }
         const name = m?.name || '';
         if (name.includes('士林')) {
             return 'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=1000&auto=format&fit=crop&q=80';
@@ -98,9 +101,6 @@ export default function NightMarketPage() {
         }
         if (name.includes('羅東')) {
             return 'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=1000&auto=format&fit=crop&q=80';
-        }
-        if (m?.marketIcon && !m.marketIcon.includes('photo-1555396273-367ea4eb4db5')) {
-            return m.marketIcon;
         }
         return 'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=1000&auto=format&fit=crop&q=80';
     };

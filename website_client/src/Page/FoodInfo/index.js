@@ -31,6 +31,7 @@ import RestaurantIcon from '@mui/icons-material/Restaurant';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import SendIcon from '@mui/icons-material/Send';
 import RateReviewIcon from '@mui/icons-material/RateReview';
+import ImagePickerDialog from '../../Compnonet/ImagePickerDialog';
 
 import helper from '../Helper/helper';
 import { useLanguage } from '../../Context/LanguageContext';
@@ -52,6 +53,7 @@ export default function FoodInfo() {
     // 聯網增強狀態
     const [enriching, setEnriching] = useState(false);
     const [enrichMsg, setEnrichMsg] = useState('');
+    const [imagePickerOpen, setImagePickerOpen] = useState(false);
 
     // 美食即時評論狀態
     const [comments, setComments] = useState([]);
@@ -102,6 +104,21 @@ export default function FoodInfo() {
             console.error('Enrich failed:', e);
         } finally {
             setEnriching(false);
+        }
+    };
+
+    const handleSelectPhoto = async (newUrl) => {
+        if (!newUrl || !food) return;
+        const updated = { ...food, foodIcon: newUrl };
+        setFood(updated);
+        setEnrichMsg(isEn ? '📷 Updated food photo from online database!' : '📷 已成功從網路大數據更新為高清美食照片！');
+        setTimeout(() => setEnrichMsg(''), 4500);
+        try {
+            if (user && user._id) {
+                await helper.helper.AsyncEditFood(user._id, updated);
+            }
+        } catch (e) {
+            console.error('Update photo failed:', e);
         }
     };
 
@@ -215,6 +232,22 @@ export default function FoodInfo() {
                     </Button>
 
                     <Button
+                        variant="outlined"
+                        onClick={() => setImagePickerOpen(true)}
+                        startIcon={<AutoAwesomeIcon sx={{ color: '#2563EB' }} />}
+                        sx={{
+                            borderRadius: 3,
+                            fontWeight: 700,
+                            borderColor: '#93C5FD',
+                            color: '#1D4ED8',
+                            bgcolor: '#EFF6FF',
+                            '&:hover': { bgcolor: '#DBEAFE', borderColor: '#3B82F6' }
+                        }}
+                    >
+                        {isEn ? 'Choose Online Photo' : '📷 挑選網路高清照片'}
+                    </Button>
+
+                    <Button
                         variant={inWishlist ? "contained" : "outlined"}
                         startIcon={inWishlist ? <FavoriteIcon /> : <FavoriteBorderIcon />}
                         onClick={() => food._id && toggleWishlist(food)}
@@ -258,6 +291,10 @@ export default function FoodInfo() {
                                 src={food.foodIcon || 'https://images.unsplash.com/photo-1562967914-608f82629710?w=800'}
                                 alt={food.foodName || '美食相片'}
                                 style={{ width: '100%', height: '360px', objectFit: 'cover', display: 'block' }}
+                                onError={(e) => {
+                                    e.target.onerror = null;
+                                    e.target.src = 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800';
+                                }}
                             />
                             {/* 價格標籤 */}
                             <Box
@@ -793,6 +830,16 @@ export default function FoodInfo() {
                     )}
                 </Stack>
             </Paper>
+
+            {/* 網路高清照片挑選彈窗 */}
+            <ImagePickerDialog
+                open={imagePickerOpen}
+                onClose={() => setImagePickerOpen(false)}
+                type="food"
+                initialQuery={food.foodName || '夜市小吃'}
+                title={isEn ? '🌐 Choose High-Res Food Photo' : '🌐 挑選網路高清特色美食照片'}
+                onSelect={handleSelectPhoto}
+            />
         </Box>
     );
 }

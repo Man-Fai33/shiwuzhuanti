@@ -298,6 +298,10 @@ export default function FoodList() {
                                         height="200"
                                         image={item.foodIcon || 'https://images.unsplash.com/photo-1562967914-608f82629710?w=600'}
                                         alt={item.foodName}
+                                        onError={(e) => {
+                                            e.target.onerror = null;
+                                            e.target.src = 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600';
+                                        }}
                                         sx={{
                                             objectFit: 'cover',
                                             transition: 'transform 0.4s ease',

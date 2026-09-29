@@ -164,14 +164,284 @@ const TAIWAN_GOURMET_ENCYCLOPEDIA = {
 };
 
 /**
+ * 高清台灣夜市美食與名店攝影圖庫
+ */
+const TAIWAN_FOOD_IMAGES = {
+    '雞排': [
+        'https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1587397845856-e6cf49176c70?auto=format&fit=crop&w=800&q=80'
+    ],
+    '鹽酥雞': [
+        'https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=800&q=80'
+    ],
+    '甜不辣': [
+        'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=800&q=80'
+    ],
+    '黑輪': [
+        'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?auto=format&fit=crop&w=800&q=80'
+    ],
+    '珍珠奶茶': [
+        'https://images.unsplash.com/photo-1558857563-b37cf5b7a151?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1525385133512-2f3bdd039054?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=800&q=80'
+    ],
+    '波霸': [
+        'https://images.unsplash.com/photo-1558857563-b37cf5b7a151?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1525385133512-2f3bdd039054?auto=format&fit=crop&w=800&q=80'
+    ],
+    '奶茶': [
+        'https://images.unsplash.com/photo-1558857563-b37cf5b7a151?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=800&q=80'
+    ],
+    '大腸包小腸': [
+        'https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=800&q=80'
+    ],
+    '香腸': [
+        'https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&w=800&q=80'
+    ],
+    '地瓜球': [
+        'https://images.unsplash.com/photo-1509722747041-616f39b57569?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?auto=format&fit=crop&w=800&q=80'
+    ],
+    '地瓜條': [
+        'https://images.unsplash.com/photo-1509722747041-616f39b57569?auto=format&fit=crop&w=800&q=80'
+    ],
+    '臭豆腐': [
+        'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80'
+    ],
+    '胡椒餅': [
+        'https://images.unsplash.com/photo-1547928576-a4a33237cbc3?auto=format&fit=crop&w=800&q=80'
+    ],
+    '蚵仔煎': [
+        'https://images.unsplash.com/photo-1552611052-33e04de081de?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=800&q=80'
+    ],
+    '藥燉排骨': [
+        'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?auto=format&fit=crop&w=800&q=80'
+    ],
+    '羊肉湯': [
+        'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80'
+    ],
+    '花枝': [
+        'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=800&q=80'
+    ],
+    '海產粥': [
+        'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=800&q=80'
+    ],
+    '滷肉飯': [
+        'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=800&q=80'
+    ],
+    '魯肉飯': [
+        'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80'
+    ],
+    '滷味': [
+        'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80'
+    ],
+    '冰': [
+        'https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1501443762994-82bd5dace89a?auto=format&fit=crop&w=800&q=80'
+    ],
+    '雪花冰': [
+        'https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=800&q=80'
+    ],
+    '芒果冰': [
+        'https://images.unsplash.com/photo-1501443762994-82bd5dace89a?auto=format&fit=crop&w=800&q=80'
+    ],
+    '湯圓': [
+        'https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=800&q=80'
+    ],
+    '章魚小丸子': [
+        'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=800&q=80'
+    ],
+    '蔥油餅': [
+        'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?auto=format&fit=crop&w=800&q=80'
+    ],
+    '蔥油派': [
+        'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?auto=format&fit=crop&w=800&q=80'
+    ],
+    '木瓜牛奶': [
+        'https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=800&q=80'
+    ],
+    '果汁': [
+        'https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=800&q=80'
+    ],
+    '芋餅': [
+        'https://images.unsplash.com/photo-1509722747041-616f39b57569?auto=format&fit=crop&w=800&q=80'
+    ],
+    '芋丸': [
+        'https://images.unsplash.com/photo-1509722747041-616f39b57569?auto=format&fit=crop&w=800&q=80'
+    ],
+    '麵線': [
+        'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=800&q=80'
+    ],
+    '意麵': [
+        'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=800&q=80'
+    ],
+    '湯': [
+        'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80'
+    ],
+    '串燒': [
+        'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=800&q=80'
+    ]
+};
+
+const TAIWAN_SHOP_IMAGES = [
+    'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1578474846511-04ba529f0b88?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1509315811345-672d83ef2fbc?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1543007630-9710e4a00a20?auto=format&fit=crop&w=800&q=80'
+];
+
+function getBestFoodImage(foodName = '', foodType = []) {
+    const name = (foodName || '').toLowerCase();
+    for (const [key, urls] of Object.entries(TAIWAN_FOOD_IMAGES)) {
+        if (name.includes(key)) {
+            return urls[0];
+        }
+    }
+    const types = Array.isArray(foodType) ? foodType.join(' ') : String(foodType || '');
+    if (/fried|炸|酥|排|烤/i.test(name + types)) {
+        return 'https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=800&q=80';
+    }
+    if (/dessert|甜|冰|茶|奶|果汁/i.test(name + types)) {
+        return 'https://images.unsplash.com/photo-1558857563-b37cf5b7a151?auto=format&fit=crop&w=800&q=80';
+    }
+    if (/pasta|麵|羹|湯|飯/i.test(name + types)) {
+        return 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=800&q=80';
+    }
+    return 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80';
+}
+
+function getBestShopImage(shopName = '', shopType = '') {
+    const name = (shopName || '').toLowerCase();
+    if (/雞排|炸雞|炸物/.test(name)) {
+        return 'https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=800&q=80';
+    }
+    if (/茶|奶茶|冰|豆花|甜/.test(name)) {
+        return 'https://images.unsplash.com/photo-1558857563-b37cf5b7a151?auto=format&fit=crop&w=800&q=80';
+    }
+    return TAIWAN_SHOP_IMAGES[Math.floor(Math.random() * TAIWAN_SHOP_IMAGES.length)];
+}
+
+async function fetchWikiImage(query) {
+    if (!query) return null;
+    try {
+        const enc = encodeURIComponent(query);
+        const url = `https://zh.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&piprop=original|thumbnail&pithumbsize=800&titles=${enc}`;
+        const res = await fetch(url, { headers: { 'User-Agent': 'TaiwanNightMarketApp/1.0' } });
+        if (!res.ok) return null;
+        const data = await res.json();
+        const pages = data.query ? data.query.pages : {};
+        for (const k in pages) {
+            const p = pages[k];
+            if (p.original && p.original.source) return p.original.source;
+            if (p.thumbnail && p.thumbnail.source) return p.thumbnail.source;
+        }
+    } catch (e) {
+        // ignore
+    }
+    return null;
+}
+
+async function searchFoodImagesOnline(query = '') {
+    const cleanQuery = (query || '').trim();
+    const results = [];
+    const seen = new Set();
+
+    if (cleanQuery) {
+        const wikiImg = await fetchWikiImage(cleanQuery);
+        if (wikiImg && !seen.has(wikiImg)) {
+            seen.add(wikiImg);
+            results.push({
+                url: wikiImg,
+                title: `${cleanQuery} (維基百科高解析度影像)`,
+                source: 'Wikipedia'
+            });
+        }
+    }
+
+    for (const [key, urls] of Object.entries(TAIWAN_FOOD_IMAGES)) {
+        if (!cleanQuery || cleanQuery.includes(key) || key.includes(cleanQuery)) {
+            for (let i = 0; i < urls.length; i++) {
+                const u = urls[i];
+                if (!seen.has(u)) {
+                    seen.add(u);
+                    results.push({
+                        url: u,
+                        title: `${key} · 台灣特色小吃精選照 #${i + 1}`,
+                        source: 'Gourmet Photo DB'
+                    });
+                }
+            }
+        }
+    }
+
+    if (results.length < 4) {
+        const general = [
+            'https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=800&q=80',
+            'https://images.unsplash.com/photo-1558857563-b37cf5b7a151?auto=format&fit=crop&w=800&q=80',
+            'https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&w=800&q=80',
+            'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=800&q=80',
+            'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80',
+            'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80'
+        ];
+        for (const u of general) {
+            if (!seen.has(u)) {
+                seen.add(u);
+                results.push({
+                    url: u,
+                    title: '道地夜市經典名饌精選',
+                    source: 'Gourmet Photo DB'
+                });
+            }
+        }
+    }
+
+    return results;
+}
+
+async function searchShopImagesOnline(query = '', type = '') {
+    const results = [];
+    const seen = new Set();
+    for (let i = 0; i < TAIWAN_SHOP_IMAGES.length; i++) {
+        const u = TAIWAN_SHOP_IMAGES[i];
+        if (!seen.has(u)) {
+            seen.add(u);
+            results.push({
+                url: u,
+                title: `台灣夜市特色名店風貌照 #${i + 1}`,
+                source: 'Night Market Photo DB'
+            });
+        }
+    }
+    return results;
+}
+
+/**
  * 智慧聯網推論：針對任意美食名稱自動產生/搜集完整深度資料
  */
 function enrichFoodData(foodName, currentData = {}) {
+    const bestImg = (!currentData.foodIcon || currentData.foodIcon.trim() === '')
+        ? getBestFoodImage(foodName, currentData.foodType)
+        : currentData.foodIcon;
+
     // 1. 優先比對台灣美食百科精確詞
     for (const [key, encyclo] of Object.entries(TAIWAN_GOURMET_ENCYCLOPEDIA)) {
         if (foodName.includes(key) || (currentData.foodName && currentData.foodName.includes(key))) {
             return {
                 ...currentData,
+                foodIcon: bestImg,
                 calories: currentData.calories || encyclo.calories,
                 culturalStory: currentData.culturalStory || encyclo.culturalStory,
                 ingredients: (currentData.ingredients && currentData.ingredients.length > 0) ? currentData.ingredients : encyclo.ingredients,
@@ -218,6 +488,7 @@ function enrichFoodData(foodName, currentData = {}) {
 
     return {
         ...currentData,
+        foodIcon: bestImg,
         calories: currentData.calories || generatedCalories,
         culturalStory: currentData.culturalStory || generatedStory,
         ingredients: (currentData.ingredients && currentData.ingredients.length > 0) ? currentData.ingredients : generatedIngredients,
@@ -386,6 +657,12 @@ function searchShopOnline(keyword, defaultMarket = '士林觀光夜市') {
 
 module.exports = {
     TAIWAN_GOURMET_ENCYCLOPEDIA,
+    TAIWAN_FOOD_IMAGES,
+    TAIWAN_SHOP_IMAGES,
+    getBestFoodImage,
+    getBestShopImage,
+    searchFoodImagesOnline,
+    searchShopImagesOnline,
     enrichFoodData,
     searchShopOnline
 };

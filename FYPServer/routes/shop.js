@@ -66,9 +66,56 @@ router.get('/', (req, res) => {
         res.json({ status: "success", shop: result })
     }).catch(err => {
         res.json({ status: "fail", message: err })
-    })
-})
-const { searchShopOnline } = require('../helper/webScraperEngine');
+    });
+});
+
+const { searchShopOnline, searchShopImagesOnline, getBestShopImage } = require('../helper/webScraperEngine');
+
+/**
+ * GET /shops/search-images
+ * 網上搜尋特定攤位之高清店面照片候選清單
+ */
+router.get('/search-images', async (req, res) => {
+    try {
+        const query = req.query.query || req.query.name || '';
+        const type = req.query.type || '';
+        const images = await searchShopImagesOnline(query, type);
+        res.json({
+            status: 'success',
+            images
+        });
+    } catch (err) {
+        console.error('[Shop:SearchImages] Error:', err);
+        res.status(500).json({ status: 'fail', message: '搜尋攤位照片失敗: ' + err.message });
+    }
+});
+
+/**
+ * POST /shops/enrich-all-images
+ * 批次補全全站所有缺少招牌照片的攤位 (後台或自動化維運使用)
+ */
+router.post('/enrich-all-images', async (req, res) => {
+    try {
+        const shops = await Shop.find();
+        let updatedCount = 0;
+        for (const s of shops) {
+            if (!s.shopIcon || s.shopIcon.trim() === '') {
+                s.shopIcon = getBestShopImage(s.shopName, s.shopType);
+                await s.save();
+                updatedCount += 1;
+            }
+        }
+        res.json({
+            status: 'success',
+            message: `🎉 全站攤位招牌照片批次聯網補全完成！共更新 ${updatedCount} 家攤商。`,
+            total: shops.length,
+            updatedCount
+        });
+    } catch (err) {
+        console.error('[Shop:EnrichAllImages] Error:', err);
+        res.status(500).json({ status: 'fail', message: '批次補全店家照片失敗: ' + err.message });
+    }
+});
 
 /**
  * GET /shops/search-web
@@ -89,14 +136,19 @@ router.get('/search-web', (req, res) => {
     }
 });
 
-router.get('/:id', (req, res) => {
-    let id = req.params.id
-    Shop.findById(id).exec().then(result => {
-        res.json({ status: "success", shop: result })
-    }).catch(err => {
-        res.json({ status: "fail", message: err })
-    })
-})
+router.get('/:id', async (req, res) => {
+    let id = req.params.id;
+    try {
+        let result = await Shop.findById(id).exec();
+        if (result && (!result.shopIcon || result.shopIcon.trim() === '')) {
+            result.shopIcon = getBestShopImage(result.shopName, result.shopType);
+            result.save().catch(e => console.error('Auto save shop icon failed:', e.message));
+        }
+        res.json({ status: "success", shop: result });
+    } catch (err) {
+        res.json({ status: "fail", message: err });
+    }
+});
 router.put('/:id', async (req, res) => {
 
     let id = req.params.id

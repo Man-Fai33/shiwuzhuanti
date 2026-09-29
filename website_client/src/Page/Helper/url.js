@@ -18,7 +18,9 @@ export const Url = {
     VerifyCode: (HOST + "/users/verify-code"),
     ShopSearchWeb: (HOST + "/shops/search-web"),
     FoodSearchWeb: (HOST + "/foods/search-web"),
-    FoodEnrich: (HOST + "/foods/enrich")
+    FoodEnrich: (HOST + "/foods/enrich"),
+    ShopSearchImages: (HOST + "/shops/search-images"),
+    FoodSearchImages: (HOST + "/foods/search-images")
 };
 
 const urlExport = {

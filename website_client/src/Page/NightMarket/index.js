@@ -60,22 +60,30 @@ export default function NightMarket() {
         localStorage.removeItem('search');
     };
 
-    // 篩選邏輯：同時考量城市地區與關鍵字
+    // 篩選邏輯：支援全台灣四大分區與關鍵字檢索
     const filteredMarkets = markets.filter((item) => {
         let matchesRegion = true;
+        const r = (item.region || '').toLowerCase();
         const loc = (item.marketLocation || '').toLowerCase();
         const name = (item.name || '').toLowerCase();
+        const city = (item.city || '').toLowerCase();
 
-        if (selectedRegion === 'taipei') {
-            matchesRegion = loc === 'tp' || loc === 'taipei' || name.includes('士林') || name.includes('饒河') || name.includes('寧夏') || name.includes('台北');
+        if (selectedRegion === 'north') {
+            matchesRegion = r === 'north' || loc.includes('台北') || loc.includes('新北') || loc.includes('基隆') || loc.includes('桃園') || loc.includes('新竹') || loc === 'tp';
+        } else if (selectedRegion === 'central') {
+            matchesRegion = r === 'central' || loc.includes('台中') || loc.includes('彰化') || loc.includes('南投') || loc.includes('雲林') || loc === 'tz';
+        } else if (selectedRegion === 'south') {
+            matchesRegion = r === 'south' || loc.includes('台南') || loc.includes('高雄') || loc.includes('嘉義') || loc.includes('屏東') || loc.includes('墾丁') || loc === 'tn';
+        } else if (selectedRegion === 'east') {
+            matchesRegion = r === 'east' || loc.includes('宜蘭') || loc.includes('花蓮') || loc.includes('台東') || loc.includes('澎湖') || loc.includes('羅東');
+        } else if (selectedRegion === 'taipei') {
+            matchesRegion = loc.includes('台北') || loc.includes('新北') || loc.includes('基隆') || loc === 'tp';
         } else if (selectedRegion === 'taichung') {
-            matchesRegion = loc === 'tz' || loc === 'taichung' || name.includes('逢甲') || name.includes('台中');
+            matchesRegion = loc.includes('台中') || loc.includes('彰化') || loc === 'tz';
         } else if (selectedRegion === 'tainan') {
-            matchesRegion = loc === 'tn' || loc === 'tainan' || name.includes('花園') || name.includes('台南');
+            matchesRegion = loc.includes('台南') || loc === 'tn';
         } else if (selectedRegion === 'kaohsiung') {
-            matchesRegion = loc === 'kaohsiung' || name.includes('六合') || name.includes('高雄');
-        } else if (selectedRegion === 'yilan') {
-            matchesRegion = loc === 'yilan' || name.includes('羅東') || name.includes('宜蘭');
+            matchesRegion = loc.includes('高雄') || loc.includes('屏東');
         }
 
         let matchesSearch = true;
@@ -83,30 +91,44 @@ export default function NightMarket() {
             const kw = searchText.trim().toLowerCase();
             const nameen = (item.nameen || '').toLowerCase();
             const brief = (item.brief || '').toLowerCase();
-            matchesSearch = name.includes(kw) || nameen.includes(kw) || brief.includes(kw);
+            matchesSearch = name.includes(kw) || nameen.includes(kw) || brief.includes(kw) || loc.includes(kw) || city.includes(kw);
         }
 
         return matchesRegion && matchesSearch;
     });
 
     const regions = [
-        { id: 'all', label: lang === 'en' ? 'All Taiwan' : '全部夜市' },
-        { id: 'taipei', label: lang === 'en' ? 'Taipei' : '台北' },
-        { id: 'taichung', label: lang === 'en' ? 'Taichung' : '台中' },
-        { id: 'tainan', label: lang === 'en' ? 'Tainan' : '台南' },
-        { id: 'kaohsiung', label: lang === 'en' ? 'Kaohsiung' : '高雄' },
-        { id: 'yilan', label: lang === 'en' ? 'Yilan' : '宜蘭' },
+        { id: 'all', label: lang === 'en' ? `All Taiwan (${markets.length})` : `全台灣全部 (${markets.length})` },
+        { id: 'north', label: lang === 'en' ? 'Northern Taiwan' : '北部地區 (雙北/基隆/桃竹)' },
+        { id: 'central', label: lang === 'en' ? 'Central Taiwan' : '中部地區 (台中/彰化/南投/雲林)' },
+        { id: 'south', label: lang === 'en' ? 'Southern Taiwan' : '南部地區 (嘉義/台南/高雄/屏東)' },
+        { id: 'east', label: lang === 'en' ? 'Eastern & Islands' : '東部與離島 (宜蘭/花東/澎湖)' },
     ];
 
     const getRegionBadge = (item) => {
-        const loc = (item.marketLocation || '').toLowerCase();
+        if (item.city) {
+            return lang === 'en' ? (item.cityEn || item.city) : item.city;
+        }
         const name = item.name || '';
-        if (loc === 'tp' || loc === 'taipei' || name.includes('士林') || name.includes('饒河') || name.includes('寧夏')) return lang === 'en' ? 'Taipei' : '台北';
-        if (loc === 'tz' || loc === 'taichung' || name.includes('逢甲')) return lang === 'en' ? 'Taichung' : '台中';
-        if (name.includes('羅東')) return lang === 'en' ? 'Yilan' : '宜蘭';
-        if (name.includes('六合')) return lang === 'en' ? 'Kaohsiung' : '高雄';
-        if (loc === 'tn' || loc === 'tainan' || name.includes('花園')) return lang === 'en' ? 'Tainan' : '台南';
-        return lang === 'en' ? 'Taiwan' : '台灣';
+        const loc = item.marketLocation || '';
+        if (name.includes('基隆') || loc.includes('基隆')) return lang === 'en' ? 'Keelung' : '基隆市';
+        if (name.includes('台北') || loc.includes('台北') || loc === 'tp') return lang === 'en' ? 'Taipei' : '台北市';
+        if (name.includes('新北') || loc.includes('新北') || name.includes('樂華') || name.includes('三和')) return lang === 'en' ? 'New Taipei' : '新北市';
+        if (name.includes('中原') || loc.includes('桃園')) return lang === 'en' ? 'Taoyuan' : '桃園市';
+        if (name.includes('城隍廟') || loc.includes('新竹')) return lang === 'en' ? 'Hsinchu' : '新竹市';
+        if (name.includes('逢甲') || name.includes('一中') || name.includes('旱溪') || loc.includes('台中') || loc === 'tz') return lang === 'en' ? 'Taichung' : '台中市';
+        if (name.includes('精誠') || loc.includes('彰化')) return lang === 'en' ? 'Changhua' : '彰化縣';
+        if (name.includes('草鞋墩') || loc.includes('南投')) return lang === 'en' ? 'Nantou' : '南投縣';
+        if (name.includes('斗六') || loc.includes('雲林')) return lang === 'en' ? 'Yunlin' : '雲林縣';
+        if (name.includes('文化路') || loc.includes('嘉義')) return lang === 'en' ? 'Chiayi' : '嘉義市';
+        if (name.includes('花園') || name.includes('大東') || name.includes('武聖') || loc.includes('台南') || loc === 'tn') return lang === 'en' ? 'Tainan' : '台南市';
+        if (name.includes('六合') || name.includes('瑞豐') || loc.includes('高雄')) return lang === 'en' ? 'Kaohsiung' : '高雄市';
+        if (name.includes('墾丁') || loc.includes('屏東')) return lang === 'en' ? 'Pingtung' : '屏東縣';
+        if (name.includes('羅東') || name.includes('東門') || loc.includes('宜蘭')) return lang === 'en' ? 'Yilan' : '宜蘭縣';
+        if (name.includes('東大門') || loc.includes('花蓮')) return lang === 'en' ? 'Hualien' : '花蓮縣';
+        if (name.includes('台東') || loc.includes('台東')) return lang === 'en' ? 'Taitung' : '台東縣';
+        if (name.includes('馬公') || name.includes('澎湖') || loc.includes('澎湖')) return lang === 'en' ? 'Penghu' : '澎湖縣';
+        return lang === 'en' ? 'Taiwan' : '全台灣';
     };
 
     return (
@@ -338,6 +360,10 @@ export default function NightMarket() {
                                         height="220"
                                         image={item.marketIcon || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600'}
                                         alt={item.name}
+                                        onError={(e) => {
+                                            e.target.onerror = null;
+                                            e.target.src = 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600';
+                                        }}
                                         sx={{
                                             transition: 'transform 0.4s ease',
                                             '&:hover': { transform: 'scale(1.04)' },
@@ -414,10 +440,8 @@ export default function NightMarket() {
                                     {/* 營運時間提醒 */}
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8, color: 'var(--tw-text-muted, #78716C)', mb: 1.5, fontSize: '0.8rem', minWidth: 0 }}>
                                         <CalendarMonthIcon fontSize="small" sx={{ flexShrink: 0, color: 'var(--tw-amber, #D97706)' }} />
-                                        <Typography variant="caption" sx={{ fontWeight: 600, color: (item.name && item.name.includes('花園')) ? 'var(--tw-terracotta, #B91C1C)' : 'var(--tw-text-muted, #78716C)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                            {(item.name && item.name.includes('花園'))
-                                                ? (lang === 'en' ? 'Thu, Sat, Sun Only (17:00-00:00)' : '週四、六、日限定營業 (17:00-00:00)')
-                                                : (lang === 'en' ? 'Daily (17:30 - 00:00)' : '每日營業 (17:30 - 00:00)')}
+                                        <Typography variant="caption" sx={{ fontWeight: 600, color: (item.openDays && !item.openDays.includes('每日')) ? 'var(--tw-terracotta, #B91C1C)' : 'var(--tw-text-muted, #78716C)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                            {item.openDays || (lang === 'en' ? 'Daily (17:30 - 00:00)' : '每日營業 (17:30 - 00:00)')}
                                         </Typography>
                                     </Box>
 
