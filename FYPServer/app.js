@@ -15,7 +15,8 @@ var mongoose = require('mongoose');
 
 //setting
 var morgan = require('morgan');
-require('dotenv').config();
+require('dotenv').config({ path: path.resolve(__dirname, './.env') });
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 var config = require('./config');
 
 

@@ -20,13 +20,13 @@ services:
       dockerfile: Dockerfile
     container_name: nightmarket-server
     restart: unless-stopped
-    depends_on:
-      - mongodb
+    env_file:
+      - .env
     environment:
       - PORT=7788
       - NODE_ENV=production
       - IS_DOCKER=true
-      - MONGODB_URI=mongodb://mongodb:27017/fyp
+      - MONGODB_URI=${MONGODB_URI:-mongodb://mongodb:27017/fyp}
       - SYNC_CRON_SCHEDULE=0 4 * * *
     ports:
       - "7788:7788"
