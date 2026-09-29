@@ -106,6 +106,84 @@ router.post('/enrich-all', async (req, res) => {
 });
 
 /**
+ * POST /foods/seed-all
+ * 全量導入台灣夜市美食大百科
+ */
+router.post('/seed-all', async (req, res) => {
+    try {
+        const { GRAND_TAIWAN_FOODS } = require('../helper/taiwanGrandFoodData');
+        const { ALL_NIGHT_MARKET_SHOPS } = require('../helper/taiwanNightMarketShopsData');
+
+        let createdCount = 0;
+        let updatedCount = 0;
+
+        for (const item of GRAND_TAIWAN_FOODS) {
+            const enriched = enrichFoodData(item);
+            let existing = await Food.findOne({ foodName: item.foodName });
+
+            if (existing) {
+                existing.foodNameEN = enriched.foodNameEN || existing.foodNameEN;
+                existing.foodPrice = enriched.foodPrice || existing.foodPrice;
+                existing.foodType = Array.from(new Set([...(existing.foodType || []), ...(enriched.foodType || [])]));
+                existing.foodInfo = enriched.foodInfo || existing.foodInfo;
+                existing.foodInfoEN = enriched.foodInfoEN || existing.foodInfoEN;
+                existing.foodIcon = enriched.foodIcon || existing.foodIcon;
+                existing.calories = enriched.calories || existing.calories;
+                existing.culturalStory = enriched.culturalStory || existing.culturalStory;
+                existing.texture = enriched.texture || existing.texture;
+                existing.ingredients = enriched.ingredients || existing.ingredients;
+                existing.allergens = enriched.allergens || existing.allergens;
+                existing.cookingMethod = enriched.cookingMethod || existing.cookingMethod;
+                existing.bestPairing = enriched.bestPairing || existing.bestPairing;
+                existing.priceRange = enriched.priceRange || existing.priceRange;
+                existing.tags = Array.from(new Set([...(existing.tags || []), ...(enriched.tags || [])]));
+                existing.nutrition = enriched.nutrition || existing.nutrition;
+                existing.onlineEnriched = true;
+                existing.isSale = true;
+                await existing.save();
+                updatedCount++;
+            } else {
+                const newFood = new Food({
+                    ...enriched,
+                    onlineEnriched: true,
+                    isSale: true
+                });
+                await newFood.save();
+                createdCount++;
+            }
+        }
+
+        for (const s of ALL_NIGHT_MARKET_SHOPS) {
+            if (Array.isArray(s.food)) {
+                for (const sf of s.food) {
+                    let existing = await Food.findOne({ foodName: sf.foodName });
+                    if (!existing) {
+                        const enriched = enrichFoodData(sf);
+                        const newFood = new Food({
+                            ...enriched,
+                            onlineEnriched: true,
+                            isSale: true
+                        });
+                        await newFood.save();
+                        createdCount++;
+                    }
+                }
+            }
+        }
+
+        const totalFoods = await Food.countDocuments();
+        res.json({
+            status: 'success',
+            message: `🎉 全台灣夜市美食大百科導入完畢！新增 ${createdCount} 道，更新 ${updatedCount} 道，全站目前共計 ${totalFoods} 種美食。`,
+            stats: { createdCount, updatedCount, totalFoods }
+        });
+    } catch (err) {
+        console.error('[Food:SeedAll] Error:', err);
+        res.status(500).json({ status: 'fail', message: '全量導入美食失敗: ' + err.message });
+    }
+});
+
+/**
  * GET /foods
  * 取得全部美食清單
  */

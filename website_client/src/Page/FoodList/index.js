@@ -53,11 +53,15 @@ export default function FoodList() {
 
     const categories = [
         { id: 'all', label: lang === 'en' ? 'All Delicacies' : '全部美食' },
+        { id: '傳統小吃', label: lang === 'en' ? 'Traditional' : '經典小吃' },
         { id: '炸物', label: lang === 'en' ? 'Crispy Fried' : '酥脆炸物' },
         { id: '烤物', label: lang === 'en' ? 'Charcoal Grilled' : '炭烤串燒' },
+        { id: '麵食', label: lang === 'en' ? 'Noodles & Buns' : '麵食包點' },
+        { id: '海鮮鍋物', label: lang === 'en' ? 'Seafood & Stews' : '海鮮羹湯' },
+        { id: '甜點', label: lang === 'en' ? 'Desserts & Ice' : '甜品冰品' },
         { id: '飲品', label: lang === 'en' ? 'Drinks & Tea' : '清涼茶飲' },
-        { id: '素食', label: lang === 'en' ? 'Vegetarian' : '蔬食奶素' },
         { id: '人氣必吃', label: lang === 'en' ? 'Chef Picks' : '老饕推薦' },
+        { id: '素食', label: lang === 'en' ? 'Vegetarian' : '蔬食友善' },
     ];
 
     const getDietaryTag = (item) => {
@@ -82,7 +86,15 @@ export default function FoodList() {
         if (selectedCategory !== 'all') {
             if (selectedCategory === '素食') {
                 const name = item.foodName || '';
-                matchesCategory = name.includes('地瓜球') || name.includes('豆花') || name.includes('果汁') || name.includes('奶茶') || name.includes('黑糖');
+                matchesCategory = name.includes('地瓜球') || name.includes('豆花') || name.includes('果汁') || name.includes('奶茶') || name.includes('黑糖') || name.includes('草莓') || name.includes('冰');
+            } else if (selectedCategory === '麵食') {
+                const types = item.foodType || [];
+                matchesCategory = types.some((t) => t.includes('麵食') || t.includes('包')) ||
+                    (item.foodName && /麵|米粉|板條|包|餃|三明治|潤餅/i.test(item.foodName));
+            } else if (selectedCategory === '甜點') {
+                const types = item.foodType || [];
+                matchesCategory = types.some((t) => t.includes('甜') || t.includes('冰')) ||
+                    (item.foodName && /冰|圓|糖|豆花|餅|燒|仙草/i.test(item.foodName));
             } else {
                 const types = item.foodType || [];
                 matchesCategory = types.some((t) => t.includes(selectedCategory)) ||
