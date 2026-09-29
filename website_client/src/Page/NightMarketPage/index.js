@@ -782,8 +782,13 @@ export default function NightMarketPage() {
 
     const marketShops = shops.filter(s => {
         if (!market.name) return true;
-        const baseName = market.name.replace('觀光夜市', '').replace('夜市', '');
-        return s.shopYeShi && (s.shopYeShi.includes(baseName) || market.name.includes(s.shopYeShi.replace('觀光夜市', '').replace('夜市', '')));
+        if (!s.shopYeShi) return false;
+        if (s.shopYeShi === market.name) return true;
+        const cleanMarket = market.name.replace(/[()（）]/g, ' ').replace(/觀光夜市|夜市|商圈/g, ' ');
+        const cleanShop = s.shopYeShi.replace(/[()（）]/g, ' ').replace(/觀光夜市|夜市|商圈/g, ' ');
+        const marketTokens = cleanMarket.split(/\s+/).filter(t => t.length >= 2);
+        const shopTokens = cleanShop.split(/\s+/).filter(t => t.length >= 2);
+        return marketTokens.some(t => s.shopYeShi.includes(t)) || shopTokens.some(t => market.name.includes(t));
     });
 
     const marketFoodNames = new Set(marketShops.flatMap(s => (s.food || []).map(f => f.foodName || f.name)));

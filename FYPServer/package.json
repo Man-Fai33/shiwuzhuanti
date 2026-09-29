@@ -6,6 +6,7 @@
     "start": "node ./bin/www",
     "devstart": "nodemon ./bin/www",
     "test": "node test/ci-test.js",
+    "db:seed-shops": "node scripts/seedAllNightMarketShops.js",
     "db:sync-to-remote": "node scripts/syncMongo.js to-remote",
     "db:sync-to-local": "node scripts/syncMongo.js to-local"
   },

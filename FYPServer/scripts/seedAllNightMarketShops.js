@@ -1,131 +1,35 @@
-const mongoose = require('mongoose')
-const express = require('express')
-const router = express.Router()
-const Food = require('../models/food')
-const Shop = require('../models/shop')
-router.post('/', async (req, res) => {
-    let requesterid = req.body.requesterid
-    let target = req.body.shop
-    // check if the email is duplicated
-    let id = target.shopManager
-    let error = false
-    let resp = {}
-    let foods = target.food
-    let shop = null
-
-    try {
-        shop = await Shop.findOne({ shopManager: id }).exec()
-        if (shop != null) {
-            resp.message = "Shop manager already registered"
-            error = true
-        }
-    }
-    catch (err) {
-        // if the shop cannot be found, do nothing
-    }
-
-    if (error) {
-        resp.status = "fail"
-        res.json(resp)
-        return
-    }
-
-    if (Array.isArray(foods)) {
-        for (const element of foods) {
-            try {
-                await new Food(element).save();
-            } catch (foodErr) {
-                console.error('Error saving nested food:', foodErr.message);
-            }
-        }
-    }
-
-    shop = new Shop(target)
-    try {
-        resp.shop = await shop.save()
-    }
-    catch (err) {
-        error = true
-        resp.message = "Shop cannot be added"
-        resp.err = err
-        console.log(err);
-    }
-
-    if (error) {
-        resp.status = "fail"
-        res.json(resp)
-        return
-    }
-
-    resp.status = "success"
-    res.json(resp)
-})
-router.get('/', (req, res) => {
-
-    Shop.find().exec().then(result => {
-        res.json({ status: "success", shop: result })
-    }).catch(err => {
-        res.json({ status: "fail", message: err })
-    });
-});
-
-const { searchShopOnline, searchShopImagesOnline, getBestShopImage } = require('../helper/webScraperEngine');
-
 /**
- * GET /shops/search-images
- * 網上搜尋特定攤位之高清店面照片候選清單
+ * 全台灣 29 大夜市商店與特色美食全量導入腳本
+ * 用法: node scripts/seedAllNightMarketShops.js
  */
-router.get('/search-images', async (req, res) => {
-    try {
-        const query = req.query.query || req.query.name || '';
-        const type = req.query.type || '';
-        const images = await searchShopImagesOnline(query, type);
-        res.json({
-            status: 'success',
-            images
-        });
-    } catch (err) {
-        console.error('[Shop:SearchImages] Error:', err);
-        res.status(500).json({ status: 'fail', message: '搜尋攤位照片失敗: ' + err.message });
-    }
-});
 
-/**
- * POST /shops/enrich-all-images
- * 批次補全全站所有缺少招牌照片的攤位 (後台或自動化維運使用)
- */
-router.post('/enrich-all-images', async (req, res) => {
-    try {
-        const shops = await Shop.find();
-        let updatedCount = 0;
-        for (const s of shops) {
-            if (!s.shopIcon || s.shopIcon.trim() === '') {
-                s.shopIcon = getBestShopImage(s.shopName, s.shopType);
-                await s.save();
-                updatedCount += 1;
-            }
-        }
-        res.json({
-            status: 'success',
-            message: `🎉 全站攤位招牌照片批次聯網補全完成！共更新 ${updatedCount} 家攤商。`,
-            total: shops.length,
-            updatedCount
-        });
-    } catch (err) {
-        console.error('[Shop:EnrichAllImages] Error:', err);
-        res.status(500).json({ status: 'fail', message: '批次補全店家照片失敗: ' + err.message });
-    }
-});
+const path = require('path');
+const mongoose = require('mongoose');
 
-/**
- * POST /shops/seed-all
- * 全量導入全台 29 大夜市名攤與美食資料
- */
-router.post('/seed-all', async (req, res) => {
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
+
+const { ALL_NIGHT_MARKET_SHOPS } = require('../helper/taiwanNightMarketShopsData');
+const { enrichFoodData, getBestFoodImage, getBestShopImage } = require('../helper/webScraperEngine');
+
+const Shop = require('../models/shop');
+const Food = require('../models/food');
+const Market = require('../models/market');
+
+const TARGET_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/fyp';
+const DEFAULT_MANAGER_ID = '6ab82ad42c46eb89a14991ae'; // 系統 Admin 預設代管
+
+async function seedAllShopsAndFoods() {
+    console.log('========================================================');
+    console.log('🍜 全台灣 29 大夜市商店與美食全量導入引擎');
+    console.log('========================================================');
+    console.log(`📌 目標資料庫: ${TARGET_URI.replace(/\/\/.*@/, '//***:***@')}`);
+    console.log(`📦 待處理商店總數: ${ALL_NIGHT_MARKET_SHOPS.length} 間`);
+    console.log('========================================================\n');
+
     try {
-        const { ALL_NIGHT_MARKET_SHOPS } = require('../helper/taiwanNightMarketShopsData');
-        const { enrichFoodData, getBestFoodImage, getBestShopImage } = require('../helper/webScraperEngine');
-        const DEFAULT_MANAGER_ID = '6ab82ad42c46eb89a14991ae';
+        await mongoose.connect(TARGET_URI);
+        console.log('✅ 成功連線至 MongoDB 資料庫\n');
 
         let createdShops = 0;
         let updatedShops = 0;
@@ -133,10 +37,15 @@ router.post('/seed-all', async (req, res) => {
         let updatedFoods = 0;
 
         for (const shopData of ALL_NIGHT_MARKET_SHOPS) {
+            console.log(`🏪 處理夜市 [${shopData.shopYeShi}] ➔ 店家: ${shopData.shopName}`);
+
+            // 1. 處理該店家所販售的美食清單
             const processedFoods = [];
             if (Array.isArray(shopData.food)) {
                 for (const fItem of shopData.food) {
                     let existingFood = await Food.findOne({ foodName: fItem.foodName });
+                    
+                    // 豐富化美食大數據維度
                     const enriched = enrichFoodData({
                         foodName: fItem.foodName,
                         foodPrice: fItem.foodPrice,
@@ -148,6 +57,7 @@ router.post('/seed-all', async (req, res) => {
                     });
 
                     if (existingFood) {
+                        // 更新既有美食
                         existingFood.foodPrice = enriched.foodPrice;
                         existingFood.foodIcon = enriched.foodIcon;
                         existingFood.foodInfo = enriched.foodInfo;
@@ -174,6 +84,7 @@ router.post('/seed-all', async (req, res) => {
                             rating: existingFood.rating || 4.8
                         });
                     } else {
+                        // 新建美食
                         const newFood = new Food({
                             ...enriched,
                             onlineEnriched: true,
@@ -192,6 +103,7 @@ router.post('/seed-all', async (req, res) => {
                 }
             }
 
+            // 2. 尋找或新建該商店
             let existingShop = await Shop.findOne({
                 shopName: shopData.shopName,
                 shopYeShi: shopData.shopYeShi
@@ -217,6 +129,7 @@ router.post('/seed-all', async (req, res) => {
                 existingShop.food = processedFoods;
                 await existingShop.save();
                 updatedShops++;
+                console.log(`   🔄 已更新店家資料與所屬美食 (${processedFoods.length} 道美食)`);
             } else {
                 const newShop = new Shop({
                     shopName: shopData.shopName,
@@ -241,72 +154,23 @@ router.post('/seed-all', async (req, res) => {
                 });
                 await newShop.save();
                 createdShops++;
+                console.log(`   ✨ 已新增名攤與關聯美食 (${processedFoods.length} 道美食)`);
             }
         }
 
-        res.json({
-            status: 'success',
-            message: `🎉 全台灣 29 大夜市商店與美食全量導入完成！新增 ${createdShops} 間店家，更新 ${updatedShops} 間店家；新增 ${createdFoods} 項美食，更新 ${updatedFoods} 項美食。`,
-            stats: { createdShops, updatedShops, createdFoods, updatedFoods, totalTargetShops: ALL_NIGHT_MARKET_SHOPS.length }
-        });
+        console.log('\n========================================================');
+        console.log('🎉 全台 29 夜市名店與美食資料導入完畢！');
+        console.log('========================================================');
+        console.log(`🏪 商店統計: 新增 ${createdShops} 間，更新 ${updatedShops} 間，總計處理 ${ALL_NIGHT_MARKET_SHOPS.length} 間`);
+        console.log(`🍲 美食統計: 新增 ${createdFoods} 項，更新 ${updatedFoods} 項`);
+        console.log('========================================================\n');
+
     } catch (err) {
-        console.error('[Shop:SeedAll] Error:', err);
-        res.status(500).json({ status: 'fail', message: '全量導入商店與美食失敗: ' + err.message });
+        console.error('❌ 導入失敗:', err);
+    } finally {
+        await mongoose.disconnect();
+        process.exit(0);
     }
-});
+}
 
-/**
- * GET /shops/search-web
- * 網上智能檢索店家資料（支援店家註冊時一鍵從網路撈取資料自動填表）
- */
-router.get('/search-web', (req, res) => {
-    try {
-        const query = req.query.query || req.query.name || '';
-        const market = req.query.market || '士林觀光夜市';
-        const data = searchShopOnline(query, market);
-        res.json({
-            status: 'success',
-            data: data
-        });
-    } catch (err) {
-        console.error('[Shop:SearchWeb] Error:', err);
-        res.status(500).json({ status: 'fail', message: '聯網檢索失敗: ' + err.message });
-    }
-});
-
-router.get('/:id', async (req, res) => {
-    let id = req.params.id;
-    try {
-        let result = await Shop.findById(id).exec();
-        if (result && (!result.shopIcon || result.shopIcon.trim() === '')) {
-            result.shopIcon = getBestShopImage(result.shopName, result.shopType);
-            result.save().catch(e => console.error('Auto save shop icon failed:', e.message));
-        }
-        res.json({ status: "success", shop: result });
-    } catch (err) {
-        res.json({ status: "fail", message: err });
-    }
-});
-router.put('/:id', async (req, res) => {
-
-    let id = req.params.id
-
-    let target = req.body.shop
-
-    Shop.findByIdAndUpdate(target._id || id, target, { new: true }).exec().then(updatedShop => {
-        res.json({ status: "success", shop: updatedShop })
-    }).catch(err => {
-        res.json({ status: "fail", message: err })
-    })
-})
-
-router.delete('/:id', (req, res) => {
-    let id = req.params.id;
-    Shop.findByIdAndDelete(id).exec().then(result => {
-        res.json({ status: "success", shop: result });
-    }).catch(err => {
-        res.json({ status: "fail", message: err });
-    });
-});
-
-module.exports = router;
+seedAllShopsAndFoods();

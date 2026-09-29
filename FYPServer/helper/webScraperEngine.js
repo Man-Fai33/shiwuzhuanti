@@ -304,7 +304,11 @@ const TAIWAN_SHOP_IMAGES = [
 ];
 
 function getBestFoodImage(foodName = '', foodType = []) {
-    const name = (foodName || '').toLowerCase();
+    if (typeof foodName === 'object' && foodName !== null) {
+        foodType = foodName.foodType || foodType;
+        foodName = foodName.foodName || '';
+    }
+    const name = String(foodName || '').toLowerCase();
     for (const [key, urls] of Object.entries(TAIWAN_FOOD_IMAGES)) {
         if (name.includes(key)) {
             return urls[0];
@@ -431,29 +435,39 @@ async function searchShopImagesOnline(query = '', type = '') {
 /**
  * 智慧聯網推論：針對任意美食名稱自動產生/搜集完整深度資料
  */
-function enrichFoodData(foodName, currentData = {}) {
-    const bestImg = (!currentData.foodIcon || currentData.foodIcon.trim() === '')
-        ? getBestFoodImage(foodName, currentData.foodType)
-        : currentData.foodIcon;
+function enrichFoodData(foodNameOrData, currentData = {}) {
+    let foodName = '';
+    let data = {};
+    if (typeof foodNameOrData === 'object' && foodNameOrData !== null) {
+        data = { ...foodNameOrData };
+        foodName = String(data.foodName || '');
+    } else {
+        foodName = String(foodNameOrData || '');
+        data = { ...currentData };
+    }
+
+    const bestImg = (!data.foodIcon || data.foodIcon.trim() === '')
+        ? getBestFoodImage(foodName, data.foodType)
+        : data.foodIcon;
 
     // 1. 優先比對台灣美食百科精確詞
     for (const [key, encyclo] of Object.entries(TAIWAN_GOURMET_ENCYCLOPEDIA)) {
-        if (foodName.includes(key) || (currentData.foodName && currentData.foodName.includes(key))) {
+        if (foodName.includes(key) || (data.foodName && data.foodName.includes(key))) {
             return {
-                ...currentData,
+                ...data,
                 foodIcon: bestImg,
-                calories: currentData.calories || encyclo.calories,
-                culturalStory: currentData.culturalStory || encyclo.culturalStory,
-                ingredients: (currentData.ingredients && currentData.ingredients.length > 0) ? currentData.ingredients : encyclo.ingredients,
-                texture: currentData.texture || encyclo.texture,
-                allergens: (currentData.allergens && currentData.allergens.length > 0) ? currentData.allergens : encyclo.allergens,
-                cookingMethod: currentData.cookingMethod || encyclo.cookingMethod,
-                bestPairing: currentData.bestPairing || encyclo.bestPairing,
-                priceRange: currentData.priceRange || encyclo.priceRange,
-                spiceLevel: currentData.spiceLevel !== undefined ? currentData.spiceLevel : encyclo.spiceLevel,
-                nutrition: currentData.nutrition || encyclo.nutrition,
-                tags: (currentData.tags && currentData.tags.length > 0) ? currentData.tags : encyclo.tags,
-                foodInfoEN: currentData.foodInfoEN || encyclo.nameen,
+                calories: data.calories || encyclo.calories,
+                culturalStory: data.culturalStory || encyclo.culturalStory,
+                ingredients: (data.ingredients && data.ingredients.length > 0) ? data.ingredients : encyclo.ingredients,
+                texture: data.texture || encyclo.texture,
+                allergens: (data.allergens && data.allergens.length > 0) ? data.allergens : encyclo.allergens,
+                cookingMethod: data.cookingMethod || encyclo.cookingMethod,
+                bestPairing: data.bestPairing || encyclo.bestPairing,
+                priceRange: data.priceRange || encyclo.priceRange,
+                spiceLevel: data.spiceLevel !== undefined ? data.spiceLevel : encyclo.spiceLevel,
+                nutrition: data.nutrition || encyclo.nutrition,
+                tags: (data.tags && data.tags.length > 0) ? data.tags : encyclo.tags,
+                foodInfoEN: data.foodInfoEN || encyclo.nameen,
                 onlineEnriched: true
             };
         }
@@ -487,24 +501,25 @@ function enrichFoodData(foodName, currentData = {}) {
     if (isSweet) allergens.push('含乳製品或大豆');
 
     return {
-        ...currentData,
+        ...data,
         foodIcon: bestImg,
-        calories: currentData.calories || generatedCalories,
-        culturalStory: currentData.culturalStory || generatedStory,
-        ingredients: (currentData.ingredients && currentData.ingredients.length > 0) ? currentData.ingredients : generatedIngredients,
-        texture: currentData.texture || generatedTexture,
-        allergens: (currentData.allergens && currentData.allergens.length > 0) ? currentData.allergens : allergens,
-        cookingMethod: currentData.cookingMethod || (isFried ? '高溫快速油炸，瀝油甩脂鎖住鮮美' : (isSoup ? '文火慢燉數小時提煉濃郁原汁' : '大火鐵板快煎現做')),
-        bestPairing: currentData.bestPairing || (isSweet ? '推薦搭配熱茶或黑咖啡' : '推薦搭配夜市冷飲冬瓜檸檬或四季春清茶'),
-        priceRange: currentData.priceRange || 'NT$ 50 - 90',
-        spiceLevel: currentData.spiceLevel || (isFried ? 1 : 0),
-        nutrition: currentData.nutrition || {
+        calories: data.calories || generatedCalories,
+        culturalStory: data.culturalStory || generatedStory,
+        ingredients: (data.ingredients && data.ingredients.length > 0) ? data.ingredients : generatedIngredients,
+        texture: data.texture || generatedTexture,
+        allergens: (data.allergens && data.allergens.length > 0) ? data.allergens : allergens,
+        cookingMethod: data.cookingMethod || (isFried ? '高溫快速油炸，瀝油甩脂鎖住鮮美' : (isSoup ? '文火慢燉數小時提煉濃郁原汁' : '大火鐵板快煎現做')),
+        bestPairing: data.bestPairing || (isSweet ? '推薦搭配熱茶或黑咖啡' : '推薦搭配夜市冷飲冬瓜檸檬或四季春清茶'),
+        priceRange: data.priceRange || 'NT$ 50 - 90',
+        spiceLevel: data.spiceLevel || (isFried ? 1 : 0),
+        nutrition: data.nutrition || {
             protein: isFried ? '26g' : '14g',
             fat: isFried ? '22g' : '10g',
             carbs: '38g',
             sodium: '480mg'
         },
-        tags: (currentData.tags && currentData.tags.length > 0) ? currentData.tags : ['夜市人氣推薦', '經典台灣味', '排隊美食', '真材實料'],
+        tags: (data.tags && data.tags.length > 0) ? data.tags : ['夜市人氣推薦', '經典台灣味', '排隊美食', '真材實料'],
+        foodInfoEN: data.foodInfoEN || `Traditional Taiwanese Night Market Delicacy (${foodName})`,
         onlineEnriched: true
     };
 }
