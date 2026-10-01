@@ -3,6 +3,7 @@ const Shop = require('../models/shop');
 const Food = require('../models/food');
 const Market = require('../models/market');
 const User = require('../models/user');
+const { ALL_NIGHT_MARKET_SHOPS } = require('./taiwanNightMarketShopsData');
 
 // 全台各大夜市 Google Maps 真實人氣名店與必吃美食數據庫
 const GOOGLE_MAPS_NIGHT_MARKET_DATA = [
@@ -689,12 +690,40 @@ async function syncAllNightMarketShops(options = {}) {
         // 清理歷史測試產生的冗餘夜市
         await Market.deleteMany({ name: { $regex: /測試/ } });
 
+        // 彙整全台 29 大夜市所有商店數據
+        const marketShopMap = new Map();
+
+        // 1. 載入全台 29 大夜市名店 (taiwanNightMarketShopsData)
+        if (Array.isArray(ALL_NIGHT_MARKET_SHOPS)) {
+            for (const s of ALL_NIGHT_MARKET_SHOPS) {
+                const mName = s.shopYeShi;
+                if (!mName) continue;
+                if (!marketShopMap.has(mName)) {
+                    marketShopMap.set(mName, []);
+                }
+                marketShopMap.get(mName).push(s);
+            }
+        }
+
+        // 2. 補充 Google Maps 傳統人氣名店 (GOOGLE_MAPS_NIGHT_MARKET_DATA)
         for (const item of GOOGLE_MAPS_NIGHT_MARKET_DATA) {
-            const marketName = item.marketName;
+            const mName = item.marketName;
+            if (!marketShopMap.has(mName)) {
+                marketShopMap.set(mName, []);
+            }
+            const existing = marketShopMap.get(mName);
+            for (const s of item.shops) {
+                if (!existing.some(x => x.shopName === s.shopName)) {
+                    existing.push({ ...s, shopYeShi: mName });
+                }
+            }
+        }
+
+        for (const [marketName, shops] of marketShopMap.entries()) {
             syncedMarkets.push(marketName);
 
             // 尋找對應的夜市記錄
-            const baseName = marketName.replace('觀光夜市', '').replace('夜市', '');
+            const baseName = marketName.replace('觀光夜市', '').replace('夜市', '').split(/[\(\（]/)[0].trim();
             let marketDoc = await Market.findOne({
                 $or: [
                     { name: marketName },
@@ -705,7 +734,7 @@ async function syncAllNightMarketShops(options = {}) {
             const shopIdsForMarket = [];
             const foodIdsForMarket = [];
 
-            for (const s of item.shops) {
+            for (const s of shops) {
                 // 1. 同步食品（Food 集合）
                 const nestedFoods = [];
                 if (Array.isArray(s.food)) {

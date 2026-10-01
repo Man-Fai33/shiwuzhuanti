@@ -12,6 +12,9 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Chip from '@mui/material/Chip';
 import Paper from '@mui/material/Paper';
 import IconButton from '@mui/material/IconButton';
+import Pagination from '@mui/material/Pagination';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 
 // Icons
 import SearchIcon from '@mui/icons-material/Search';
@@ -31,6 +34,9 @@ export default function FoodList() {
     const [foodList, setFoodList] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [searchText, setSearchText] = useState('');
+    const [sortBy, setSortBy] = useState('default');
+    const [page, setPage] = useState(1);
+    const pageSize = 16;
 
     useEffect(() => {
         async function loadFoods() {
@@ -114,6 +120,27 @@ export default function FoodList() {
 
         return matchesCategory && matchesSearch;
     });
+
+    const sortedFoods = [...filteredFoods].sort((a, b) => {
+        if (sortBy === 'price_asc') {
+            return (a.foodPrice || 0) - (b.foodPrice || 0);
+        }
+        if (sortBy === 'price_desc') {
+            return (b.foodPrice || 0) - (a.foodPrice || 0);
+        }
+        if (sortBy === 'rating_desc') {
+            return (b.rating || 0) - (a.rating || 0);
+        }
+        if (sortBy === 'calories_asc') {
+            const calA = a.calories ? Number(a.calories) : 9999;
+            const calB = b.calories ? Number(b.calories) : 9999;
+            return calA - calB;
+        }
+        return 0;
+    });
+
+    const totalPages = Math.ceil(sortedFoods.length / pageSize) || 1;
+    const paginatedFoods = sortedFoods.slice((page - 1) * pageSize, page * pageSize);
 
     return (
         <Box sx={{ pb: 6 }}>
@@ -230,7 +257,10 @@ export default function FoodList() {
                                         key={c.id}
                                         label={c.label}
                                         clickable
-                                        onClick={() => setSelectedCategory(c.id)}
+                                        onClick={() => {
+                                            setSelectedCategory(c.id);
+                                            setPage(1);
+                                        }}
                                         sx={{
                                             fontWeight: 700,
                                             fontSize: '0.85rem',
@@ -258,7 +288,10 @@ export default function FoodList() {
                             size="small"
                             placeholder={lang === 'en' ? 'Search food by name or ingredient...' : '搜尋小吃名稱、食材關鍵字...'}
                             value={searchText}
-                            onChange={(e) => setSearchText(e.target.value)}
+                            onChange={(e) => {
+                                setSearchText(e.target.value);
+                                setPage(1);
+                            }}
                             InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">
@@ -269,7 +302,10 @@ export default function FoodList() {
                                     <InputAdornment position="end">
                                         <Button
                                             size="small"
-                                            onClick={() => setSearchText('')}
+                                            onClick={() => {
+                                                setSearchText('');
+                                                setPage(1);
+                                            }}
                                             sx={{ minWidth: 'auto', p: 0.5, color: '#999' }}
                                         >
                                             <ClearIcon fontSize="small" />
@@ -289,10 +325,63 @@ export default function FoodList() {
                 </Grid>
             </Paper>
 
-            {/* 美食卡片網格 */}
-            {filteredFoods.length > 0 ? (
-                <Grid container spacing={3}>
-                    {filteredFoods.map((item) => (
+            {/* 排序方式與搜尋結果計數 */}
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    mb: 3,
+                    flexWrap: 'wrap',
+                    gap: 1.5,
+                }}
+            >
+                <Typography variant="body2" sx={{ fontWeight: 700, color: 'var(--tw-text-muted, #78716C)' }}>
+                    {sortedFoods.length === 0 ? (
+                        lang === 'en' ? '0 delicacies found' : '無符合的美食'
+                    ) : (
+                        lang === 'en'
+                            ? `Showing ${(page - 1) * pageSize + 1}–${Math.min(page * pageSize, sortedFoods.length)} of ${sortedFoods.length} delicacies · Page ${page}/${totalPages}`
+                            : `共 ${sortedFoods.length} 道特色美食 · 顯示第 ${(page - 1) * pageSize + 1}–${Math.min(page * pageSize, sortedFoods.length)} 道 (第 ${page}/${totalPages} 頁)`
+                    )}
+                </Typography>
+
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'var(--tw-text-muted, #78716C)', fontSize: '0.85rem' }}>
+                        {lang === 'en' ? 'Sort by:' : '排序：'}
+                    </Typography>
+                    <Select
+                        size="small"
+                        value={sortBy}
+                        onChange={(e) => {
+                            setSortBy(e.target.value);
+                            setPage(1);
+                        }}
+                        sx={{
+                            borderRadius: '12px',
+                            fontSize: '0.85rem',
+                            fontWeight: 700,
+                            backgroundColor: '#FFF',
+                            height: 36,
+                            border: '1px solid var(--tw-border-subtle, #EAE5DD)',
+                            '& fieldset': { border: 'none' },
+                            '& .MuiSelect-select': { py: 0.8, px: 1.5 }
+                        }}
+                    >
+                        <MenuItem value="default">{lang === 'en' ? 'Default / Featured' : '推薦排序'}</MenuItem>
+                        <MenuItem value="price_asc">{lang === 'en' ? 'Price: Low to High' : '銅板價格 (低至高)'}</MenuItem>
+                        <MenuItem value="price_desc">{lang === 'en' ? 'Price: High to Low' : '價格 (高至低)'}</MenuItem>
+                        <MenuItem value="rating_desc">{lang === 'en' ? 'Highest Rating' : '食客評分最高'}</MenuItem>
+                        <MenuItem value="calories_asc">{lang === 'en' ? 'Lowest Calories' : '低卡輕盈優先'}</MenuItem>
+                    </Select>
+                </Box>
+            </Box>
+
+            {/* 美食卡片網格與分頁導覽 */}
+            {sortedFoods.length > 0 ? (
+                <>
+                    <Grid container spacing={3}>
+                    {paginatedFoods.map((item) => (
                         <Grid item xs={12} sm={6} md={3} key={item._id}>
                             <Card
                                 className="tw-card"
@@ -307,6 +396,7 @@ export default function FoodList() {
                                 <Box sx={{ position: 'relative', overflow: 'hidden' }}>
                                     <CardMedia
                                         component="img"
+                                        loading="lazy"
                                         height="200"
                                         image={item.foodIcon || 'https://images.unsplash.com/photo-1562967914-608f82629710?w=600'}
                                         alt={item.foodName}
@@ -483,6 +573,42 @@ export default function FoodList() {
                         </Grid>
                     ))}
                 </Grid>
+
+                    {totalPages > 1 && (
+                        <Box
+                            sx={{
+                                mt: 5,
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                            }}
+                        >
+                            <Pagination
+                                count={totalPages}
+                                page={page}
+                                onChange={(e, val) => {
+                                    setPage(val);
+                                    window.scrollTo({ top: 380, behavior: 'smooth' });
+                                }}
+                                color="primary"
+                                shape="rounded"
+                                size="large"
+                                showFirstButton
+                                showLastButton
+                                sx={{
+                                    '& .MuiPaginationItem-root': {
+                                        fontWeight: 700,
+                                        borderRadius: '8px',
+                                    },
+                                    '& .Mui-selected': {
+                                        backgroundColor: 'var(--tw-terracotta, #B91C1C) !important',
+                                        color: '#fff',
+                                    }
+                                }}
+                            />
+                        </Box>
+                    )}
+                </>
             ) : (
                 <Paper sx={{ p: 6, textAlign: 'center', borderRadius: '16px', backgroundColor: '#FFF', border: '1px dashed var(--tw-border-subtle, #EAE5DD)' }}>
                     <RestaurantMenuIcon sx={{ fontSize: 56, color: '#D6D3D1', mb: 1.5 }} />

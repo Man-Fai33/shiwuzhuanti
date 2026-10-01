@@ -44,6 +44,9 @@ var app = express();
 
 // app.use(formData.parse())
 
+// Set strictQuery to prepare for Mongoose upgrade and suppress deprecation warning
+mongoose.set('strictQuery', false);
+
 const mongoURI = process.env.MONGODB_URI || 
   (process.env.MONGODB_PASS 
     ? `mongodb+srv://CMF:${process.env.MONGODB_PASS}@cluster0.vsbu5md.mongodb.net/test${process.env.MONGODB_NAME || ''}?retryWrites=true&w=majority`
@@ -188,18 +191,21 @@ mongoose.Promise = global.Promise;
 
 
 
-//error handle 
+// Silently respond to favicon.ico requests if not caught by static middleware
+app.get('/favicon.ico', (req, res) => res.status(204).end());
+
+// error handle 
 app.use((req, res, next) => {
   const error = new Error('Not Found');
   error.status = 404;
-  const remoteAddress = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-  console.log(remoteAddress)
   next(error);
 });
 
-//send back error object as json
+// send back error object as json
 app.use((error, req, res, next) => {
-  console.error(error);
+  if (error.status !== 404) {
+    console.error(`[Error ${error.status || 500}]`, error);
+  }
   res.status(error.status || 500);
   res.json({
     error: {
